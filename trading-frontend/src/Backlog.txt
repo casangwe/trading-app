@@ -1,0 +1,10 @@
+To do:
+
+Home page:
+Adust the padding/height of the EQTTrades chart.
+
+Analysis Page:
+-The Analysis section should be the full width
+-Replace that section with the Monthly Trades. Might have to create a new component
+
+
