@@ -35,6 +35,12 @@ def get_db():
     finally:
         db.close()
 
+# Root
+
+@app.get("/")
+async def read_root():
+    return {"message": "Welcome to the Trading App API!"}
+
 # Users Endpoints
 @app.get("/users/", response_model=List[UserResponse])
 async def read_users(skip: int = 0, limit: int = 100, db: Session = Depends(get_db)):
