@@ -1,4 +1,5 @@
-const API_BASE_URL = "http://localhost:8000";
+// const API_BASE_URL = "http://localhost:8000";
+const API_BASE_URL = "http://54.158.155.144:8000";
 
 // Retrieve userId from localStorage
 const getUserId = () => {
