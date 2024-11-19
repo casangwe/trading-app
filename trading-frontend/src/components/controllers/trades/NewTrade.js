@@ -1,10 +1,7 @@
 import React, { useState } from "react";
-import { useNavigate } from "react-router-dom";
 import { createTrade } from "../api/TradesAPI";
-// import { getTrades } from "./TradeTable";
 
-const NewTrade = ({ onClose }) => {
-  const navigate = useNavigate();
+const NewTrade = ({ onClose, onNewTrade }) => {
   const [formData, setFormData] = useState({
     symbol: "",
     option_type: "CALL",
@@ -39,9 +36,10 @@ const NewTrade = ({ onClose }) => {
       });
 
       console.log("Success:", response);
+      if (onNewTrade) {
+        onNewTrade(response);
+      }
       onClose();
-      navigate("/trades", { replace: true });
-      window.location.reload();
     } catch (error) {
       console.error("Error:", error);
       alert("Error submitting trade");
