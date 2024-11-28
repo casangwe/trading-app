@@ -50,5 +50,5 @@ fi
 
 # Step 7: Start the backend server
 echo "Starting backend server..."
-nohup uvicorn main:app --host 0.0.0.0 --port 8000 --reload > backend.log 2>&1 &
+nohup python -m uvicorn main:app --host 0.0.0.0 --port 8000 --reload > backend.log 2>&1 &
 echo "Backend server started. Logs are in backend.log."
