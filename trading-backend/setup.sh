@@ -38,19 +38,19 @@ echo "Installing dependencies..."
 pip install --upgrade pip
 pip install -r requirements.txt
 
-# Step 6: Stop any running process on port 8000
-echo "Stopping any running backend server..."
-PIDS=$(lsof -t -i:8000)
-if [ -n "$PIDS" ]; then
-    echo "Stopping process on port 8000 with PIDs: $PIDS..."
-    if kill -9 $PIDS; then
-        echo "Processes stopped successfully."
-    else
-        echo "Warning: Failed to stop some processes. They may have already exited."
-    fi
-else
-    echo "No process running on port 8000."
-fi
+# # Step 6: Stop any running process on port 8000
+# echo "Stopping any running backend server..."
+# PIDS=$(lsof -t -i:8000)
+# if [ -n "$PIDS" ]; then
+#     echo "Stopping process on port 8000 with PIDs: $PIDS..."
+#     if kill -9 $PIDS; then
+#         echo "Processes stopped successfully."
+#     else
+#         echo "Warning: Failed to stop some processes. They may have already exited."
+#     fi
+# else
+#     echo "No process running on port 8000."
+# fi
 
 # Step 7: Start the backend server
 echo "Starting backend server..."
