@@ -1,5 +1,7 @@
 // const API_BASE_URL = "http://localhost:8000";
-const API_BASE_URL = "http://54.158.155.144:8000";
+// const API_BASE_URL = "http://54.158.155.144:8000";
+
+const API_BASE_URL = "http://174.129.175.116:8000";
 
 // Register Users
 export const registerUser = async (userData) => {
