@@ -1,9 +1,7 @@
 import React, { useState } from "react";
-import { useNavigate } from "react-router-dom";
 import { createWatchlist } from "../api/WatchlistApi";
 
-const NewWatchlist = ({ onClose }) => {
-  const navigate = useNavigate();
+const NewWatchlist = ({ onClose, onSave }) => {
   const [formData, setFormData] = useState({
     symbol: "",
     price: "",
@@ -28,8 +26,7 @@ const NewWatchlist = ({ onClose }) => {
       const response = await createWatchlist(formData);
       console.log("Success:", response);
       onClose();
-      navigate("/trades", { replace: true });
-      window.location.reload();
+      onSave(response);
     } catch (error) {
       console.error("Error:", error);
       alert("Error submitting watchlist");
