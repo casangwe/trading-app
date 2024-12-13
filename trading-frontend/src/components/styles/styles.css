@@ -1903,10 +1903,8 @@ input:checked + .slider:before {
 
 .modal-content {
   background: #fefefe;
-  border-radius: 12px;
-  /* width: 600px; */
-  width: 250px;
-  max-width: 100%;
+  border-radius: 10px;
+  width: 300px;
   box-shadow: 0 8px 24px rgba(0, 0, 0, 0.15);
   font-family: "Roboto", sans-serif;
 }
@@ -1917,7 +1915,6 @@ input:checked + .slider:before {
   align-items: center;
   padding: 20px;
   border-bottom: 1px solid #ddd;
-  /* background-color: #f0f2f5; */
   background-color: #d9e7f5;
   border-top-left-radius: 12px;
   border-top-right-radius: 12px;
@@ -2009,6 +2006,14 @@ input:checked + .slider:before {
 .settings-icon:hover {
   color: #165599;
 }
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
+}
 
 @keyframes slideUp {
   from {
@@ -2024,6 +2029,8 @@ input:checked + .slider:before {
 .new-trade-container {
   padding: 10px;
   width: 25%;
+  /* width: 250px;
+  max-width: 100%; */
   border-radius: 8px;
   background-color: white;
   box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
