@@ -3,39 +3,50 @@ import Bars from "../controllers/pnl/Bars";
 import Calendar from "../controllers/pnl/Calender";
 import TradeSum from "../controllers/trades/TradeSum";
 import AnalysisDisplay from "../controllers/analysis/AnalysisDisplay";
+import AnalysisCircle from "../controllers/analysis/AnalysisCircle";
 import InvestmentChart from "../controllers/pnl/InvestmentChart";
 import EQTCurve from "../controllers/trades/EQTcurve";
 
 const Analysis = () => {
   return (
     <div className="Analysis">
-      {/* <div className="eqt-curve">
+      <div className="eqt-curve-trade">
         <EQTCurve />
-      </div> */}
-      <div className="two-horizontal-charts">
-        <div className="investment-chart">
-          <InvestmentChart />
-        </div>
-        <div className="eqt-curve">
-          <EQTCurve />
-        </div>
-      </div>
-      {/* Calendar and Bars side by side */}
-      <div className="calendar-bars-container">
-        <div className="bars-home">
-          <Bars />
-        </div>
-        <div className="calendar-home">
-          <Calendar />
-        </div>
       </div>
       <div className="analysis-analysis">
         <AnalysisDisplay />
       </div>
-
-      <div className="trade-sum-analysis">
-        <TradeSum />
+      <div className="analysis-analysis">
+        <AnalysisCircle />
       </div>
+
+      {/* <div className="two-horizontal-charts">
+        {/* <div className="bars-home">
+          <Bars />
+        </div> */}
+
+      {/* <div className="eqt-curve">
+          <EQTCurve />
+        </div> }
+      </div> */}
+      {/* Calendar and Bars side by side */}
+      <div className="calendar-bars-container">
+        {/* <div className="investment-chart">
+          <InvestmentChart />
+        </div> */}
+        {/* <div className="bars-home">
+          <Bars />
+        </div> */}
+        {/* <div className="investment-chart">
+          <InvestmentChart />
+        </div> */}
+        {/* <div className="calendar-home">
+          <Calendar />
+        </div> */}
+      </div>
+      {/* <div className="trade-sum-analysis">
+        <TradeSum />
+      </div> */}
     </div>
   );
 };

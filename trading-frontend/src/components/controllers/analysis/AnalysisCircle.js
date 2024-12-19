@@ -82,7 +82,7 @@ const AnalysisDisplay = () => {
   };
   return (
     <div className="analysis-container">
-      <div className="analysis-row">
+      {/* <div className="analysis-row">
         <div className="analysis-circle">
           <h3>Trades</h3>
           <p>{numberOfTrades}</p>
@@ -95,11 +95,11 @@ const AnalysisDisplay = () => {
           <h3>Losses</h3>
           <p>{losingTrades}</p>
         </div>
-      </div>
+      </div> */}
       {/* <br /> */}
       <div className="analysis-circle-row">
         {/* Win Rate */}
-        {/* <ResponsiveContainer width="100%" height={150}>
+        <ResponsiveContainer width="100%" height={150}>
           <PieChart>
             <Pie
               data={winRateData}
@@ -150,11 +150,11 @@ const AnalysisDisplay = () => {
               }}
             />
           </PieChart>
-        </ResponsiveContainer> */}
+        </ResponsiveContainer>
 
         {/* Win Ratio */}
-        {/*<ResponsiveContainer width="100%" height={150}>
-           <PieChart>
+        <ResponsiveContainer width="100%" height={150}>
+          <PieChart>
             <Pie
               data={[
                 { name: "Wins", value: winningTrades, color: "#4a90e2" },
@@ -208,10 +208,10 @@ const AnalysisDisplay = () => {
               }}
             />
           </PieChart>
-        </ResponsiveContainer> */}
+        </ResponsiveContainer>
 
         {/* Average Win / Loss */}
-        {/* <ResponsiveContainer width="100%" height={150}>
+        <ResponsiveContainer width="100%" height={150}>
           <PieChart>
             <Pie
               data={data}
@@ -256,9 +256,9 @@ const AnalysisDisplay = () => {
               }}
             />
           </PieChart>
-        </ResponsiveContainer> */}
+        </ResponsiveContainer>
       </div>
-      {/* <br /> */}
+      <br />
     </div>
   );
 };

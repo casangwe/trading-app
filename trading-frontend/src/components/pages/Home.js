@@ -7,6 +7,7 @@ import Bars from "../controllers/pnl/Bars";
 import AnalysisDisplay from "../controllers/analysis/AnalysisDisplay";
 import InvestmentChart from "../controllers/pnl/InvestmentChart";
 import EQTCurve from "../controllers/trades/EQTcurve";
+import AnalysisCircle from "../controllers/analysis/AnalysisCircle";
 
 const Home = ({ onClose }) => {
   const [userData, setUserData] = useState(null);
@@ -78,19 +79,26 @@ const Home = ({ onClose }) => {
       </div>
 
       {/* AnalysisDisplay in full width */}
+
+      <div className="eqt-curve-trade">
+        <EQTCurve />
+      </div>
       <div className="analysis-display-container">
         <AnalysisDisplay />
       </div>
 
+      <div className="analysis-analysis">
+        <AnalysisCircle />
+      </div>
       {/* Trades Table and EQTchat side by side */}
-      <div className="trades-eqt-container">
+      {/* <div className="trades-eqt-container">
         <div className="trades-table">
           <MiniTradeTable />
         </div>
         <div className="eqt-chart">
           <EQTCurve />
         </div>
-      </div>
+      </div> */}
     </div>
   );
 };

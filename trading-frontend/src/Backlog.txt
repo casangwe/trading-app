@@ -1,10 +1,23 @@
 To do:
-
+Global:
+    Loading Feature:
+    -Give everything a loading and 'fade-In' feature.
+    -Recolor
 Home page:
-Adust the padding/height of the EQTTrades chart.
-
+    Mini-Trades Section:
+    -Make it visible
 Analysis Page:
--The Analysis section should be the full width
--Replace that section with the Monthly Trades. Might have to create a new component
+    Bars Section:
+    -Bars should be a histogram similar to the networth tracker chart
+    -Replace that section with the Monthly Trades. Might have to create a new component
 
+    Watchlist section:
+    -Re-design the watchlist item display 
+        -NoID above the symbol, entry date underneath the symbol, price information on the right
+        -Plan on the center, date on far right, 
+    -Re-design the Watchlist information card.
+networth Page:
+    histogram section:
+    - Try out the line on the histogram first, if it doesn't look good becuase of the blue line dropping
+    due to the $0.00 income on some weeks, then just let it enter the last 5 entries, or just show a filter
 

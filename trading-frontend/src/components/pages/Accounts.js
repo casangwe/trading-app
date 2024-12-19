@@ -2,6 +2,7 @@ import React, { useEffect, useState } from "react";
 import Cash from "../controllers/cash/Cash";
 import NewCash from "../controllers/cash/NewCash";
 import AnalysisDisplay from "../controllers/analysis/AnalysisDisplay";
+import AnalysisCircle from "../controllers/analysis/AnalysisCircle";
 import TransactionTable from "../controllers/transactions/TransactionTable";
 import InvestmentChart from "../controllers/pnl/InvestmentChart";
 import EQTCurve from "../controllers/trades/EQTcurve";
@@ -55,9 +56,7 @@ const Accounts = ({ onClose }) => {
       <div className="investment-chart">
         <InvestmentChart />
       </div>
-      <div className="analysis-analysis-account">
-        <AnalysisDisplay />
-      </div>
+
       <div className="account-horizontal">
         <div className="transactions-accounts">
           <TransactionTable />
@@ -66,11 +65,15 @@ const Accounts = ({ onClose }) => {
           <Rules />
         </div>
       </div>
-
       <div className="eqt-curve">
         <EQTCurve />
       </div>
-
+      <div className="analysis-analysis-account">
+        <AnalysisDisplay />
+      </div>
+      <div className="analysis-analysis-account">
+        <AnalysisCircle />
+      </div>
       {showModal && (
         <NewCash onClose={handleCloseModal} onNewCash={handleNewCash} />
       )}

@@ -2202,7 +2202,6 @@ input:checked + .slider:before {
   height: 100px;
   background-color: transparent;
   border-radius: 50%;
-  /* cursor: pointer; */
   display: flex;
   align-items: center;
   justify-content: center;
