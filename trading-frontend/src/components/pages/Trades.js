@@ -20,9 +20,9 @@ const Trades = () => {
       <div className="eqt-curve-trade">
         <EQTCurve />
       </div>
-      <div className="analysis-display-container">
+      {/* <div className="analysis-display-container">
         <AnalysisDisplay />
-      </div>
+      </div> */}
       {/* <div className="analysis-analysis-account">
         <AnalysisCircle />
       </div> */}
