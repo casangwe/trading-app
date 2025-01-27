@@ -42,9 +42,9 @@ const Watchlist = () => {
   };
 
   const handleCloseModal = () => {
+    setShowModal(false);
     setSelectedWatchlist(null);
     setIsEditing(false);
-    setShowModal(false);
   };
 
   const handleSaveChanges = async (updatedData) => {
@@ -60,12 +60,13 @@ const Watchlist = () => {
       } catch (error) {
         console.error("Error updating watchlist:", error);
       } finally {
+        setShowModal(false);
         setItemsLoading(false);
       }
     } else {
       fetchWatchlistData();
     }
-    handleCloseModal();
+    // handleCloseModal();
   };
 
   return (

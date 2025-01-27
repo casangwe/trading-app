@@ -1,7 +1,7 @@
 import React, { useState } from "react";
 import { createMiscEntry } from "../api/MiscAPI";
 
-const NewMisc = ({ onClose, onSave }) => {
+const NewMisc = ({ onClose, onNewMisc }) => {
   const [formData, setFormData] = useState({
     category: "plan",
     entry_date: "",
@@ -22,8 +22,10 @@ const NewMisc = ({ onClose, onSave }) => {
       console.log("Submitting Data:", formData);
       const response = await createMiscEntry(formData);
       console.log("Success:", response);
+      if (onNewMisc) {
+        onNewMisc(response);
+      }
       onClose();
-      onSave(response);
     } catch (error) {
       console.error("Error:", error);
       alert("Error submitting misc entry");

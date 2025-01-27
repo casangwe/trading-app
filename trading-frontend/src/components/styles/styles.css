@@ -25,6 +25,18 @@ body::-webkit-scrollbar {
   display: flex;
   align-items: center;
   width: 100%;
+  margin-top: 5px;
+}
+.nav-logo {
+  display: flex;
+  align-items: center;
+  margin-right: 20px;
+}
+
+.logo-image {
+  height: 30px; /* Adjust size as needed */
+  width: auto;
+  object-fit: contain;
 }
 
 .search {
@@ -275,28 +287,30 @@ body::-webkit-scrollbar {
 
 /* Home Page  */
 
-.home-dash .title {
+/* .home-dash .title {
   padding: 20px;
   padding-top: 20px;
-}
+  min-height: min-content;
+} */
 
 #new-pnl-btn {
   font-size: 12px;
   cursor: pointer;
   color: black;
-  border: 1px solid black;
+  /* border: 1px solid black; */
   padding: 6px 10px;
   border-radius: 5px;
-  margin-right: 20px;
+  min-height: auto;
+  /* opacity: 0; */
+  transition: opacity 0.5s ease-in-out;
 }
 
 #new-pnl-btn:hover {
   font-size: 12px;
   cursor: pointer;
   color: #4a90e2;
-  border: 1px solid #4a90e2;
-  background-color: #e6f7ff;
-  cursor: pointer;
+  /* border: 1px solid #4a90e2; */
+  /* background-color: #e6f7ff; */
 }
 
 /* Tooltip  */
@@ -304,6 +318,16 @@ body::-webkit-scrollbar {
   position: relative;
   display: inline-block;
   color: transparent;
+}
+/* Initial hidden state */
+.fade-out {
+  opacity: 0;
+  transition: opacity 0.5s ease-in-out;
+}
+
+.fade-in {
+  opacity: 1;
+  transition: opacity 0.5s ease-in-out;
 }
 
 .tooltip .tooltiptext {
@@ -329,6 +353,7 @@ body::-webkit-scrollbar {
   background-color: transparent;
   /* color: #444; */
   color: #4a90e2;
+
   font-size: 10px;
 }
 
@@ -366,6 +391,31 @@ body::-webkit-scrollbar {
   margin-top: 15%;
 }
 
+.dailypnl-wrapper {
+  position: relative;
+  min-height: 300px;
+}
+/* .dailypnl-wrapper.fade-in {
+  opacity: 1;
+  transform: translateY(0);
+} */
+.dailypnl-container {
+  padding: 20px;
+  background-color: transparent;
+  border-radius: 8px;
+  font-family: Arial, sans-serif;
+  opacity: 0;
+  transform: translateY(10px);
+  transition: opacity 1s ease, transform 1s ease;
+  position: relative;
+  min-height: 450px;
+}
+
+.dailypnl-container.fade-in {
+  opacity: 1;
+  transform: translateY(0);
+}
+
 .daily-pnl-section .daily-pnl-card-container {
   display: flex;
   justify-content: space-between;
@@ -375,26 +425,28 @@ body::-webkit-scrollbar {
 .daily-pnl-section .daily-pnl-card {
   border-radius: 8px;
   /* padding: 12px; */
-  padding: 20px;
-  background-color: #ffffff;
+  /* padding: 20px; */
+  /* background-color: #ffffff; */
   flex: 1;
   max-width: 100%;
   display: flex;
-  border: 1px solid rgb(231, 223, 223);
+  /* border: 1px solid rgb(231, 223, 223); */
   transition: transform 0.3s, background-color 0.3s;
 }
 
-.daily-pnl-section .daily-pnl-card:hover {
+/* .daily-pnl-section .daily-pnl-card:hover {
   transform: scale(1.05) translateY(-4px);
   background-color: #e6f7ff;
   cursor: pointer;
   border: 1px solid #4a90e2;
   box-shadow: 0 6px 12px rgba(72, 144, 226, 0.2),
     0 12px 24px rgba(72, 144, 226, 0.15);
-}
+} */
 
 .daily-pnl-section .card-content {
   display: flex;
+  flex-direction: column;
+  align-items: flex-start;
   justify-content: space-between;
   width: 100%;
 }
@@ -412,25 +464,29 @@ body::-webkit-scrollbar {
 
 .daily-pnl-section .label {
   font-size: 10px;
-  font-weight: 500;
-  color: #666;
+  font-weight: 600;
+  color: #333;
 }
 
 .daily-pnl-section .value {
-  font-size: 12px;
-  font-weight: 600;
+  font-size: 10px;
+  font-weight: 500;
   color: #333;
+  margin-top: 4px;
 }
 
 .daily-pnl-section .divider {
   border: none;
   border-top: 1px solid #e6e8ec;
   margin: 16px 0;
+
+  /* border-top: 1px solid #4a90e2;
+  opacity: 0.5; */
 }
 
 .new-daily-pnl-container {
   padding: 10px;
-  width: 25%;
+  width: 50%;
   border-radius: 8px;
   background-color: white;
   box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
@@ -487,6 +543,7 @@ body::-webkit-scrollbar {
 /* Analysis Page */
 .eqt-curve {
   padding: 20px;
+  /* min-height: max-content; */
 }
 /* 
 .two-horizontal-home {
@@ -519,10 +576,19 @@ body::-webkit-scrollbar {
   display: flex;
   justify-content: center;
   align-items: center;
+  position: relative;
   flex-direction: column;
   background-color: transparent;
   transition: 0.3s;
 }
+/* .investment-chart-container {
+  font-family: Arial, sans-serif;
+  margin: 40px;
+  background-color: transparent;
+  transition: transform 0.3s, box-shadow 0.3s;
+  position: relative;
+  min-height: 400px;
+} */
 
 /* Tile styling */
 .react-calendar__tile {
@@ -1551,8 +1617,18 @@ input:checked + .slider:before {
 
 /* Misc */
 
+.misc-wrapper {
+  position: relative;
+  min-height: 300px;
+  /* padding: 20px; */
+  background-color: transparent;
+  border-radius: 8px;
+  font-family: Arial, sans-serif;
+}
+
 .misc-container {
   padding: 20px;
+  /* margin: 20px; */
   background-color: transparent;
   border-radius: 8px;
   font-family: Arial, sans-serif;
@@ -1562,14 +1638,12 @@ input:checked + .slider:before {
   position: relative;
   min-height: 450px;
 }
-.misc-wrapper {
-  position: relative;
-  min-height: 300px;
-}
-.misc-wrapper.fade-in {
+
+.misc-container.fade-in {
   opacity: 1;
   transform: translateY(0);
 }
+
 .misc-container:hover {
   box-shadow: 0 3px 6px rgba(72, 128, 170, 0.2),
     0 6px 12px rgba(72, 128, 170, 0.15);
@@ -2074,23 +2148,29 @@ input:checked + .slider:before {
 }
 
 .form-container button {
-  padding: 15px 0px;
+  padding: 12px 0px;
   font-size: 12px;
   background-color: transparent;
   color: black;
-  border: 1px solid black;
+  border: 1px solid #333;
   border-radius: 4px;
   cursor: pointer;
-  transition: 0.3s;
+  /* transition: 0.3s; */
+  transition: all 0.3s ease-in-out;
   margin-top: 2vh;
   width: 100%;
 }
 
 .form-container button:hover {
-  background-color: #e6f7ff;
+  background-color: #f3fafd;
   cursor: pointer;
-  border: 1px solid #4a90e2;
-  color: #4a90e2;
+  border: 1px solid grey;
+  color: black;
+
+  /* background-color: #e6f7ff; */
+  /* cursor: pointer; */
+  /* border: 1px solid #333; */
+  transform: translateY(-2px);
 }
 
 /* Account Page  */
@@ -2196,6 +2276,7 @@ input:checked + .slider:before {
   position: relative;
   display: flex;
   justify-content: space-around;
+  min-height: 140px;
 }
 
 .analysis-row {
@@ -2270,6 +2351,7 @@ input:checked + .slider:before {
   display: flex;
   justify-content: space-around;
   gap: 1rem;
+  /* height: 40px; */
 }
 
 .analysis-metric {
@@ -2365,8 +2447,12 @@ input:checked + .slider:before {
 
 .investment-chart-container {
   font-family: Arial, sans-serif;
-  padding: 20px;
+  /* padding: 40px; */
+  margin: 40px;
   background-color: transparent;
+  transition: transform 0.3s, box-shadow 0.3s;
+  position: relative;
+  min-height: 400px;
 }
 
 .summary-section {
@@ -2377,7 +2463,7 @@ input:checked + .slider:before {
 }
 
 .summary-section .investment-date {
-  font-size: 11px;
+  font-size: 10px;
   color: #888;
   margin: 0;
   margin-top: 2px;
@@ -2387,12 +2473,13 @@ input:checked + .slider:before {
   font-size: 26px;
   font-weight: 700;
   color: #4a90e2;
+  /* color: #414040; */
   margin-top: 6px;
   margin-bottom: 4px;
 }
 
 .summary-section .investment-roi {
-  font-size: 11px;
+  font-size: 10px;
   color: #4a90e2;
   font-weight: 500;
   margin: 0;
@@ -2433,7 +2520,8 @@ input:checked + .slider:before {
 /* EQTCurve */
 .equity-curve-chart-container {
   font-family: Arial, sans-serif;
-  /* padding: 50px; */
+  /* padding: 40px; */
+  margin: 30px;
   background-color: transparent;
   transition: transform 0.3s, box-shadow 0.3s;
   position: relative;
@@ -2896,4 +2984,23 @@ input:checked + .slider:before {
 
 .fade-in-items.hidden {
   opacity: 0;
+}
+
+/* Calendar fade-in  */
+.fades-in-hidden {
+  opacity: 0;
+  visibility: hidden;
+}
+
+.fades-in {
+  opacity: 0;
+  visibility: visible;
+  animation: fadesIn 0.9s ease-in-out forwards;
+  /* animation: fadesIn 0.9s ease-out forwards; */
+}
+
+@keyframes fadesIn {
+  to {
+    opacity: 1;
+  }
 }

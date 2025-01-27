@@ -11,6 +11,13 @@ const TradeTable = ({ onNewTrade }) => {
   const [componentLoading, setComponentLoading] = useState(true); // Controls the initial component spinner
   const [fadeInTable, setFadeInTable] = useState(false); // Controls fade-in for table content
 
+  useEffect(() => {
+    setTimeout(() => {
+      setComponentLoading(false);
+    }, 1500);
+    fetchTradeData();
+  }, []);
+
   const fetchTradeData = () => {
     setLoading(true);
     setError(null);
@@ -29,13 +36,6 @@ const TradeTable = ({ onNewTrade }) => {
       }
     }, 1000);
   };
-
-  useEffect(() => {
-    setTimeout(() => {
-      setComponentLoading(false);
-    }, 1500);
-    fetchTradeData();
-  }, []);
 
   const handleNewTradeEntry = async (newTrade) => {
     setShowModal(false);

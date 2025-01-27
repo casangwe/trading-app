@@ -35,11 +35,11 @@ const Home = ({ onClose }) => {
 
   return (
     <div className="home">
-      <div className="home-dash">
+      {/* <div className="home-dash">
         <div className="header-card">
           {userData && (
             <p className="title">
-              {/* Welcome {userData.fname || userData.username} */}
+              Welcome {userData.fname || userData.username}
             </p>
           )}
           <div className="tooltip">
@@ -51,7 +51,7 @@ const Home = ({ onClose }) => {
             <span className="tooltiptext">New P/L</span>
           </div>
         </div>
-      </div>
+      </div> */}
       <div className="dashboard-container">
         <div className="profit-chart-trade">
           <InvestmentChart />

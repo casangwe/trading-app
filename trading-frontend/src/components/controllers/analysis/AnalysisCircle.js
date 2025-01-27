@@ -15,6 +15,7 @@ import { Line } from "rc-progress";
 
 const AnalysisDisplay = () => {
   const [analysisResults, setAnalysisResults] = useState(null);
+
   const [error, setError] = useState(null);
 
   useEffect(() => {
@@ -30,12 +31,12 @@ const AnalysisDisplay = () => {
     fetchData();
   }, []);
 
-  if (error) {
-    console.error("Error fetching analysis data:", error);
-  }
+  // if (error) {
+  //   console.error("Error fetching analysis data:", error);
+  // }
 
   if (!analysisResults && !error) {
-    return <div>Loading...</div>;
+    return <div></div>;
   }
 
   const {
@@ -82,20 +83,6 @@ const AnalysisDisplay = () => {
   };
   return (
     <div className="analysis-container">
-      {/* <div className="analysis-row">
-        <div className="analysis-circle">
-          <h3>Trades</h3>
-          <p>{numberOfTrades}</p>
-        </div>
-        <div className="analysis-circle">
-          <h3>Wins</h3>
-          <p>{winningTrades}</p>
-        </div>
-        <div className="analysis-circle">
-          <h3>Losses</h3>
-          <p>{losingTrades}</p>
-        </div>
-      </div> */}
       {/* <br /> */}
       <div className="analysis-circle-row">
         {/* Win Rate */}

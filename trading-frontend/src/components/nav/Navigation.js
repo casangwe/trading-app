@@ -4,6 +4,7 @@ import React from "react";
 import { Link, useLocation, useNavigate } from "react-router-dom";
 import { FaSignOutAlt } from "react-icons/fa";
 import "../styles/styles.css";
+import Logo from "../assets/T-bg.png";
 
 const Navigation = () => {
   const location = useLocation();
@@ -18,6 +19,12 @@ const Navigation = () => {
   return (
     <div className="navigation">
       <div className="nav-container">
+        {/* Logo Section */}
+        <div className="nav-logo">
+          <Link to="/">
+            <img src={Logo} alt="Logo" className="logo-image" />
+          </Link>
+        </div>
         <div className="search">
           <input type="text" placeholder="Search..." />
         </div>

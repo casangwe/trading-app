@@ -14,28 +14,50 @@ const Bars = () => {
   const [dailyPNLData, setDailyPNLData] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
-  const [view, setView] = useState("daily");
+  // const [view, setView] = useState("daily");
+  const [view, setView] = useState("weekly");
+  const [componentLoading, setComponentLoading] = useState(true);
+  const [hasLoaded, setHasLoaded] = useState(false);
+
+  // useEffect(() => {
+  //   const fetchDailyPNLData = async () => {
+  //     try {
+  //       const data = await fetchDailyPnls();
+  //       setDailyPNLData(data);
+  //       console.log("daily pnl: ", data);
+  //     } catch (error) {
+  //       setError("No Daily PNL data");
+  //       console.error("No Daily PNL data:", error);
+  //     } finally {
+  //       setLoading(false);
+  //     }
+  //   };
+
+  //   fetchDailyPNLData();
+  // }, []);
 
   useEffect(() => {
     const fetchDailyPNLData = async () => {
       try {
         const data = await fetchDailyPnls();
         setDailyPNLData(data);
-        console.log("daily pnl: ", data);
       } catch (error) {
         setError("No Daily PNL data");
         console.error("No Daily PNL data:", error);
       } finally {
-        setLoading(false);
+        setTimeout(() => {
+          setComponentLoading(false);
+          setTimeout(() => setHasLoaded(true), 100);
+        }, 1000);
       }
     };
 
     fetchDailyPNLData();
   }, []);
 
-  if (loading) return <div>Loading...</div>;
-  if (error) return <div>{error}</div>;
-  if (!dailyPNLData) return <p>No PNL data available</p>;
+  // if (loading) return <div>Loading...</div>;
+  // if (error) return <div>{error}</div>;
+  // if (!dailyPNLData) return <p>No PNL data available</p>;
 
   const formatMonthYear = (dateStr) => {
     if (!dateStr || !dateStr.includes("-")) return "";
@@ -106,10 +128,13 @@ const Bars = () => {
 
     if (view === "daily") {
       const currentWeek = getCurrentWeek(dailyPNLData);
-      barsData = currentWeek.map((day) => ({
-        date: formatDate(day.entry_date),
-        balance: parseFloat(day.balance || 0),
-      }));
+      barsData = currentWeek
+        .map((day) => ({
+          date: formatDate(day.entry_date),
+          balance: parseFloat(day.balance || 0),
+          fill: day.balance >= 0 ? "#4a90e2" : "#f44336",
+        }))
+        .reverse();
     } else if (view === "weekly") {
       const currentMonth = getCurrentMonth(dailyPNLData);
       barsData = currentMonth.map((week) => {
@@ -122,20 +147,24 @@ const Bars = () => {
             week[week.length - 1].entry_date
           )}`,
           balance: weekBalance,
+          fill: weekBalance >= 0 ? "#4a90e2" : "#f44336",
         };
       });
     } else if (view === "monthly") {
       const months = getMonthsData(dailyPNLData);
-      barsData = months.map((month) => {
-        const monthBalance = month.reduce(
-          (sum, day) => sum + parseFloat(day.balance || 0),
-          0
-        );
-        return {
-          date: formatMonthYear(month[0].entry_date),
-          balance: monthBalance,
-        };
-      });
+      barsData = months
+        .map((month) => {
+          const monthBalance = month.reduce(
+            (sum, day) => sum + parseFloat(day.balance || 0),
+            0
+          );
+          return {
+            date: formatMonthYear(month[0].entry_date),
+            balance: monthBalance,
+            fill: monthBalance >= 0 ? "#4a90e2" : "#f44336",
+          };
+        })
+        .reverse();
     }
 
     return barsData;
@@ -201,10 +230,10 @@ const Bars = () => {
           />
           <Bar
             dataKey="balance"
-            fill="#4a90e2"
             isAnimationActive={true}
             radius={[5, 5, 5, 5]}
             barSize={55}
+            fill={({ payload }) => payload.fill}
           />
         </BarChart>
       </ResponsiveContainer>

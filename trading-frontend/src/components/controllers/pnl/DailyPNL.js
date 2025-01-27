@@ -7,99 +7,175 @@ import {
 } from "react-icons/fa";
 import { fetchDailyPnls } from "../api/DailyPNLApi";
 import { formatCash } from "../func/functions";
+import NewDailyPNL from "./NewDailyPNL";
 
-const DailyPNL = () => {
-  const [dailyPNLData, setDailyPNLData] = useState(null);
+const DailyPNL = ({ onNewPNL }) => {
+  const [dailyPNLData, setDailyPNLData] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
+  const [componentLoading, setComponentLoading] = useState(true);
+  const [fadeInTable, setFadeInTable] = useState(false);
+  const [showModal, setShowModal] = useState(false);
 
   useEffect(() => {
-    const fetchDailyPNLData = async () => {
-      try {
-        const data = await fetchDailyPnls();
-        console.log(data);
-        if (data.length > 0) {
-          const sortedData = data.sort(
-            (a, b) => new Date(b.entry_date) - new Date(a.entry_date)
-          );
-          setDailyPNLData(sortedData[0]);
-        } else {
-          setDailyPNLData(null);
-        }
-      } catch (error) {
-        setError("No Daily PNL data");
-        console.error("No Daily PNL data:", error);
-      } finally {
-        setLoading(false);
-      }
-    };
-
+    setTimeout(() => {
+      setComponentLoading(false);
+    }, 1500);
     fetchDailyPNLData();
   }, []);
 
-  if (loading) return <p>Loading...</p>;
-  if (error) return <p>{error}</p>;
+  const fetchDailyPNLData = async () => {
+    setLoading(true);
+    setError(null);
+    setFadeInTable(false);
+    setTimeout(async () => {
+      try {
+        const data = await fetchDailyPnls();
+        const sortedData = Array.isArray(data)
+          ? data.sort((a, b) => b.id - a.id)
+          : [];
+        setDailyPNLData(sortedData);
+      } catch (err) {
+        console.error("Error fetching PNL data:", error);
+        setError("Error fetching PNL");
+      } finally {
+        setLoading(false);
+        setTimeout(() => setFadeInTable(true), 1000);
+      }
+    }, 1000);
+  };
 
-  const openCash = dailyPNLData
-    ? formatCash(dailyPNLData.open_cash)
-    : formatCash(0);
-  const closeCash = dailyPNLData
-    ? formatCash(dailyPNLData.close_cash)
-    : formatCash(0);
-  const balance = dailyPNLData
-    ? formatCash(dailyPNLData.balance)
-    : formatCash(0);
-  const roi = dailyPNLData ? `${dailyPNLData.roi}%` : "0%";
+  const handleNewPNLEntry = async (newPNL) => {
+    setShowModal(false);
+    if (onNewPNL) onNewPNL(newPNL);
+
+    setDailyPNLData([]);
+    setLoading(true);
+    setFadeInTable(false);
+
+    await fetchDailyPNLData();
+  };
+
+  const handleOpenModal = () => setShowModal(true);
+  const handleCloseModal = () => setShowModal(false);
+  const latestPNL = dailyPNLData.length > 0 ? dailyPNLData[0] : null;
+
   return (
-    <div className="daily-pnl-section">
-      <div className="daily-pnl-card-container">
-        {/* Open Cash Card */}
-        <div className="daily-pnl-card">
-          <div className="card-content">
-            <div className="icon-label">
-              <FaMoneyBillWave className="card-icon" />
-              <span className="label">Open Cash:</span>
-            </div>
-            <span className="value">{openCash}</span>
-          </div>
+    <div className="dailypnl-wrapper">
+      {componentLoading && (
+        <div className="component-loading-spinner-wrapper">
+          <div className="spinner"></div>
         </div>
+      )}
+      {/* Fade-in the DailyPNL-container only after componentLoading */}
 
-        {/* Close Cash Card */}
-        <div className="daily-pnl-card">
-          <div className="card-content">
-            <div className="icon-label">
-              <FaUpload className="card-icon" />
-              <span className="label">Close Cash:</span>
-            </div>
-            <span className="value">{closeCash}</span>
-          </div>
-        </div>
-      </div>
+      <div
+        className={`dailypnl-container ${
+          !componentLoading ? "fade-in" : "loading"
+        }`}
+      >
+        {!componentLoading && (
+          <>
+            {loading && (
+              <div className="spinner-wrapper">
+                <div className="spinner"></div>
+              </div>
+            )}
 
-      <hr className="divider" />
+            {!loading && error ? (
+              <p>{error}</p>
+            ) : (
+              <>
+                {/* Header Section */}
+                <div className="header-card">
+                  <p className="title"></p>
+                  <div className="tooltip">
+                    <i
+                      className="btn btn-primary fa-solid fa-plus"
+                      id="new-pnl-btn"
+                      onClick={handleOpenModal}
+                    ></i>
+                    <span className="tooltiptext">New P/L</span>
+                  </div>
+                </div>
+                {/* <hr /> */}
 
-      <div className="daily-pnl-card-container">
-        {/* Balance Card */}
-        <div className="daily-pnl-card">
-          <div className="card-content">
-            <div className="icon-label">
-              <FaChartLine className="card-icon" />
-              <span className="label">P/L:</span>
-            </div>
-            <span className="value">{balance}</span>
-          </div>
-        </div>
+                {/* Table or Cards Section */}
+                <div className={`fade-in ${fadeInTable ? "visible" : ""}`}>
+                  <div className="daily-pnl-section">
+                    {/* <hr className="divider" /> */}
 
-        {/* ROI Card */}
-        <div className="daily-pnl-card">
-          <div className="card-content">
-            <div className="icon-label">
-              <FaPercentage className="card-icon" />
-              <span className="label">RoI:</span>
-            </div>
-            <span className="value">{roi}</span>
-          </div>
-        </div>
+                    <div className="daily-pnl-card-container">
+                      {/* Open Cash Card */}
+                      <div className="daily-pnl-card">
+                        <div className="card-content">
+                          <div className="icon-label">
+                            {/* <FaMoneyBillWave className="card-icon" /> */}
+                            <span className="label">Open Cash:</span>
+                          </div>
+                          <span className="value">
+                            {formatCash(latestPNL?.open_cash || 0)}
+                          </span>
+                        </div>
+                      </div>
+
+                      {/* Close Cash Card */}
+                      <div className="daily-pnl-card">
+                        <div className="card-content">
+                          <div className="icon-label">
+                            {/* <FaUpload className="card-icon" /> */}
+                            <span className="label">Close Cash:</span>
+                          </div>
+                          <span className="value">
+                            {formatCash(latestPNL?.close_cash || 0)}
+                          </span>
+                        </div>
+                      </div>
+                    </div>
+
+                    <hr className="divider" />
+
+                    <div className="daily-pnl-card-container">
+                      {/* Balance Card */}
+                      <div className="daily-pnl-card">
+                        <div className="card-content">
+                          <div className="icon-label">
+                            {/* <FaChartLine className="card-icon" /> */}
+                            <span className="label">P/L:</span>
+                          </div>
+                          <span className="value">
+                            {formatCash(latestPNL?.balance || 0)}
+                          </span>
+                        </div>
+                      </div>
+
+                      {/* ROI Card */}
+                      <div className="daily-pnl-card">
+                        <div className="card-content">
+                          <div className="icon-label">
+                            {/* <FaPercentage className="card-icon" /> */}
+                            <span className="label">RoI:</span>
+                          </div>
+                          <span className="value">
+                            {`${latestPNL?.roi || 0}%`}
+                          </span>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              </>
+            )}
+          </>
+        )}
+
+        {/* Modal for Adding New PNL */}
+        {showModal && (
+          <NewDailyPNL
+            onClose={handleCloseModal}
+            onNewPNL={handleNewPNLEntry}
+          />
+        )}
       </div>
     </div>
   );

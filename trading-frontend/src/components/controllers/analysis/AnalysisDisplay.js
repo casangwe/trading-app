@@ -30,13 +30,13 @@ const AnalysisDisplay = () => {
     fetchData();
   }, []);
 
-  if (error) {
-    console.error("Error fetching analysis data:", error);
-  }
+  // if (error) {
+  //   console.error("Error fetching analysis data:", error);
+  // }
 
-  if (!analysisResults && !error) {
-    return <div>Loading...</div>;
-  }
+  // if (!analysisResults && !error) {
+  //   return <div>Loading...</div>;
+  // }
 
   const {
     absoluteReturn = 0,

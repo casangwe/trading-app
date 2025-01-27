@@ -12,10 +12,10 @@ import {
 } from "../cash/CashCalc";
 
 const InvestmentChart = () => {
-  const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
   const [chartData, setChartData] = useState([]);
   const [investmentSummary, setInvestmentSummary] = useState(null);
+  const [componentLoading, setComponentLoading] = useState(true);
   const [transactions, setTransactions] = useState([]);
 
   useEffect(() => {
@@ -49,7 +49,8 @@ const InvestmentChart = () => {
         setError("Error fetching data");
         console.error("Error fetching daily PNL data:", error);
       } finally {
-        setLoading(false);
+        // setLoading(false);
+        setTimeout(() => setComponentLoading(false), 1000);
       }
     };
 
@@ -90,54 +91,62 @@ const InvestmentChart = () => {
 
   return (
     <div className="investment-chart-container">
-      <div className="summary-section">
-        <p className="investment-cash">
-          {formatCash(investmentSummary?.balance || 0)}
-        </p>
-        <p className="investment-roi">
-          {investmentSummary
-            ? `${formatCash(
-                investmentSummary.pnl || 0
-              )} (${investmentSummary.roi.toFixed(2)}%)`
-            : "Loading..."}
-        </p>
-        <p className="investment-date">
-          {investmentSummary?.latestDate || "Loading..."}
-        </p>
-      </div>
-
-      {loading ? (
-        <div>Loading...</div>
-      ) : error ? (
-        <div>{error}</div>
+      {/* Initial Component Loading Spinner */}
+      {componentLoading ? (
+        <div className="component-loading-spinner-wrapper">
+          <div className="spinner"></div>
+        </div>
       ) : (
-        <ResponsiveContainer width="100%" height={300}>
-          <LineChart data={chartData} style={{ background: "transparent" }}>
-            <XAxis dataKey="date" tick={false} axisLine={false} />
-            <Tooltip
-              cursor={false}
-              content={({ payload }) => {
-                if (payload && payload.length) {
-                  const { date, closingBalance } = payload[0].payload;
-                  return (
-                    <div className="tooltip-content">
-                      <p>{formatCash(closingBalance)}</p>
-                      <p className="invest-date">{date}</p>
-                    </div>
-                  );
-                }
-                return null;
-              }}
-            />
-            <Line
-              type="monotone"
-              dataKey="closingBalance"
-              stroke="#4a90e2"
-              strokeWidth={2}
-              dot={false}
-            />
-          </LineChart>
-        </ResponsiveContainer>
+        <>
+          <div className="summary-section">
+            <p className="investment-cash">
+              {formatCash(investmentSummary?.balance || 0)}
+            </p>
+            <p className="investment-roi">
+              {investmentSummary
+                ? `${formatCash(
+                    investmentSummary.pnl || 0
+                  )} (${investmentSummary.roi.toFixed(2)}%)`
+                : "Loading..."}
+            </p>
+            <p className="investment-date">
+              {investmentSummary?.latestDate || "Loading..."}
+            </p>
+          </div>
+
+          {/* Chart Section */}
+          {error ? (
+            <div>{error}</div>
+          ) : (
+            <ResponsiveContainer width="100%" height={300}>
+              <LineChart data={chartData} style={{ background: "transparent" }}>
+                <XAxis dataKey="date" tick={false} axisLine={false} />
+                <Tooltip
+                  cursor={false}
+                  content={({ payload }) => {
+                    if (payload && payload.length) {
+                      const { date, closingBalance } = payload[0].payload;
+                      return (
+                        <div className="tooltip-content">
+                          <p>{formatCash(closingBalance)}</p>
+                          <p className="invest-date">{date}</p>
+                        </div>
+                      );
+                    }
+                    return null;
+                  }}
+                />
+                <Line
+                  type="monotone"
+                  dataKey="closingBalance"
+                  stroke="#4a90e2"
+                  strokeWidth={2}
+                  dot={false}
+                />
+              </LineChart>
+            </ResponsiveContainer>
+          )}
+        </>
       )}
     </div>
   );

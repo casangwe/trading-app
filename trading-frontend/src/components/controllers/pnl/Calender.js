@@ -2,30 +2,59 @@ import React, { useState, useEffect } from "react";
 import Calendar from "react-calendar";
 import { FaArrowUp, FaArrowDown } from "react-icons/fa";
 import { fetchDailyPnls } from "../api/DailyPNLApi";
+import { fetchTransactions } from "../api/TransactionsAPI";
 import { formatCash } from "../func/functions";
 
 const Calender = () => {
   const [dailyPNLData, setDailyPNLData] = useState([]);
-  const [loading, setLoading] = useState(true);
-  const [error, setError] = useState(null);
+  const [transactions, setTransactions] = useState([]);
+  const [componentLoading, setComponentLoading] = useState(true);
+  const [hasLoaded, setHasLoaded] = useState(false);
   const [selectedDate, setSelectedDate] = useState(new Date());
   const [modalDetails, setModalDetails] = useState(null);
 
   useEffect(() => {
-    const fetchDailyPNLData = async () => {
+    const fetchData = async () => {
       try {
-        const data = await fetchDailyPnls();
-        setDailyPNLData(data);
+        const [dailyPNLs, transactionData] = await Promise.all([
+          fetchDailyPnls(),
+          fetchTransactions(),
+        ]);
+
+        setDailyPNLData(dailyPNLs);
+        setTransactions(transactionData);
       } catch (error) {
-        setError("Error fetching Daily PNL data");
-        console.error("Error fetching Daily PNL data:", error);
+        console.error("Error fetching data:", error);
       } finally {
-        setLoading(false);
+        setTimeout(() => {
+          setComponentLoading(false);
+          setTimeout(() => setHasLoaded(true), 100);
+        }, 1000);
       }
     };
 
-    fetchDailyPNLData();
+    fetchData();
   }, []);
+
+  const calculateTransactionsForPeriod = (startDate, endDate) => {
+    const start = new Date(startDate);
+    const end = new Date(endDate);
+
+    const filteredTransactions = transactions.filter((transaction) => {
+      const transactionDate = new Date(transaction.transaction_date);
+      return transactionDate >= start && transactionDate <= end;
+    });
+
+    const totalDeposits = filteredTransactions
+      .filter((t) => t.transaction_type === "deposit")
+      .reduce((sum, t) => sum + parseFloat(t.amount), 0);
+
+    const totalWithdrawals = filteredTransactions
+      .filter((t) => t.transaction_type === "withdrawal")
+      .reduce((sum, t) => sum + parseFloat(t.amount), 0);
+
+    return { totalDeposits, totalWithdrawals };
+  };
 
   const aggregateByMonth = () => {
     const monthlyData = {};
@@ -51,22 +80,45 @@ const Calender = () => {
       }
       monthlyData[monthKey].entries.push(entry);
     });
+
     Object.keys(monthlyData).forEach((monthKey) => {
       const monthData = monthlyData[monthKey];
       const { entries } = monthData;
+
       if (entries.length > 0) {
-        monthData.initial_open_cash = entries[0].open_cash;
-        monthData.final_close_cash = entries[entries.length - 1].close_cash;
-      } else {
-        console.log("No data");
+        const startDate = entries[0].entry_date;
+        const endDate = entries[entries.length - 1].entry_date;
+
+        monthData.initial_open_cash = parseFloat(entries[0].open_cash || 0);
+        monthData.final_close_cash = parseFloat(
+          entries[entries.length - 1].close_cash || 0
+        );
+
+        // Aggregate transactions for the month
+        const { totalDeposits, totalWithdrawals } =
+          calculateTransactionsForPeriod(startDate, endDate);
+
+        monthData.total_deposits = totalDeposits;
+        monthData.total_withdrawals = totalWithdrawals;
+
+        // Calculate net deposits and total cash invested
+        const totalInvested =
+          monthData.total_deposits -
+          monthData.total_withdrawals +
+          monthData.initial_open_cash;
+
+        // Calculate ROI
+        if (totalInvested === 0) {
+          monthData.roi = 0;
+        } else {
+          monthData.roi = (
+            ((monthData.final_close_cash - totalInvested) / totalInvested) *
+            100
+          ).toFixed(2);
+        }
       }
-      monthData.roi = (
-        ((parseFloat(monthData.final_close_cash) -
-          parseFloat(monthData.initial_open_cash)) /
-          parseFloat(monthData.initial_open_cash)) *
-        100
-      ).toFixed(2);
     });
+
     console.log(monthlyData);
     return monthlyData;
   };
@@ -98,16 +150,39 @@ const Calender = () => {
       const { entries } = yearData;
 
       if (entries.length > 0) {
-        yearData.initial_open_cash = entries[0].open_cash;
-        yearData.final_close_cash = entries[entries.length - 1].close_cash;
+        const startDate = entries[0].entry_date;
+        const endDate = entries[entries.length - 1].entry_date;
+
+        yearData.initial_open_cash = parseFloat(entries[0].open_cash || 0);
+        yearData.final_close_cash = parseFloat(
+          entries[entries.length - 1].close_cash || 0
+        );
+
+        // Aggregate transactions for the year
+        const { totalDeposits, totalWithdrawals } =
+          calculateTransactionsForPeriod(startDate, endDate);
+
+        yearData.total_deposits = totalDeposits;
+        yearData.total_withdrawals = totalWithdrawals;
+
+        // Calculate net deposits and total cash invested
+        const totalInvested =
+          yearData.total_deposits -
+          yearData.total_withdrawals +
+          yearData.initial_open_cash;
+
+        // Calculate ROI
+        if (totalInvested === 0) {
+          yearData.roi = 0;
+        } else {
+          yearData.roi = (
+            ((yearData.final_close_cash - totalInvested) / totalInvested) *
+            100
+          ).toFixed(2);
+        }
       }
-      yearData.roi = (
-        ((parseFloat(yearData.final_close_cash) -
-          parseFloat(yearData.initial_open_cash)) /
-          parseFloat(yearData.initial_open_cash)) *
-        100
-      ).toFixed(2);
     });
+
     return yearlyData;
   };
 
@@ -124,7 +199,7 @@ const Calender = () => {
           parseFloat(pnlEntry.open_cash) <= parseFloat(pnlEntry.close_cash) ? (
             <FaArrowUp style={{ color: "#4a90e2" }} />
           ) : (
-            <FaArrowDown style={{ color: "red" }} />
+            <FaArrowDown style={{ color: "f44336" }} />
           );
 
         return (
@@ -142,11 +217,10 @@ const Calender = () => {
 
       if (monthlyEntry) {
         const icon =
-          parseFloat(monthlyEntry.final_close_cash) >
-          parseFloat(monthlyEntry.initial_open_cash) ? (
+          parseFloat(monthlyEntry.balance) >= 0 ? (
             <FaArrowUp style={{ color: "#4a90e2" }} />
           ) : (
-            <FaArrowDown style={{ color: "red" }} />
+            <FaArrowDown style={{ color: "#f44336" }} />
           );
 
         return (
@@ -164,11 +238,10 @@ const Calender = () => {
 
       if (yearlyEntry) {
         const icon =
-          parseFloat(yearlyEntry.final_close_cash) >
-          parseFloat(yearlyEntry.initial_open_cash) ? (
-            <FaArrowUp style={{ color: "#4caf50" }} />
+          parseFloat(yearlyEntry.balance) >= 0 ? (
+            <FaArrowUp style={{ color: "#4a90e2" }} />
           ) : (
-            <FaArrowDown style={{ color: "red" }} />
+            <FaArrowDown style={{ color: "#f44336" }} />
           );
 
         return (
@@ -225,70 +298,79 @@ const Calender = () => {
     setModalDetails(null);
   };
 
-  if (loading) return <p>Loading...</p>;
-  if (error) return <p>{error}</p>;
-
   return (
     <div className="calendar-container">
-      <Calendar
-        onChange={setSelectedDate}
-        value={selectedDate}
-        tileContent={tileContent}
-        onClickDay={(date) => handleTileClick(date, "month")}
-        onActiveStartDateChange={({ activeStartDate, view }) =>
-          handleTileClick(activeStartDate, view)
-        }
-      />
-      {modalDetails && (
-        <div className="modal-container">
-          <div className="modal-content">
-            <div className="modal-header">
-              <h2>{modalDetails.date}</h2>
-              <button className="close-button" onClick={handleCloseModal}>
-                &times;
-              </button>
-            </div>
-            <div className="modal-body">
-              <p className="no-id">
-                N<sup>o</sup>: {`000${modalDetails.id}`.slice(-5)}
-              </p>
-              <hr />
-              <div className="modal-row">
-                <span className="label">Open:</span>
-                <span className="separator"></span>
-                <span className="value">
-                  {formatCash(modalDetails.open_cash)}
-                </span>
-              </div>
-              <div className="modal-row">
-                <span className="label">Close:</span>
-                <span className="separator"></span>
-                <span className="value">
-                  {formatCash(modalDetails.close_cash)}
-                </span>
-              </div>
-              <span className="hrs">
-                <hr />
-              </span>
+      {componentLoading ? (
+        <div className="component-loading-spinner-wrapper">
+          <div className="spinner"></div>
+        </div>
+      ) : (
+        <div
+          className={`calendar-content ${
+            hasLoaded ? "fades-in" : "fades-in-hidden"
+          }`}
+        >
+          <Calendar
+            onChange={setSelectedDate}
+            value={selectedDate}
+            tileContent={tileContent}
+            onClickDay={(date) => handleTileClick(date, "month")}
+            onActiveStartDateChange={({ activeStartDate, view }) =>
+              // handleTileClick(activeStartDate, view)
+              setModalDetails(null)
+            }
+          />
+          {modalDetails && (
+            <div className="modal-container">
+              <div className="modal-content">
+                <div className="modal-header">
+                  <h2>{modalDetails.date}</h2>
+                  <button className="close-button" onClick={handleCloseModal}>
+                    &times;
+                  </button>
+                </div>
+                <div className="modal-body">
+                  <p className="no-id">
+                    N<sup>o</sup>: {`000${modalDetails.id}`.slice(-5)}
+                  </p>
+                  <hr />
+                  <div className="modal-row">
+                    <span className="label">Open:</span>
+                    <span className="separator"></span>
+                    <span className="value">
+                      {formatCash(modalDetails.open_cash)}
+                    </span>
+                  </div>
+                  <div className="modal-row">
+                    <span className="label">Close:</span>
+                    <span className="separator"></span>
+                    <span className="value">
+                      {formatCash(modalDetails.close_cash)}
+                    </span>
+                  </div>
+                  <span className="hrs">
+                    <hr />
+                  </span>
 
-              <div className="modal-row">
-                <span className="label">Balance:</span>
-                <span className="separator"></span>
-                <span className="value">
-                  {formatCash(modalDetails.balance)}
-                </span>
-              </div>
-              <div className="modal-row">
-                <span className="label">RoI:</span>
-                <span className="separator"></span>
-                <span className="value">{modalDetails.roi}%</span>
+                  <div className="modal-row">
+                    <span className="label">Balance:</span>
+                    <span className="separator"></span>
+                    <span className="value">
+                      {formatCash(modalDetails.balance)}
+                    </span>
+                  </div>
+                  <div className="modal-row">
+                    <span className="label">RoI:</span>
+                    <span className="separator"></span>
+                    <span className="value">{modalDetails.roi}%</span>
+                  </div>
+                </div>
               </div>
             </div>
-          </div>
+          )}
         </div>
       )}
     </div>
   );
 };
-
 export default Calender;
