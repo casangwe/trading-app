@@ -2,7 +2,7 @@ import React, { useState, useEffect } from "react";
 import { fetchWatchlists, updateWatchlist } from "../api/WatchlistApi";
 import NewWatchlist from "./NewWatchlist";
 import UpdateWatchlist from "./UpdateWatchlist";
-import { formatDate } from "../func/functions";
+import { formatDate, splitText } from "../func/functions";
 
 const Watchlist = () => {
   const [watchlists, setWatchlists] = useState([]);
@@ -27,6 +27,7 @@ const Watchlist = () => {
     try {
       const data = await fetchWatchlists();
       setWatchlists(data);
+      console.log(data);
     } catch (error) {
       setError("Error fetching watchlists");
     } finally {
@@ -69,6 +70,21 @@ const Watchlist = () => {
     // handleCloseModal();
   };
 
+  const handleToggleHit = async (id, currentStatus) => {
+    const updatedStatus = !currentStatus; // Toggle the boolean value
+
+    try {
+      await updateWatchlist(id, { target_hit: updatedStatus }); // API Call to Save in DB
+      setWatchlists((prevWatchlists) =>
+        prevWatchlists.map((wl) =>
+          wl.id === id ? { ...wl, target_hit: updatedStatus } : wl
+        )
+      );
+    } catch (error) {
+      console.error("Error updating target hit status:", error);
+    }
+  };
+
   return (
     <div className="watchlist-wrapper">
       {componentLoading && (
@@ -95,7 +111,7 @@ const Watchlist = () => {
             ) : (
               <>
                 <div className="header-card">
-                  <p className="title">Watchlists</p>
+                  <p className="title">Watchlist</p>
                   <div className="tooltip">
                     <i
                       className="btn btn-primary fa-solid fa-plus"
@@ -107,7 +123,6 @@ const Watchlist = () => {
                 </div>
 
                 <hr />
-                {/* <div className={`fade-in ${fadeInTable ? "visible" : ""}`}> */}
                 <div
                   className={`fade-in ${fadeInTable ? "visible" : "hidden"}`}
                 >
@@ -121,29 +136,96 @@ const Watchlist = () => {
                         <div
                           className="watch-item"
                           key={watchlist.id}
-                          style={{
-                            borderLeft:
-                              watchlist.target_price > watchlist.price
-                                ? "2px solid #4a90e2"
-                                : "2px solid red",
-                          }}
+                          // style={{
+                          //   borderLeft:
+                          //     watchlist.target_price > watchlist.price
+                          //       ? "2px solid #4a90e2"
+                          //       : "2px solid red",
+                          // }}
                           onClick={() => handleOpenModal(watchlist)}
                         >
-                          <span className="watch-item-symbol">
+                          <p className="no-id">
+                            N<sup>o</sup>: {`000${watchlist.id}`.slice(-5)}
+                          </p>
+                          <p className="watch-item-symbol">
                             {watchlist.symbol}
-                          </span>
-                          <span className="watch-item-price">
-                            ${watchlist.price.toFixed(2)}
-                          </span>
-                          <span className="watch-item-target-price">
-                            ${watchlist.target_price.toFixed(2)}
-                          </span>
-                          <span className="watch-item-exp-date">
-                            {formatDate(watchlist.exp_date)}
-                          </span>
-                          <span className="watch-item-target-hit">
-                            {watchlist.target_hit ? "Yes" : "No"}
-                          </span>
+                          </p>
+                          <div className="watch-details">
+                            <div className="watch-row">
+                              <div className="watch-entry-date">
+                                <div className="watch-date-icon-label">
+                                  <span className="label">Date:</span>
+                                </div>
+                                <span className="value">
+                                  {formatDate(watchlist.entry_date)}
+                                </span>
+                              </div>
+                            </div>
+
+                            <div className="watch-row">
+                              <div className="watch-price">
+                                <div className="watch-price-icon-label">
+                                  <span className="label">Price:</span>
+                                </div>
+                                <span className="value">
+                                  ${watchlist.price.toFixed(2)}
+                                </span>
+                              </div>
+                            </div>
+                            <div className="watch-row">
+                              <div className="watch-target">
+                                <div className="watch-target-icon-label">
+                                  <span className="label">Target:</span>
+                                </div>
+                                <span className="value">
+                                  ${watchlist.target_price.toFixed(2)}
+                                </span>
+                              </div>
+                            </div>
+                            <div className="watch-row">
+                              <div className="watch-target-hit">
+                                <div className="watch-target-hit-icon-label">
+                                  {/* <span className="label">Hit:</span> */}
+                                </div>
+                                <label
+                                  className="toggle-switch"
+                                  onClick={(e) => e.stopPropagation()}
+                                >
+                                  <input
+                                    type="checkbox"
+                                    checked={watchlist.target_hit}
+                                    onChange={() =>
+                                      handleToggleHit(
+                                        watchlist.id,
+                                        watchlist.target_hit
+                                      )
+                                    }
+                                  />
+                                  <span className="slider"></span>
+                                </label>
+                              </div>
+                            </div>
+
+                            {/* <div className="watch-row">
+                              <div className="watch-target-hit">
+                                <div className="watch-target-hit-icon-label">
+                                  <span className="label">Hit:</span>
+                                </div>
+                                <span className="value">
+                                  {watchlist.target_hit ? "Yes" : "No"}
+                                </span>
+                              </div>
+                            </div> */}
+                          </div>
+                          {/* <div className="watch-plan">
+                            <div className="label">Metrics:</div>
+                            <div className="value">{watchlist.plan}</div>
+                          </div>
+                          <div className="watch-exp-date">
+                            <div className="value">
+                              {formatDate(watchlist.exp_date)}
+                            </div>
+                          </div> */}
                         </div>
                       ))
                     )}

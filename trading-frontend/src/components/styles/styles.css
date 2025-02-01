@@ -424,24 +424,11 @@ body::-webkit-scrollbar {
 
 .daily-pnl-section .daily-pnl-card {
   border-radius: 8px;
-  /* padding: 12px; */
-  /* padding: 20px; */
-  /* background-color: #ffffff; */
   flex: 1;
   max-width: 100%;
   display: flex;
-  /* border: 1px solid rgb(231, 223, 223); */
   transition: transform 0.3s, background-color 0.3s;
 }
-
-/* .daily-pnl-section .daily-pnl-card:hover {
-  transform: scale(1.05) translateY(-4px);
-  background-color: #e6f7ff;
-  cursor: pointer;
-  border: 1px solid #4a90e2;
-  box-shadow: 0 6px 12px rgba(72, 144, 226, 0.2),
-    0 12px 24px rgba(72, 144, 226, 0.15);
-} */
 
 .daily-pnl-section .card-content {
   display: flex;
@@ -1320,24 +1307,22 @@ body::-webkit-scrollbar {
   transform: translateY(0);
 }
 
-/* .watchlist-container:hover {
+.watchlist-container:hover {
   box-shadow: 0 3px 6px rgba(72, 128, 170, 0.2),
     0 6px 12px rgba(72, 128, 170, 0.15);
-} */
+}
 
 #watchlist-new-btn {
   font-size: 12px;
   cursor: pointer;
   color: black;
-  border: 1px solid black;
   padding: 6px 10px;
   border-radius: 5px;
 }
 #watchlist-new-btn:hover {
   font-size: 12px;
-  background-color: #e6f7ff;
   cursor: pointer;
-  border: 1px solid #4a90e2;
+  /* border: 1px solid #4a90e2; */
   color: #4a90e2;
 }
 
@@ -1346,7 +1331,7 @@ body::-webkit-scrollbar {
 }
 
 .watch-container {
-  max-height: 300px;
+  max-height: 400px;
   overflow-y: auto;
   display: flex;
   flex-direction: column;
@@ -1357,46 +1342,81 @@ body::-webkit-scrollbar {
   display: none;
 }
 
+/* ------------------------------------- */
 .watch-item {
   display: flex;
-  justify-content: space-between;
-  align-items: center;
-  /* background-color: #f9f9f9; */
-  background-color: transparent;
-  cursor: pointer;
-  margin-top: 10px;
-  border-left: 2px solid #4a90e2;
+  flex-direction: column;
+  align-items: flex-start;
   padding: 10px;
-  transition: transform 0.3s, background-color 0.3s;
-  opacity: 0;
-  animation: fadeIn 0.8s ease forwards;
+  background: transparent;
+  transition: transform 0.2s ease-in-out, box-shadow 0.2s ease-in-out;
+  cursor: pointer;
+  box-shadow: 0 4px 10px rgba(255, 255, 255, 0.05);
+  /* border-bottom: 1px solid #dadada; */
 }
-
-.watch-item.staggered {
-  animation-delay: var(--delay);
-}
-
 .watch-item:hover {
-  transform: scale(1.05) translateY(-4px);
+  transform: scale(1.03) translateY(-4px);
+  /* border-left: 5px solid #4a90e2; */
 }
 
-.watch-item-symbol {
-  width: 20%;
+.watch-item .watch-item-symbol {
   font-weight: bold;
-  font-size: 16px;
+  font-size: 30px;
+  color: #505050;
+  margin-bottom: 8px;
+}
+.watch-item .no-id {
+  font-size: 8px;
+  color: #333;
+  margin-bottom: 5px;
 }
 
-.watch-item-price,
-.watch-item-target-price,
-.watch-item-target-hit,
-.watch-item-exp-date {
-  width: 20%;
-  text-align: center;
-  font-size: 11px;
+.watch-item .watch-details {
+  display: flex;
+  flex-direction: row;
+  justify-content: flex-start;
+  align-items: center;
+  width: 100%;
+  font-size: 10px;
+  margin-bottom: 10px;
+  gap: 20px;
 }
-.watch-item-target-price {
-  font-weight: bold;
+
+.watch-item .watch-details > * {
+  flex: 1;
+  text-align: left;
 }
+
+.watch-item .watch-row .label {
+  font-size: 10px;
+  font-weight: 600;
+  color: #333;
+  margin-top: 4px;
+}
+
+.watch-item .watch-row .value {
+  font-size: 10px;
+  font-weight: 500;
+  color: #333;
+}
+
+.watch-item .watch-plan .label {
+  font-size: 10px;
+  font-weight: 600;
+  color: #333;
+}
+.watch-item .watch-plan .value {
+  font-size: 10px;
+  color: #333;
+}
+.watch-item .watch-exp-date {
+  font-size: 8px;
+  font-weight: 600;
+  color: #333;
+  margin-top: 5px;
+}
+
+/* ------------------------------------ */
 
 .new-watchlist-container {
   padding: 10px;
@@ -1469,11 +1489,16 @@ hr.small-hr {
   text-align: right;
   color: #555;
 }
+
+/* Toggle */
+
 .toggle-switch {
   position: relative;
   display: inline-block;
-  width: 50px;
-  height: 24px;
+  /* width: 50px; */
+  width: 34px;
+  /* height: 24px; */
+  height: 18px;
   cursor: pointer;
 }
 
@@ -1497,9 +1522,9 @@ hr.small-hr {
 .slider:before {
   position: absolute;
   content: "";
-  height: 18px;
-  width: 18px;
-  left: 4px;
+  height: 12px;
+  width: 12px;
+  left: 3px;
   bottom: 3px;
   background-color: white;
   border-radius: 50%;
@@ -1511,7 +1536,7 @@ input:checked + .slider {
 }
 
 input:checked + .slider:before {
-  transform: translateX(26px);
+  transform: translateX(16px);
 }
 
 .toggle-label {
@@ -1722,7 +1747,7 @@ input:checked + .slider:before {
   /* background-color: #f9f9f9; */
   background-color: transparent;
   cursor: pointer;
-  height: 200px;
+  height: 300px;
   margin-top: 10px;
   border-left: 2px solid #4a90e2;
   padding: 40px;
