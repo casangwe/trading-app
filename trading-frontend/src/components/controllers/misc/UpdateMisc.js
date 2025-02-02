@@ -56,6 +56,7 @@ const UpdateMisc = ({ misc, onClose, onSave }) => {
             <div className="misc-description">
               {isEditable ? (
                 <textarea
+                  className="edit-textarea"
                   name="description"
                   value={formData.description}
                   onChange={handleChange}
@@ -69,18 +70,38 @@ const UpdateMisc = ({ misc, onClose, onSave }) => {
             </div>
           </div>
         </div>
-        <hr className="modal-hr" />
+        {/* <hr className="modal-hr" /> */}
         <div className="modal-footer">
+          <div className="icon-container">
+            {/* <span
+              onClick={(e) => {
+                e.stopPropagation();
+                handleDelete(watchlist.id);
+              }}
+              className="delete-icon"
+            >
+              <i className="fa-solid fa-trash"></i>
+            </span> */}
+            <span
+              onClick={(e) => {
+                e.stopPropagation();
+                toggleEdit();
+              }}
+              className="settings-icon"
+            >
+              <i className="fa-solid fa-cog"></i>
+            </span>
+          </div>
           {isEditable && (
             <button onClick={handleSubmit} className="update-button">
               Update
             </button>
           )}
-          {!isEditable && (
+          {/* {!isEditable && (
             <button onClick={toggleEdit} className="edit-button">
               Edit
             </button>
-          )}
+          )} */}
         </div>
       </div>
     </div>

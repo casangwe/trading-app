@@ -10,6 +10,9 @@ const Trades = () => {
   return (
     <div className="trades">
       <div className="trades-horizontal">
+        {/* <div className="misc-trade">
+          <Misc />
+        </div> */}
         <div className="watchlist-trade">
           <Watchlist />
         </div>
