@@ -151,7 +151,7 @@ const Watchlist = () => {
                             {watchlist.symbol}
                           </p>
                           <div className="watch-details">
-                            <div className="watch-row">
+                            {/* <div className="watch-row">
                               <div className="watch-entry-date">
                                 <div className="watch-date-icon-label">
                                   <span className="label">Date:</span>
@@ -160,7 +160,7 @@ const Watchlist = () => {
                                   {formatDate(watchlist.entry_date)}
                                 </span>
                               </div>
-                            </div>
+                            </div> */}
 
                             <div className="watch-row">
                               <div className="watch-price">
