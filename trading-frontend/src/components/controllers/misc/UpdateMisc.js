@@ -20,7 +20,7 @@ const UpdateMisc = ({ misc, onClose, onSave }) => {
 
   const handleSubmit = (e) => {
     e.preventDefault();
-    onSave({ id: misc.id, ...formData }); // Include the original ID
+    onSave({ id: misc.id, ...formData });
     setIsEditable(false);
   };
 

@@ -100,13 +100,13 @@ const Misc = ({ onNewMisc }) => {
     console.log("Updating misc entry...");
     const { id, ...miscData } = updatedMisc;
     try {
+      setShowModal(false);
+      setFadeInTable(false);
       await updateMiscEntry(id, miscData);
       console.log("Misc entry updated:", updatedMisc);
-      setFadeInTable(false);
       setLoading(true);
       setSelectedMisc(null);
       setIsEditing(false);
-      setShowModal(false);
 
       await fetchMiscData();
     } catch (error) {

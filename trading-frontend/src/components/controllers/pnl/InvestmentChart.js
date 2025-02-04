@@ -58,10 +58,33 @@ const InvestmentChart = () => {
   }, []);
 
   const calculateInvestmentSummary = (dailyPnls, cashData, transactions) => {
+    if (!dailyPnls.length || !cashData) {
+      return {
+        balance: 0,
+        roi: 0,
+        latestDate: "N/A",
+        pnl: 0,
+      };
+    }
+
     const initialCash = calculateInitialCash(cashData);
     const netPL = calculateNetPL(dailyPnls);
     const cashBalance = calculateCashBalance(initialCash, netPL, transactions);
-    const roi = calculateROI(initialCash, netPL);
+
+    const totalDeposits = transactions
+      .filter((t) => t.transaction_type === "deposit")
+      .reduce((sum, t) => sum + parseFloat(t.amount), 0);
+
+    const totalWithdrawals = transactions
+      .filter((t) => t.transaction_type === "withdrawal")
+      .reduce((sum, t) => sum + parseFloat(t.amount), 0);
+
+    const totalInvested = initialCash + totalDeposits - totalWithdrawals;
+
+    let roi = 0;
+    if (totalInvested !== 0) {
+      roi = ((cashBalance - totalInvested) / totalInvested) * 100;
+    }
 
     const latestDate = formatDate(
       dailyPnls.length > 0 ? dailyPnls[dailyPnls.length - 1]?.entry_date : null
@@ -69,7 +92,7 @@ const InvestmentChart = () => {
 
     return {
       balance: cashBalance,
-      roi: roi,
+      roi: roi.toFixed(2),
       latestDate: latestDate,
       pnl: netPL,
     };
@@ -104,11 +127,12 @@ const InvestmentChart = () => {
             </p>
             <p className="investment-roi">
               {investmentSummary
-                ? `${formatCash(
-                    investmentSummary.pnl || 0
-                  )} (${investmentSummary.roi.toFixed(2)}%)`
+                ? `${formatCash(investmentSummary.pnl || 0)} (${
+                    investmentSummary.roi
+                  }%)`
                 : "Loading..."}
             </p>
+
             <p className="investment-date">
               {investmentSummary?.latestDate || "Loading..."}
             </p>

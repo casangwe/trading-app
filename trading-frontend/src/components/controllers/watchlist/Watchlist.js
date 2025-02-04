@@ -51,30 +51,35 @@ const Watchlist = () => {
   const handleSaveChanges = async (updatedData) => {
     if (isEditing) {
       try {
-        setItemsLoading(true);
+        setShowModal(false);
+        setFadeInTable(false);
+
         await updateWatchlist(selectedWatchlist.id, updatedData);
+
         setWatchlists((prevWatchlists) =>
           prevWatchlists.map((wl) =>
             wl.id === selectedWatchlist.id ? { ...wl, ...updatedData } : wl
           )
         );
+        setItemsLoading(true);
       } catch (error) {
         console.error("Error updating watchlist:", error);
       } finally {
-        setShowModal(false);
-        setItemsLoading(false);
+        setTimeout(() => {
+          setItemsLoading(false);
+          setFadeInTable(true);
+        }, 1000);
       }
     } else {
       fetchWatchlistData();
     }
-    // handleCloseModal();
   };
 
   const handleToggleHit = async (id, currentStatus) => {
-    const updatedStatus = !currentStatus; // Toggle the boolean value
+    const updatedStatus = !currentStatus;
 
     try {
-      await updateWatchlist(id, { target_hit: updatedStatus }); // API Call to Save in DB
+      await updateWatchlist(id, { target_hit: updatedStatus });
       setWatchlists((prevWatchlists) =>
         prevWatchlists.map((wl) =>
           wl.id === id ? { ...wl, target_hit: updatedStatus } : wl
@@ -123,9 +128,7 @@ const Watchlist = () => {
                 </div>
 
                 <hr />
-                <div
-                  className={`fade-in ${fadeInTable ? "visible" : "hidden"}`}
-                >
+                <div className={`fade-in ${fadeInTable ? "visible" : ""}`}>
                   <div className="watch-container">
                     {itemsLoading ? (
                       <div className="items-spinner-wrapper">
@@ -184,9 +187,7 @@ const Watchlist = () => {
                             </div>
                             <div className="watch-row">
                               <div className="watch-target-hit">
-                                <div className="watch-target-hit-icon-label">
-                                  {/* <span className="label">Hit:</span> */}
-                                </div>
+                                <div className="watch-target-hit-icon-label"></div>
                                 <label
                                   className="toggle-switch"
                                   onClick={(e) => e.stopPropagation()}
@@ -205,27 +206,7 @@ const Watchlist = () => {
                                 </label>
                               </div>
                             </div>
-
-                            {/* <div className="watch-row">
-                              <div className="watch-target-hit">
-                                <div className="watch-target-hit-icon-label">
-                                  <span className="label">Hit:</span>
-                                </div>
-                                <span className="value">
-                                  {watchlist.target_hit ? "Yes" : "No"}
-                                </span>
-                              </div>
-                            </div> */}
                           </div>
-                          {/* <div className="watch-plan">
-                            <div className="label">Metrics:</div>
-                            <div className="value">{watchlist.plan}</div>
-                          </div>
-                          <div className="watch-exp-date">
-                            <div className="value">
-                              {formatDate(watchlist.exp_date)}
-                            </div>
-                          </div> */}
                         </div>
                       ))
                     )}

@@ -79,26 +79,6 @@ const UpdateWatchlist = ({ watchlist, onClose, onSave, handleDelete }) => {
               </label>
             </div>
           </div>
-          {/* Plan should be editable when the settings-icon is clicked  */}
-          {/* <div className="watch-plan">
-            <div className="watch-plan-icon-label"></div>
-            <span className="value">{splitText(watchlist.plan)}</span>
-          </div> */}
-          {/* Plan should be editable when the settings-icon is clicked */}
-          {/* <div className="watch-plan">
-            <div className="watch-plan-icon-label"></div>
-            {isEditable ? (
-              <textarea
-                className="editable-textarea"
-                value={formData.plan}
-                onChange={(e) =>
-                  setFormData((prev) => ({ ...prev, plan: e.target.value }))
-                }
-              />
-            ) : (
-              <span className="value">{splitText(watchlist.plan)}</span>
-            )}
-          </div> */}
 
           <div className="watch-plan">
             <div className="watch-plan-icon-label"></div>
@@ -146,8 +126,13 @@ const UpdateWatchlist = ({ watchlist, onClose, onSave, handleDelete }) => {
               <i className="fa-solid fa-cog"></i>
             </span>
           </div>
-          {showUpdateButton && (
+          {/* {showUpdateButton && (
             <button onClick={handleSubmit} className="update-button">
+              Update
+            </button>
+          )} */}
+          {showUpdateButton && (
+            <button onClick={() => onSave(formData)} className="update-button">
               Update
             </button>
           )}
