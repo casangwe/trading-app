@@ -8,6 +8,7 @@ import AnalysisDisplay from "../controllers/analysis/AnalysisDisplay";
 import InvestmentChart from "../controllers/pnl/InvestmentChart";
 import EQTCurve from "../controllers/trades/EQTcurve";
 import AnalysisCircle from "../controllers/analysis/AnalysisCircle";
+import AnalysisSummary from "../controllers/analysis/AnalysisSummary";
 
 const Home = ({ onClose }) => {
   const [userData, setUserData] = useState(null);
@@ -79,13 +80,17 @@ const Home = ({ onClose }) => {
       </div>
 
       {/* AnalysisDisplay in full width */}
-
-      <div className="eqt-curve-trade">
-        <EQTCurve />
+      <div className="eqt-analysis-sum-container">
+        <div className="eqt-curve-trade">
+          <EQTCurve />
+        </div>
+        <div className="trades-analysis-sum">
+          <AnalysisSummary />
+        </div>
       </div>
-      <div className="analysis-display-container">
+      {/* <div className="analysis-display-container">
         <AnalysisDisplay />
-      </div>
+      </div> */}
 
       <div className="analysis-analysis">
         <AnalysisCircle />

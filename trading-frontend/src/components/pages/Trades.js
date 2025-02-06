@@ -5,6 +5,7 @@ import Misc from "../controllers/misc/Misc";
 import EQTCurve from "../controllers/trades/EQTcurve";
 import AnalysisDisplay from "../controllers/analysis/AnalysisDisplay";
 import AnalysisCircle from "../controllers/analysis/AnalysisCircle";
+import AnalysisSummary from "../controllers/analysis/AnalysisSummary";
 
 const Trades = () => {
   return (
@@ -20,18 +21,31 @@ const Trades = () => {
           <Misc />
         </div>
       </div>
-      <div className="eqt-curve-trade">
+      <div className="eqt-analysis-sum-container">
+        <div className="eqt-curve-trade">
+          <EQTCurve />
+        </div>
+        <div className="trades-analysis-sum">
+          <AnalysisSummary />
+        </div>
+      </div>
+
+      {/* <div className="eqt-curve-trade">
         <EQTCurve />
-      </div>
-      <div className="analysis-display-container">
-        <AnalysisDisplay />
-      </div>
-      {/* <div className="analysis-analysis-account">
-        <AnalysisCircle />
       </div> */}
+      {/* <div className="analysis-display-container">
+        <AnalysisDisplay />
+      </div> */}
+      <div className="analysis-analysis-account">
+        <AnalysisCircle />
+      </div>
       <div className="trades-trade">
         <TradeTable />
       </div>
+      {/* <div className="analysis-sum-trades">
+        <AnalysisSummary />
+      </div>
+      <div className="eqt-analysis-sum-container"></div> */}
     </div>
   );
 };
