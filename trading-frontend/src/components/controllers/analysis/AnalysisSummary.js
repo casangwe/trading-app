@@ -34,49 +34,55 @@ const AnalysisSummary = () => {
           <div className="analysis-circle-summary">
             {/* Absolute Return - Main Center Circle */}
             <div className="wins">
-              <h3>Wins</h3>
               <p>{analysisData ? `${analysisData.winningTrades}` : "N/A"}</p>
+              <h3>Wins</h3>
             </div>{" "}
             {/* Absolute Return - Main Center Circle */}
             <div className="loss">
-              <h3>Losses</h3>
               <p>{analysisData ? `${analysisData.losingTrades}` : "N/A"}</p>
+              <h3>Losses</h3>
+            </div>
+            <div className="win-rate">
+              <p>
+                {analysisData ? `${analysisData.winRate.toFixed(2)}%` : "N/A"}
+              </p>{" "}
+              {/* <h3>Rate</h3> */}
             </div>
             {/* Absolute Return - Main Center Circle */}
             <div className="abs-return">
-              <h3>Absolute return</h3>
               <p>
                 {analysisData
                   ? `${analysisData.absoluteReturn.toFixed(2)}%`
                   : "N/A"}
               </p>
+              <h3>Abs. return</h3>
             </div>
             {/* Sharpe Ratio - "2 o'clock" position */}
             <div className="sharpe-ratio">
-              <h3>Sharpe Ratio</h3>
               <p>
                 {analysisData
                   ? `${analysisData.sharpeRatio.toFixed(2)}`
                   : "Sharpe Ratio: N/A"}
               </p>
+              <h3>Sharpe Ratio</h3>
             </div>
             {/* Risk Reward - "3 o'clock" position */}
             <div className="risk-reward">
-              <h3>Risk Reward</h3>
               <p>
                 {analysisData
                   ? `${analysisData.riskRewardRatio.toFixed(2)}`
                   : "R/R: N/A"}
               </p>
+              <h3>Risk Reward</h3>
             </div>
             {/* Days in Trade - "4 o'clock" position */}
             <div className="avg-days">
-              <h3>Days</h3>
               <p>
                 {analysisData
                   ? `${analysisData.avgDaysInTrade.toFixed(0)}`
                   : "Avg. Days: N/A"}
               </p>
+              <h3>Days</h3>
             </div>
           </div>
 

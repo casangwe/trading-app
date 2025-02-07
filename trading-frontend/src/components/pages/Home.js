@@ -84,17 +84,17 @@ const Home = ({ onClose }) => {
         <div className="eqt-curve-trade">
           <EQTCurve />
         </div>
-        <div className="trades-analysis-sum">
+        <div className="analysis-sum-trade">
           <AnalysisSummary />
         </div>
       </div>
       {/* <div className="analysis-display-container">
         <AnalysisDisplay />
       </div> */}
-
+      {/* 
       <div className="analysis-analysis">
         <AnalysisCircle />
-      </div>
+      </div> */}
       {/* Trades Table and EQTchat side by side */}
       {/* <div className="trades-eqt-container">
         <div className="trades-table">

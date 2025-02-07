@@ -1,21 +1,9 @@
 import React, { useState, useEffect } from "react";
-import {
-  BarChart,
-  Bar,
-  XAxis,
-  YAxis,
-  Tooltip,
-  PieChart,
-  Pie,
-  Cell,
-  ResponsiveContainer,
-} from "recharts";
+import { Tooltip, PieChart, Pie, Cell, ResponsiveContainer } from "recharts";
 import { performAnalysis } from "./AnalysisGet";
-import { Line } from "rc-progress";
 
-const AnalysisDisplay = () => {
+const AnalysisCircle = () => {
   const [analysisResults, setAnalysisResults] = useState(null);
-
   const [error, setError] = useState(null);
 
   useEffect(() => {
@@ -31,30 +19,20 @@ const AnalysisDisplay = () => {
     fetchData();
   }, []);
 
-  // if (error) {
-  //   console.error("Error fetching analysis data:", error);
-  // }
-
   if (!analysisResults && !error) {
     return <div></div>;
   }
 
   const {
-    absoluteReturn = 0,
-    sharpeRatio = 0,
     winRate = 0,
-    numberOfTrades = 0,
     winningTrades = 0,
     losingTrades = 0,
     averageWin = 0,
     averageLoss = 0,
-    riskRewardRatio = 0,
   } = analysisResults || {};
   const total = averageWin + averageLoss;
   const winPercent = total > 0 ? (averageWin / total) * 100 : 50;
   const formatCash = (value) => `$${value.toFixed(2)}`;
-  const absoluteReturnPercentage = absoluteReturn * 100;
-  const sharpeRatioPercentage = (sharpeRatio / 3) * 100;
 
   const data = [
     {
@@ -75,15 +53,9 @@ const AnalysisDisplay = () => {
     { name: "Win Rate", value: winRate, color: "#4a90e2" },
     { name: "Remaining", value: 100 - winRate, color: "#d8e3ef" },
   ];
-  const formatValue = (value, isCurrency = false) => {
-    if (isNaN(value) || value === undefined) {
-      return isCurrency ? "$0.00" : "N/A";
-    }
-    return isCurrency ? `$${value.toFixed(2)}` : `${value.toFixed(2)}`;
-  };
+
   return (
     <div className="analysis-container">
-      {/* <br /> */}
       <div className="analysis-circle-row">
         {/* Win Rate */}
         <ResponsiveContainer width="100%" height={150}>
@@ -250,4 +222,4 @@ const AnalysisDisplay = () => {
   );
 };
 
-export default AnalysisDisplay;
+export default AnalysisCircle;

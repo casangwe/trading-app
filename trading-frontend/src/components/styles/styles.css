@@ -524,26 +524,6 @@ body::-webkit-scrollbar {
 }
 
 /* Trades page  */
-.eqt-analysis-sum-container {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  gap: 0px;
-  margin-top: 20px;
-  margin-bottom: 20px;
-  /* width: 100%; */
-  /* padding: 10px; */
-  /* padding: 20px; */
-}
-.eqt-curve-trade {
-  flex: 0.65;
-  /* min-width: 50%; */
-}
-.trades-analysis-sum {
-  flex: 0.35;
-  width: min-content;
-  padding: 20px;
-}
 
 /* Analysis Page */
 .eqt-curve {
@@ -1968,15 +1948,29 @@ input:checked + .slider:before {
   flex: 1;
 } */
 
+.eqt-analysis-sum-container {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 0px;
+  padding: 20px;
+  margin-top: 20px;
+  margin-bottom: 20px;
+}
+.eqt-curve-trade {
+  flex: 0.7;
+}
+.analysis-sum-trade {
+  flex: 0.33;
+  padding: 20px;
+}
 /* AnalysisSummary  */
 .analysis-summary-container {
   display: flex;
-  justify-content: left;
+  justify-content: center;
   align-items: center;
   position: relative;
-  width: 50%;
   height: 250px;
-  margin-left: 0px;
   padding: 20px;
 }
 
@@ -1986,10 +1980,9 @@ input:checked + .slider:before {
   height: 100%;
 }
 
-/* Main Center Circle */
 .analysis-circle-summary .abs-return {
-  width: 170px;
-  height: 170px;
+  width: 120px;
+  height: 120px;
   position: absolute;
   top: 50%;
   left: 50%;
@@ -2004,14 +1997,13 @@ input:checked + .slider:before {
   border: 1px solid #dadada;
 }
 
-/* Sharpe Ratio - Positioned at "2 o'clock" */
 .analysis-circle-summary .sharpe-ratio {
-  width: 100px;
-  height: 100px;
+  width: 95px;
+  height: 95px;
   position: absolute;
-  top: -20%;
-  left: 75%;
-  background-color: transparent;
+  top: calc(50% + 10px);
+  left: calc(50% + 115px);
+  transform: translate(-50%, -50%);
   border-radius: 50%;
   display: flex;
   align-items: center;
@@ -2019,16 +2011,48 @@ input:checked + .slider:before {
   text-align: center;
   flex-direction: column;
   border: 1px solid #dadada;
+  background-color: transparent;
+}
+.analysis-circle-summary .risk-reward {
+  width: 95px;
+  height: 95px;
+  position: absolute;
+  top: calc(50% + 105px);
+  left: calc(50% + 45px);
+  transform: translate(-50%, -50%);
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  text-align: center;
+  flex-direction: column;
+  border: 1px solid #dadada;
+  background-color: transparent;
+}
+.analysis-circle-summary .avg-days {
+  width: 65px;
+  height: 65px;
+  position: absolute;
+  top: calc(50% + 95px);
+  left: calc(50% + 130px);
+  transform: translate(-50%, -50%);
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  text-align: center;
+  flex-direction: column;
+  border: 1px solid #dadada;
+  background-color: transparent;
 }
 
-/* Risk Reward - Positioned at "3 o'clock" */
-.analysis-circle-summary .risk-reward {
-  width: 100px;
-  height: 100px;
+.analysis-circle-summary .win-rate {
+  width: 65px;
+  height: 65px;
   position: absolute;
   top: 50%;
-  left: 100%;
-  transform: translateY(-50%);
+  left: calc(50% - 100px);
+  transform: translate(-50%, -50%);
   background-color: transparent;
   border-radius: 50%;
   display: flex;
@@ -2037,31 +2061,16 @@ input:checked + .slider:before {
   text-align: center;
   flex-direction: column;
   border: 1px solid #dadada;
-}
-
-/* Days in Trade - Positioned at "4 o'clock" */
-.analysis-circle-summary .avg-days {
-  width: 100px;
-  height: 100px;
-  position: absolute;
-  top: 80%;
-  left: 75%;
-  background-color: transparent;
-  border-radius: 50%;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  text-align: center;
-  flex-direction: column;
-  border: 1px solid #dadada;
+  transition: transform 0.3s ease, border-color 0.3s ease, box-shadow 0.3s ease;
 }
 
 .analysis-circle-summary .wins {
-  width: 60px;
-  height: 60px;
+  width: 65px;
+  height: 65px;
   position: absolute;
-  top: -20%;
-  left: 0%;
+  top: calc(50% - 70px);
+  left: calc(50% - 70px);
+  transform: translate(-50%, -50%);
   background-color: transparent;
   border-radius: 50%;
   display: flex;
@@ -2070,15 +2079,15 @@ input:checked + .slider:before {
   text-align: center;
   flex-direction: column;
   border: 1px solid #dadada;
-  /* border: none; */
   transition: transform 0.3s ease, border-color 0.3s ease, box-shadow 0.3s ease;
 }
 .analysis-circle-summary .loss {
-  width: 60px;
-  height: 60px;
+  width: 65px;
+  height: 65px;
   position: absolute;
-  top: -20%;
-  left: 40%;
+  top: calc(50% - 100px);
+  left: 50%;
+  transform: translate(-50%, -50%);
   background-color: transparent;
   border-radius: 50%;
   display: flex;
@@ -2087,57 +2096,61 @@ input:checked + .slider:before {
   text-align: center;
   flex-direction: column;
   border: 1px solid #dadada;
-  /* border: none; */
-  transition: transform 0.3s ease, border-color 0.3s ease, box-shadow 0.3s ease;
-}
-.wins:hover,
-.loss:hover {
-  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.15);
-  transform: scale(1.05) translateY(-4px);
+  transition: transform 0.3s ease-out, border-color 0.3s ease,
+    box-shadow 0.3s ease;
 }
 
+/* Circle text styles */
+.analysis-circle-summary h3 {
+  margin: 0;
+  font-size: 9px;
+  font-weight: 500;
+  color: #666;
+  text-align: center;
+}
+
+.analysis-circle-summary p {
+  font-size: 11px;
+  font-weight: 550;
+  color: #333;
+  margin: 0;
+  text-align: center;
+}
+/* Circle hover effects */
 .abs-return:hover,
 .sharpe-ratio:hover,
 .risk-reward:hover,
+.win-rate:hover,
 .avg-days:hover {
   border: 1px solid #dadada;
   background-color: #dadada;
   transition: background-color 0.3s ease, border-color 0.3s ease;
 }
 
-/* Circle text styles */
-.analysis-circle-summary h3 {
-  margin: 0;
-  font-size: 10px;
-  font-weight: 500;
-  color: #666;
-  margin-bottom: 2px;
-  text-align: center;
-}
-
-.analysis-circle-summary p {
-  font-size: 11px;
-  font-weight: 600;
-  color: #333;
-  margin: 0;
-  text-align: center;
+.wins:hover,
+.loss:hover {
+  box-shadow: 0 6px 12px rgba(0, 0, 0, 0.2);
+  transform: scale(1.08) translateY(-6px);
 }
 
 .analysis-circle-summary .wins:hover {
   cursor: pointer;
   background-color: #e6f7ff;
   border-color: #4a90e2;
-  box-shadow: 0 6px 12px rgba(72, 144, 226, 0.2),
-    0 12px 24px rgba(72, 144, 226, 0.15);
+  box-shadow: 0 8px 16px rgba(72, 144, 226, 0.3),
+    0 14px 28px rgba(72, 144, 226, 0.2);
+  transform: translate(-50%, -60%) scale(1.1);
 }
 
 .analysis-circle-summary .loss:hover {
   cursor: pointer;
   background-color: #fdecea;
   border-color: #e74c3c;
-  box-shadow: 0 6px 12px rgba(231, 76, 60, 0.2),
-    0 12px 24px rgba(231, 76, 60, 0.2);
+  box-shadow: 0 8px 16px rgba(231, 76, 60, 0.3),
+    0 14px 28px rgba(231, 76, 60, 0.2);
+  transform: translate(-50%, -60%) scale(1.1);
 }
+
 /* AnalysisSummary  */
 /* .analysis-summary-container {
   display: flex;
@@ -2945,7 +2958,8 @@ input:checked + .slider:before {
 .equity-curve-chart-container {
   font-family: Arial, sans-serif;
   /* padding: 40px; */
-  margin: 30px;
+  /* margin: 30px; */
+  margin: 40px;
   background-color: transparent;
   transition: transform 0.3s, box-shadow 0.3s;
   position: relative;

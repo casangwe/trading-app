@@ -75,14 +75,30 @@ export const calculateStandardDeviation = (trades) => {
 
 // Calculate Average Days in Trade
 export const calculateAverageDaysInTrade = (trades) => {
-  const totalDays = trades.reduce((acc, trade) => {
+  if (!trades || trades.length === 0) return 0;
+
+  let totalDays = 0;
+  let validTrades = 0;
+
+  trades.forEach((trade) => {
+    if (!trade.entry_date || !trade.close_date) return;
+
     const entryDate = new Date(trade.entry_date);
-    const exitDate = new Date(trade.exit_date);
+    const exitDate = new Date(trade.close_date);
+
+    if (isNaN(entryDate.getTime()) || isNaN(exitDate.getTime())) {
+      console.warn("Invalid date format for trade:", trade);
+      return;
+    }
+
     const diffTime = Math.abs(exitDate - entryDate);
     const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24));
-    return acc + diffDays;
-  }, 0);
-  return trades.length === 0 ? 0 : totalDays / trades.length;
+
+    totalDays += diffDays;
+    validTrades += 1;
+  });
+
+  return validTrades === 0 ? 0 : totalDays / validTrades;
 };
 
 // Calculate Cash Balance
