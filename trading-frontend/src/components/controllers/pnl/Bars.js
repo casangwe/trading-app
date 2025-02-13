@@ -19,28 +19,19 @@ const Bars = () => {
   const [componentLoading, setComponentLoading] = useState(true);
   const [hasLoaded, setHasLoaded] = useState(false);
 
-  // useEffect(() => {
-  //   const fetchDailyPNLData = async () => {
-  //     try {
-  //       const data = await fetchDailyPnls();
-  //       setDailyPNLData(data);
-  //       console.log("daily pnl: ", data);
-  //     } catch (error) {
-  //       setError("No Daily PNL data");
-  //       console.error("No Daily PNL data:", error);
-  //     } finally {
-  //       setLoading(false);
-  //     }
-  //   };
-
-  //   fetchDailyPNLData();
-  // }, []);
-
   useEffect(() => {
     const fetchDailyPNLData = async () => {
       try {
         const data = await fetchDailyPnls();
-        setDailyPNLData(data);
+        const filteredData = data.filter(
+          (entry) => formatDate(entry.entry_date) !== "01/01"
+        );
+
+        if (filteredData.length === 0) {
+          console.warn("sNo valid trading days after filtering out 1/1.");
+        }
+
+        setDailyPNLData(filteredData);
       } catch (error) {
         setError("No Daily PNL data");
         console.error("No Daily PNL data:", error);
@@ -54,10 +45,6 @@ const Bars = () => {
 
     fetchDailyPNLData();
   }, []);
-
-  // if (loading) return <div>Loading...</div>;
-  // if (error) return <div>{error}</div>;
-  // if (!dailyPNLData) return <p>No PNL data available</p>;
 
   const formatMonthYear = (dateStr) => {
     if (!dateStr || !dateStr.includes("-")) return "";

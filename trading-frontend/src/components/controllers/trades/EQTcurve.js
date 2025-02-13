@@ -126,9 +126,6 @@ const EQTCurve = () => {
               </span>
               <span className="trade-label"> Trades</span>
             </p>
-            <p className="equity-summary-roi">
-              {tradeSummary ? `${tradeSummary.roi}%` : "ROI: N/A"}
-            </p>
             <p className="equity-summary-sharpe-ratio">
               {tradeSummary
                 ? `${tradeSummary.sharpeRatio}`

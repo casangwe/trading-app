@@ -3,7 +3,7 @@ import Calendar from "react-calendar";
 import { FaArrowUp, FaArrowDown } from "react-icons/fa";
 import { fetchDailyPnls } from "../api/DailyPNLApi";
 import { fetchTransactions } from "../api/TransactionsAPI";
-import { formatCash } from "../func/functions";
+import { formatCash, formatDate } from "../func/functions";
 
 const Calender = () => {
   const [dailyPNLData, setDailyPNLData] = useState([]);
@@ -20,8 +20,15 @@ const Calender = () => {
           fetchDailyPnls(),
           fetchTransactions(),
         ]);
+        const filteredPnls = dailyPNLs.filter(
+          (entry) => formatDate(entry.entry_date) !== "01/01"
+        );
 
-        setDailyPNLData(dailyPNLs);
+        if (filteredPnls.length === 0) {
+          console.warn("No valid trading days after filtering out 1/1.");
+        }
+
+        setDailyPNLData(filteredPnls);
         setTransactions(transactionData);
       } catch (error) {
         console.error("Error fetching data:", error);
