@@ -8,6 +8,8 @@ import {
   calculateInitialCash,
   calculateNetPL,
   calculateCashBalance,
+  calculateTotalDeposits,
+  calculateTotalWithdrawals,
   calculateROI,
 } from "../cash/CashCalc";
 
@@ -34,7 +36,9 @@ const InvestmentChart = () => {
 
           setTransactions(transactionsResponse);
 
-          setChartData(formatChartData(sortedData, cashData));
+          setChartData(
+            formatChartData(sortedData, cashData, transactionsResponse)
+          );
           setInvestmentSummary(
             calculateInvestmentSummary(
               sortedData,
@@ -70,14 +74,8 @@ const InvestmentChart = () => {
     const initialCash = calculateInitialCash(cashData);
     const netPL = calculateNetPL(dailyPnls);
     const cashBalance = calculateCashBalance(initialCash, netPL, transactions);
-
-    const totalDeposits = transactions
-      .filter((t) => t.transaction_type === "deposit")
-      .reduce((sum, t) => sum + parseFloat(t.amount), 0);
-
-    const totalWithdrawals = transactions
-      .filter((t) => t.transaction_type === "withdrawal")
-      .reduce((sum, t) => sum + parseFloat(t.amount), 0);
+    const totalDeposits = calculateTotalDeposits(transactions);
+    const totalWithdrawals = calculateTotalWithdrawals(transactions);
 
     const totalInvested = initialCash + totalDeposits - totalWithdrawals;
 
@@ -98,18 +96,52 @@ const InvestmentChart = () => {
     };
   };
 
-  const formatChartData = (data, cashData) => {
-    const initialEntry = {
-      date: formatDate(cashData.entry_date),
-      closingBalance: parseFloat(cashData.initial_cash || 0),
-    };
+  const formatChartData = (dailyPnls, cashData, transactions = []) => {
+    // console.log("🔥 formatChartData: Raw Data", dailyPnls);
 
-    const formattedData = data.map((entry) => ({
-      date: formatDate(entry.entry_date),
-      closingBalance: parseFloat(entry.close_cash || 0),
-    }));
+    if (dailyPnls.length === 0 || !cashData) {
+      return [];
+    }
+    const filteredPnls = dailyPnls.filter(
+      (entry) => formatDate(entry.entry_date) !== "01/01"
+    );
 
-    return [initialEntry, ...formattedData];
+    if (filteredPnls.length === 0) {
+      console.warn("⚠️ No valid trading days after filtering out 1/1.");
+      return [];
+    }
+
+    // console.log("📉 Filtered Daily PNL Data (Removed 1/1):", filteredPnls);
+
+    const initialCash = calculateInitialCash(cashData);
+    const totalDeposits = calculateTotalDeposits(transactions);
+    const totalWithdrawals = calculateTotalWithdrawals(transactions);
+
+    const totalInvested = initialCash + totalDeposits - totalWithdrawals;
+    // console.log("💰 Total Invested:", totalInvested);
+
+    let previousBalance = totalInvested;
+    let formattedData = [];
+
+    for (let i = 0; i < filteredPnls.length; i++) {
+      let currentDate = filteredPnls[i].entry_date;
+      let dailyPNLChange = parseFloat(filteredPnls[i].balance);
+
+      previousBalance += dailyPNLChange;
+
+      formattedData.push({
+        date: formatDate(currentDate),
+        closingBalance: previousBalance,
+      });
+
+      console.log(
+        `📅 Date: ${currentDate}, PNL Change: ${dailyPNLChange}, Updated Closing Balance: ${previousBalance}`
+      );
+    }
+
+    console.log("🔥 Final Formatted Data:", formattedData);
+
+    return formattedData;
   };
 
   return (

@@ -2046,7 +2046,7 @@ input:checked + .slider:before {
   background-color: transparent;
 }
 
-.analysis-circle-summary .win-rate {
+.analysis-circle-summary .wins {
   width: 65px;
   height: 65px;
   position: absolute;
@@ -2064,7 +2064,7 @@ input:checked + .slider:before {
   transition: transform 0.3s ease, border-color 0.3s ease, box-shadow 0.3s ease;
 }
 
-.analysis-circle-summary .wins {
+.analysis-circle-summary .win-rate {
   width: 65px;
   height: 65px;
   position: absolute;
@@ -2139,7 +2139,7 @@ input:checked + .slider:before {
   border-color: #4a90e2;
   box-shadow: 0 8px 16px rgba(72, 144, 226, 0.3),
     0 14px 28px rgba(72, 144, 226, 0.2);
-  transform: translate(-50%, -60%) scale(1.1);
+  transform: translate(-50%, -60%) scale(1);
 }
 
 .analysis-circle-summary .loss:hover {
@@ -2148,7 +2148,7 @@ input:checked + .slider:before {
   border-color: #e74c3c;
   box-shadow: 0 8px 16px rgba(231, 76, 60, 0.3),
     0 14px 28px rgba(231, 76, 60, 0.2);
-  transform: translate(-50%, -60%) scale(1.1);
+  transform: translate(-50%, -60%) scale(1);
 }
 
 /* AnalysisSummary  */
