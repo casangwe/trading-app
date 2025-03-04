@@ -1,33 +1,30 @@
 # main.py
-import uvicorn
-from fastapi import FastAPI, Depends, HTTPException
+import pandas as pd
+from fastapi import FastAPI, Depends, Query, HTTPException, File, UploadFile, Depends
 from sqlalchemy.orm import Session
 from typing import List
 from fastapi.middleware.cors import CORSMiddleware
-
-# Import CRUD functions and schema definitions
 from database.auth import router as auth_router
 from database.database import get_db_connection
+from database.analysis import analyze_option_flow
 from database.schema import *
 from database.models import *
 from database.crud import *
-from database import crud, analysis
+from database import crud
+
 
 app = FastAPI()
 
-# Configure CORS middleware
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=["http://localhost:3001", "http://54.209.237.174:3000" ],  #this needs to be private.
+    allow_origins=["http://localhost:3001", "http://54.209.237.174:3000" ],  # this needs to be private.
     allow_credentials=True,
     allow_methods=["GET", "POST", "PUT", "DELETE"],
     allow_headers=["*"],
 )
 
-# Include authentication router
 app.include_router(auth_router, prefix="/auth")
 
-# Dependency to get the database session
 def get_db():
     db = next(get_db_connection())
     try:
@@ -36,10 +33,13 @@ def get_db():
         db.close()
 
 # Root
-
 @app.get("/")
 async def read_root():
     return {"message": "Welcome to the Trading App API!"}
+
+####################################################################
+# Trading Tracker App
+####################################################################
 
 # Users Endpoints
 @app.get("/users/", response_model=List[UserResponse])
@@ -86,7 +86,6 @@ async def read_cash(user_id: int, db: Session = Depends(get_db)):
     return cash
 
 # Rules Endpoints
-
 @app.post("/rules/", response_model=schema.RuleResponse)
 async def create_rule(rule: schema.RuleCreate, db: Session = Depends(get_db)):
     """Create a new rule for a user."""
@@ -278,7 +277,6 @@ async def delete_daily_pnl(pnl_id: int, db: Session = Depends(get_db)):
     return {"detail": "Daily PNL entry deleted"}
 
 # Misc Endpoints
-
 @app.post("/misc/", response_model=schema.MiscResponse)
 async def create_misc_entry(misc: schema.MiscCreate, user_id: int, db: Session = Depends(get_db)):
     """Create a new misc entry."""
@@ -315,7 +313,9 @@ async def delete_misc_entry(misc_id: int, user_id: int, db: Session = Depends(ge
         raise HTTPException(status_code=404, detail="Misc entry not found")
     return {"detail": "Misc entry deleted"}
 
-# Financial Endpoints
+####################################################################
+# Networth Endpoints
+####################################################################
 
 @app.post("/financials/", response_model=schema.FinancialResponse)
 async def create_financial(financial: schema.FinancialCreate, db: Session = Depends(get_db)):
@@ -352,3 +352,30 @@ async def delete_financial(user_id: int, financial_id: int, db: Session = Depend
     if deleted_financial is None:
         raise HTTPException(status_code=404, detail="Financial entry not found")
     return deleted_financial
+
+####################################################################
+# Flow Endpoints
+####################################################################
+
+# Upload option flow
+@app.post("/upload-option-flow/")
+async def upload_option_flow(file: UploadFile = File(...), db: Session = Depends(get_db_connection)):
+    contents = await file.read()  
+    response = process_option_flow_csv(contents, db) 
+    return response
+
+# Option Flow Analysis 
+@app.get("/analysis/")
+async def get_option_flow_analysis(
+    symbol: str = Query(None, description="Stock symbol (e.g., AAPL, MSFT)"),
+    date_range: int = Query(30, description="Number of days to look back"),
+    db: Session = Depends(get_db_connection),
+):
+    """Retrieve option flow analysis results for a given stock."""
+    
+    results = analyze_option_flow(db, symbol, date_range)
+
+    if "message" in results:
+        raise HTTPException(status_code=404, detail=results["message"])
+
+    return results

@@ -1948,7 +1948,8 @@ input:checked + .slider:before {
   flex: 1;
 } */
 
-.eqt-analysis-sum-container {
+.eqt-analysis-sum-container,
+.eqt-account-sum-container {
   display: flex;
   justify-content: space-between;
   align-items: center;
@@ -1963,6 +1964,13 @@ input:checked + .slider:before {
 .analysis-sum-trade {
   flex: 0.33;
   padding: 20px;
+}
+
+.eqt-account-sum-container .investment-chart {
+  flex: 0.7;
+}
+.eqt-account-sum-container .cash-accounts {
+  flex: 0.28;
 }
 /* AnalysisSummary  */
 .analysis-summary-container {
@@ -2613,6 +2621,67 @@ input:checked + .slider:before {
 /* Account Page  */
 
 .cash-container {
+  padding: 50px;
+  padding-top: 0px;
+  max-width: 100%;
+}
+
+.cash-container .cash-card-container {
+  display: flex;
+  flex-direction: column;
+  align-items: stretch;
+  gap: 16px;
+  max-width: 100%;
+}
+
+.cash-container .cash-card {
+  border-radius: 8px;
+  max-width: 100%;
+  display: flex;
+  transition: transform 0.3s, background-color 0.3s;
+}
+
+.cash-container .card-content {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  justify-content: space-between;
+  width: 100%;
+}
+
+.cash-container .icon-label {
+  display: flex;
+  align-items: center;
+}
+
+.cash-container .card-icon {
+  font-size: 16px;
+  color: #4a90e2;
+  margin-right: 8px;
+}
+
+.cash-container .label {
+  font-size: 10px;
+  font-weight: 600;
+  color: #333;
+}
+
+.cash-container .value {
+  font-size: 10px;
+  font-weight: 500;
+  color: #333;
+  margin-top: 4px;
+}
+
+.cash-container .divider {
+  border: none;
+  border-top: 1px solid #e6e8ec;
+  /* margin: 16px 0; */
+  margin: 2px 0;
+}
+
+/* 
+.cash-container {
   padding: 20px;
   padding-top: 0px;
 }
@@ -2682,7 +2751,7 @@ input:checked + .slider:before {
 .accounts-dash .title {
   padding: 20px;
   padding-top: 20px;
-}
+} */
 /* .two-horizontal-charts-account {
   display: flex;
   gap: 10px;

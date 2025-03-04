@@ -1,3 +1,6 @@
+import numpy as np
+import pandas as pd
+import io
 from typing import List
 from fastapi import HTTPException
 from sqlalchemy.orm import Session
@@ -8,6 +11,9 @@ from .schema import *
 from .auth import *
 from .models import *
 
+####################################################################
+# Trading Tracker App
+####################################################################
 
 # User
 def get_user(db: Session, user_id: int):
@@ -73,9 +79,7 @@ def create_cash(db: Session, cash: schema.CashCreate):
     return db_cash
 
 # Rules
-
 def create_rule(db: Session, rule_create: schema.RuleCreate) -> schema.RuleResponse:
-    # Create a new Rule instance
     db_rule = models.Rule(
         user_id=rule_create.user_id,
         entry_date=rule_create.entry_date,
@@ -87,22 +91,18 @@ def create_rule(db: Session, rule_create: schema.RuleCreate) -> schema.RuleRespo
     return schema.RuleResponse.from_orm(db_rule)
 
 def get_rules(db: Session, user_id: int) -> List[schema.RuleResponse]:
-    # Retrieve all rules for a specific user
     rules = db.query(models.Rule).filter(models.Rule.user_id == user_id).all()
     return [schema.RuleResponse.from_orm(rule) for rule in rules]
 
 def get_rule(db: Session, user_id: int, rule_id: int) -> Optional[schema.RuleResponse]:
-    # Retrieve a single rule by user ID and rule ID
     rule = db.query(models.Rule).filter(models.Rule.user_id == user_id, models.Rule.id == rule_id).first()
     return schema.RuleResponse.from_orm(rule) if rule else None
 
 def update_rule(db: Session, user_id: int, rule_id: int, rule_update: schema.RuleUpdate) -> Optional[schema.RuleResponse]:
-    # Find the rule to update
     rule = db.query(models.Rule).filter(models.Rule.user_id == user_id, models.Rule.id == rule_id).first()
     if not rule:
         return None
 
-    # Apply updates from the RuleUpdate model
     for key, value in rule_update.dict(exclude_unset=True).items():
         setattr(rule, key, value)
 
@@ -111,7 +111,6 @@ def update_rule(db: Session, user_id: int, rule_id: int, rule_update: schema.Rul
     return schema.RuleResponse.from_orm(rule)
 
 def delete_rule(db: Session, user_id: int, rule_id: int) -> Optional[schema.RuleResponse]:
-    # Find the rule to delete
     rule = db.query(models.Rule).filter(models.Rule.user_id == user_id, models.Rule.id == rule_id).first()
     if not rule:
         return None
@@ -123,7 +122,6 @@ def delete_rule(db: Session, user_id: int, rule_id: int) -> Optional[schema.Rule
 
 # Transactions
 def create_transaction(db: Session, transaction_create: schema.TransactionCreate) -> schema.TransactionResponse:
-    # Create a new Transaction instance
     db_transaction = models.Transaction(
         user_id=transaction_create.user_id,
         transaction_type=transaction_create.transaction_type,
@@ -136,7 +134,6 @@ def create_transaction(db: Session, transaction_create: schema.TransactionCreate
     db.commit()
     db.refresh(db_transaction)
 
-    #update Cash records on Transactions
     cash_record = get_cash(db, transaction_create.user_id)
     if not cash_record:
         raise HTTPException(status_code=404, detail="Cash record not found for user")
@@ -248,7 +245,6 @@ def create_trade(db: Session, trade_create: TradeCreate, user_id: int) -> TradeR
     profit_loss = net - principal
     roi = (profit_loss / principal) if principal else 0
 
-    # Create a new Trade instance
     db_trade = models.Trade(
         user_id=user_id,
         symbol=trade_create.symbol,
@@ -273,7 +269,6 @@ def create_trade(db: Session, trade_create: TradeCreate, user_id: int) -> TradeR
     return TradeResponse.from_orm(db_trade)
 
 def get_trades(db: Session, user_id: int) -> List[schema.TradeResponse]:
-    """Retrieve all trades for a specific user, sorted by most recent close date."""
     trades = db.query(models.Trade).filter(models.Trade.user_id == user_id).order_by(desc(models.Trade.close_date)).all()
     return [schema.TradeResponse.from_orm(trade) for trade in trades]
 
@@ -408,9 +403,11 @@ def delete_misc(db: Session, misc_id: int, user_id: int) -> bool:
         return True
     return False
 
+####################################################################
+# Networth Section
+####################################################################
 
 # Financial
-
 def get_latest_financial(db: Session, user_id: int):
     return db.query(models.Financial).filter(models.Financial.user_id == user_id).order_by(desc(models.Financial.entry_date)).first()
 
@@ -475,3 +472,124 @@ def delete_financial(db: Session, user_id: int, financial_id: int) -> Optional[s
     db.delete(financial)
     db.commit()
     return schema.FinancialResponse.from_orm(financial)
+
+####################################################################
+# Flow 
+####################################################################
+
+# Convert Premium to Int
+def convert_premium(value):
+    if not isinstance(value, str): 
+        return value
+    value = value.strip().replace("$", "").replace(",", "").lower()
+    
+    multiplier = 1
+    if "k" in value:
+        multiplier = 1000
+        value = value.replace("k", "")
+    elif "m" in value:
+        multiplier = 1000000
+        value = value.replace("m", "")
+    elif "b" in value:
+        multiplier = 1000000000
+        value = value.replace("b", "")
+    
+    try:
+        return float(value) * multiplier  
+    except ValueError:
+        return None  
+
+def clean_value(value):
+    return None if (pd.isna(value) or value is np.nan) else value
+
+
+# Process and Insert CSV Data
+def process_option_flow_csv(contents: bytes, db: Session):    
+    df = pd.read_csv(io.StringIO(contents.decode("utf-8")))
+
+    df.rename(columns={
+        "date": "trade_date",
+        "time": "trade_time",
+        "symbol": "symbol",
+        "expiry": "expiry",
+        "strike": "strike",
+        "put_call": "put_call",
+        "side": "side",
+        "spot": "spot",
+        "size": "size",
+        "price": "price",
+        "premium": "premium",
+        "sweep_block_split": "sweep_block_split",
+        "volume": "volume",
+        "open_int": "open_int",
+        "conds": "conds"
+    }, inplace=True)
+
+    df["trade_date"] = pd.to_datetime(df["trade_date"]).dt.date
+    df["trade_time"] = pd.to_datetime(df["trade_time"], format="%I:%M:%S %p").dt.time
+    df["expiry"] = pd.to_datetime(df["expiry"]).dt.date
+    df["premium"] = df["premium"].apply(convert_premium)
+    df["price"] = df["price"].astype(str).str.replace("$", "").astype(float)
+    df["premium"] = df["premium"].apply(convert_premium)
+    df["conds"] = df["conds"].apply(clean_value) 
+
+    new_records = 0
+    for _, row in df.iterrows():
+        option_flow_entry = Options(
+            trade_date=row["trade_date"],
+            trade_time=row["trade_time"],
+            symbol=row["symbol"],
+            expiry=row["expiry"],
+            strike=row["strike"],
+            put_call=row["put_call"],
+            side=row["side"],
+            spot=row["spot"],
+            size=row["size"],
+            price=row["price"],
+            premium=row["premium"],
+            sweep_block_split=row["sweep_block_split"],
+            volume=row["volume"],
+            open_int=row["open_int"],
+            conds=row["conds"]
+        )
+
+        existing_record = db.query(Options).filter(
+            Options.trade_date == row["trade_date"],
+            Options.trade_time == row["trade_time"],
+            Options.symbol == row["symbol"],
+            Options.expiry == row["expiry"],
+            Options.strike == row["strike"],
+            Options.put_call == row["put_call"],
+            Options.side == row["side"],
+            Options.spot == row["spot"],
+            Options.size == row["size"],
+            Options.price == row["price"],
+            Options.sweep_block_split == row["sweep_block_split"]
+        ).first()
+
+        if not existing_record:
+            db.add(option_flow_entry)
+            new_records += 1
+
+    db.commit()
+    return {"message": f"{new_records} new records inserted successfully!"}
+
+
+# Flow Data Retrieval
+def fetch_option_flow(db: Session, symbol: str = None, date_range: int = 30):
+    """Fetches option flow data from the database for analysis."""
+    
+    query = db.query(Options).filter(Options.trade_date >= pd.Timestamp.now().date() - pd.Timedelta(days=date_range))
+    
+    if symbol:
+        query = query.filter(Options.symbol == symbol)
+
+    data = query.all()
+
+    df = pd.DataFrame([row.__dict__ for row in data])
+    
+    if df.empty:
+        return df 
+    df.drop(columns=["_sa_instance_state"], inplace=True)  
+
+    return df

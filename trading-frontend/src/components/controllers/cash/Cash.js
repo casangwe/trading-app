@@ -47,7 +47,7 @@ const Cash = () => {
     fetchData();
   }, []);
 
-  if (loading) return <p>Loading...</p>;
+  // if (loading) return <p>Loading...</p>;
 
   const initialCash = cashData ? calculateInitialCash(cashData) : 0;
   const netPL = dailyPnls.length > 0 ? calculateNetPL(dailyPnls) : 0;
@@ -63,10 +63,17 @@ const Cash = () => {
       ? formatCash(calculateCashBalance(initialCash, netPL, transactions))
       : formatCash(initialCash);
 
+  const totalInvested = initialCash + totalDeposits - totalWithdrawals;
+
   const roi =
-    initialCash !== 0 && netPL !== 0
-      ? `${calculateROI(initialCash, netPL).toFixed(2)}%`
+    totalInvested !== 0
+      ? `${calculateROI(totalInvested, netPL).toFixed(2)}%`
       : "0%";
+
+  // const roi =
+  //   initialCash !== 0 && netPL !== 0
+  //     ? `${calculateROI(initialCash, netPL).toFixed(2)}%`
+  //     : "0%";
 
   return (
     <div className="cash-container">
@@ -75,19 +82,20 @@ const Cash = () => {
         <div className="cash-card">
           <div className="card-content">
             <div className="icon-label">
-              <FaCashRegister className="card-icon" />
-              <span className="label">Capital:</span>
+              {/* <FaCashRegister className="card-icon" /> */}
+              <span className="label">Starting Capital:</span>
             </div>
             <span className="value">{formatCash(initialCash)}</span>
           </div>
         </div>
+        <hr className="divider" />
 
         {/* Cash Card */}
         <div className="cash-card">
           <div className="card-content">
             <div className="icon-label">
-              <FaChartPie className="card-icon" />
-              <span className="label">Cash:</span>
+              {/* <FaChartPie className="card-icon" /> */}
+              <span className="label">Total Invested:</span>
             </div>
             <span className="value">{cash}</span>
           </div>
@@ -97,8 +105,8 @@ const Cash = () => {
         <div className="cash-card">
           <div className="card-content">
             <div className="icon-label">
-              <FaChartLine className="card-icon" />
-              <span className="label">P/L:</span>
+              {/* <FaChartLine className="card-icon" /> */}
+              <span className="label">Net P/L:</span>
             </div>
             <span className="value">{formatCash(netPL)}</span>
           </div>
@@ -108,7 +116,7 @@ const Cash = () => {
         <div className="cash-card">
           <div className="card-content">
             <div className="icon-label">
-              <FaMoneyBillWave className="card-icon" />
+              {/* <FaMoneyBillWave className="card-icon" /> */}
               <span className="label">Equity:</span>
             </div>
             <span className="value">{cashBalance}</span>
@@ -119,10 +127,32 @@ const Cash = () => {
         <div className="cash-card">
           <div className="card-content">
             <div className="icon-label">
-              <FaPercentage className="card-icon" />
+              {/* <FaPercentage className="card-icon" /> */}
               <span className="label">RoI:</span>
             </div>
             <span className="value">{roi}</span>
+          </div>
+        </div>
+        <hr className="divider" />
+        {/* Deposit Card */}
+        <div className="cash-card">
+          <div className="card-content">
+            <div className="icon-label">
+              {/* <FaChartLine className="card-icon" /> */}
+              <span className="label">Deposits:</span>
+            </div>
+            <span className="value">{formatCash(totalDeposits)}</span>
+          </div>
+        </div>
+
+        {/* Withdrawls Card */}
+        <div className="cash-card">
+          <div className="card-content">
+            <div className="icon-label">
+              {/* <FaChartLine className="card-icon" /> */}
+              <span className="label">Withdrawls:</span>
+            </div>
+            <span className="value">{formatCash(totalWithdrawals)}</span>
           </div>
         </div>
       </div>

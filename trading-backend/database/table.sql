@@ -2,6 +2,7 @@ CREATE DATABASE IF NOT EXISTS trading_db;
 
 USE trading_db;
 
+-- Users
 CREATE TABLE IF NOT EXISTS Users (
     id INT AUTO_INCREMENT PRIMARY KEY,
     fname VARCHAR(50) NOT NULL,
@@ -15,6 +16,7 @@ CREATE TABLE IF NOT EXISTS Users (
     INDEX (email)
 );
 
+-- Trading
 CREATE TABLE IF NOT EXISTS Cash (
     id INT AUTO_INCREMENT PRIMARY KEY,
     user_id INT NOT NULL,
@@ -27,7 +29,6 @@ CREATE TABLE IF NOT EXISTS Cash (
     INDEX (user_id)
 );
 
--- Create Rules table
 CREATE TABLE IF NOT EXISTS Rules (
     id INT AUTO_INCREMENT PRIMARY KEY,
     user_id INT NOT NULL,
@@ -115,6 +116,7 @@ CREATE TABLE IF NOT EXISTS Misc (
     INDEX (category) 
 );
 
+-- Financial
 CREATE TABLE IF NOT EXISTS Financial (
     id INT AUTO_INCREMENT PRIMARY KEY,
     user_id INT NOT NULL,
@@ -131,5 +133,30 @@ CREATE TABLE IF NOT EXISTS Financial (
     FOREIGN KEY (user_id) REFERENCES Users(id) ON DELETE CASCADE,
     INDEX (user_id),
     INDEX (entry_date)
+);
+
+-- Sentiment
+CREATE TABLE IF NOT EXISTS Options (
+    id INT AUTO_INCREMENT PRIMARY KEY,
+    trade_date DATE NOT NULL,
+    trade_time TIME NOT NULL,
+    symbol VARCHAR(10) NOT NULL,
+    expiry DATE NOT NULL,
+    strike DECIMAL(10,2) NOT NULL,
+    put_call VARCHAR(4) CHECK (put_call IN ('call', 'put')) NOT NULL,
+    side VARCHAR(10) NOT NULL,
+    spot DECIMAL(10,2) NOT NULL,
+    size INT NOT NULL,
+    price DECIMAL(10,2) NOT NULL,
+    premium DECIMAL(10,2) NOT NULL,
+    sweep_block_split VARCHAR(10) NOT NULL,
+    volume INT NOT NULL,
+    open_int INT NOT NULL,
+    conds VARCHAR(50),
+    UNIQUE (trade_date, trade_time, symbol, expiry, strike, put_call, side, spot, size, price, sweep_block_split),
+    INDEX idx_symbol (symbol),
+    INDEX idx_symbol_trade_date (symbol, trade_date),
+    INDEX idx_expiry (expiry),
+    INDEX idx_time (trade_time)
 );
 

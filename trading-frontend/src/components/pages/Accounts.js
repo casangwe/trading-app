@@ -6,6 +6,7 @@ import AnalysisCircle from "../controllers/analysis/AnalysisCircle";
 import TransactionTable from "../controllers/transactions/TransactionTable";
 import InvestmentChart from "../controllers/pnl/InvestmentChart";
 import EQTCurve from "../controllers/trades/EQTcurve";
+import AnalysisSummary from "../controllers/analysis/AnalysisSummary";
 import Rules from "../controllers/rules/Rules";
 
 const Accounts = ({ onClose }) => {
@@ -32,11 +33,11 @@ const Accounts = ({ onClose }) => {
   return (
     <div className="accounts">
       {/* Header Section */}
-      <div className="accounts-dash">
+      {/* <div className="accounts-dash">
         <div className="header-card">
           {userData && (
             <p className="title">
-              {/* Welcome, {userData.fname || userData.username}! */}
+              Welcome, {userData.fname || userData.username}!
             </p>
           )}
           <div className="tooltip">
@@ -48,13 +49,15 @@ const Accounts = ({ onClose }) => {
             <span className="tooltiptext">Add Cash</span>
           </div>
         </div>
-      </div>
+      </div> */}
 
-      <div className="cash-accounts">
-        <Cash />
-      </div>
-      <div className="investment-chart">
-        <InvestmentChart />
+      <div className="eqt-account-sum-container">
+        <div className="investment-chart">
+          <InvestmentChart />
+        </div>
+        <div className="cash-accounts">
+          <Cash />
+        </div>
       </div>
 
       <div className="account-horizontal">
@@ -65,12 +68,20 @@ const Accounts = ({ onClose }) => {
           <Rules />
         </div>
       </div>
-      <div className="eqt-curve">
+      <div className="eqt-account-sum-container">
+        <div className="eqt-curve-trade">
+          <EQTCurve />
+        </div>
+        <div className="analysis-sum-trade">
+          <AnalysisSummary />
+        </div>
+      </div>
+      {/* <div className="eqt-curve">
         <EQTCurve />
-      </div>
-      <div className="analysis-analysis-account">
+      </div> */}
+      {/* <div className="analysis-analysis-account">
         <AnalysisDisplay />
-      </div>
+      </div> */}
       <div className="analysis-analysis-account">
         <AnalysisCircle />
       </div>

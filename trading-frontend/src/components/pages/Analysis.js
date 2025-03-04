@@ -19,6 +19,12 @@ const Analysis = () => {
           <AnalysisSummary />
         </div>
       </div>
+      <div className="analysis-analysis">
+        <AnalysisCircle />
+      </div>
+      {/* <div className="analysis-analysis">
+        <Bars />
+      </div> */}
     </div>
   );
 };

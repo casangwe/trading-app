@@ -56,11 +56,11 @@ export const calculateAbsoluteReturn = (trades) => {
   return totalPL;
 };
 
-// Calculate Sharpe Ratio (return/risk, assumes risk-free rate of 0 for simplicity)
+// Calculate Sharpe Ratio
 export const calculateSharpeRatio = (trades) => {
-  const absoluteReturn = calculateAbsoluteReturn(trades);
+  const averageReturn = calculateAbsoluteReturn(trades) / trades.length;
   const standardDeviation = calculateStandardDeviation(trades);
-  return standardDeviation === 0 ? 0 : absoluteReturn / standardDeviation;
+  return standardDeviation === 0 ? 0 : averageReturn / standardDeviation;
 };
 
 // Calculate Standard Deviation of returns for Sharpe Ratio
