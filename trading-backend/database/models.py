@@ -1,6 +1,6 @@
 # models.py
 from datetime import datetime
-from sqlalchemy import Column, Integer, String, Text, Boolean, Numeric, Enum, Date, DECIMAL, ForeignKey, Index, DateTime
+from sqlalchemy import Column, Integer, String, Text, Boolean, Numeric, Enum, Date, Time, DECIMAL, ForeignKey, Index, DateTime, UniqueConstraint
 from sqlalchemy.ext.declarative import declarative_base
 from sqlalchemy.orm import relationship
 import enum
@@ -218,4 +218,35 @@ class Financial(Base):
     __table_args__ = (
         Index("idx_user_id", "user_id"),
         Index("idx_entry_date", "entry_date"),
+    )
+
+
+# Sentiment
+class Options(Base):
+    __tablename__ = "Options"
+
+    id = Column(Integer, primary_key=True, autoincrement=True)
+    trade_date = Column(Date, nullable=False)
+    trade_time = Column(Time, nullable=False)
+    symbol = Column(String(10), nullable=False)
+    expiry = Column(Date, nullable=False)
+    strike = Column(DECIMAL(10, 2), nullable=False)
+    put_call = Column(String(4), nullable=False) 
+    side = Column(String(10), nullable=False)
+    spot = Column(DECIMAL(10, 2), nullable=False)
+    size = Column(Integer, nullable=False)
+    price = Column(DECIMAL(10, 2), nullable=False)
+    premium = Column(DECIMAL(10, 2), nullable=False)
+    sweep_block_split = Column(String(10), nullable=False)
+    volume = Column(Integer, nullable=False)
+    open_int = Column(Integer, nullable=False)
+    conds = Column(String(50))
+
+    __table_args__ = (
+        UniqueConstraint('trade_date', 'trade_time', 'symbol', 'expiry', 'strike', 'put_call',
+                         'side', 'spot', 'size', 'price', 'sweep_block_split'),
+        Index('idx_symbol', 'symbol'),
+        Index('idx_symbol_trade_date', 'symbol', 'trade_date'),
+        Index('idx_expiry', 'expiry'),
+        Index('idx_time', 'trade_time')
     )
