@@ -12,7 +12,6 @@ const Rules = () => {
   const [selectedRule, setSelectedRule] = useState(null);
   const [isEditing, setIsEditing] = useState(false);
 
-  // Fetch the list of rules initially
   useEffect(() => {
     const getRules = async () => {
       try {
@@ -28,32 +27,26 @@ const Rules = () => {
     getRules();
   }, []);
 
-  // Open modal for new rule or editing an existing rule
   const handleOpenModal = (rule = null) => {
     setSelectedRule(rule);
     setIsEditing(!!rule);
     setShowModal(true);
   };
 
-  // Close the modal and reset selected rule
   const handleCloseModal = () => {
     setSelectedRule(null);
     setIsEditing(false);
     setShowModal(false);
   };
 
-  // Handle saving changes (either add or update a rule)
   const handleSaveChanges = async (ruleData) => {
     try {
       if (isEditing) {
-        // Update an existing rule
         await updateRule(selectedRule.id, ruleData);
       } else {
-        // Create a new rule
         await createRule(ruleData);
       }
 
-      // Refetch the rules from server to get the latest state
       const refreshedRules = await fetchRules();
       setRules(refreshedRules);
     } catch (error) {
@@ -62,14 +55,6 @@ const Rules = () => {
       handleCloseModal();
     }
   };
-
-  if (loading) {
-    return <div>Loading rules...</div>;
-  }
-
-  if (error) {
-    return <div>Error fetching rules: {error}</div>;
-  }
 
   return (
     <div className="rules-container">
@@ -119,116 +104,3 @@ const Rules = () => {
 };
 
 export default Rules;
-
-// import React, { useState, useEffect } from "react";
-// import { fetchRules, updateRule, createRule } from "../api/RulesAPI";
-// import NewRule from "./NewRule";
-// import UpdateRule from "./UpdateRule";
-// import { formatDate } from "../func/functions";
-
-// const Rules = () => {
-//   const [rules, setRules] = useState([]);
-//   const [loading, setLoading] = useState(true);
-//   const [error, setError] = useState(null);
-//   const [showModal, setShowModal] = useState(false);
-//   const [selectedRule, setSelectedRule] = useState(null);
-//   const [isEditing, setIsEditing] = useState(false);
-
-//   useEffect(() => {
-//     const getRules = async () => {
-//       try {
-//         const data = await fetchRules();
-//         setRules(data);
-//         setLoading(false);
-//       } catch (error) {
-//         setError(error.message);
-//         setLoading(false);
-//       }
-//     };
-
-//     getRules();
-//   }, []);
-
-//   const handleOpenModal = (rule = null) => {
-//     setSelectedRule(rule);
-//     setIsEditing(!!rule);
-//     setShowModal(true);
-//   };
-
-//   const handleCloseModal = () => {
-//     setSelectedRule(null);
-//     setIsEditing(false);
-//     setShowModal(false);
-//   };
-
-//   const handleSaveChanges = async (ruleData) => {
-//     try {
-//       if (isEditing) {
-//         await updateRule(selectedRule.id, ruleData);
-//       } else {
-//         await createRule(ruleData);
-//       }
-
-//       const refreshedRules = await fetchRules();
-//       setRules(refreshedRules);
-//     } catch (error) {
-//       console.error("Error saving rule:", error);
-//     } finally {
-//       handleCloseModal();
-//     }
-//   };
-
-//   if (loading) {
-//     return <div>Loading rules...</div>;
-//   }
-
-//   if (error) {
-//     return <div>Error fetching rules: {error}</div>;
-//   }
-
-//   return (
-//     <div className="rules-container">
-//       <div className="header-card">
-//         <p className="title">Rules</p>
-//         <div className="tooltip">
-//           <i
-//             className="btn btn-primary fa-solid fa-plus"
-//             id="rule-new-btn"
-//             onClick={() => handleOpenModal()}
-//           ></i>
-//           <span className="tooltiptext">New Rule</span>
-//         </div>
-//       </div>
-
-//       <hr />
-//       <div className="rules-list">
-//         {rules.map((rule) => (
-//           <div
-//             className="rule-item"
-//             key={rule.id}
-//             onClick={() => handleOpenModal(rule)}
-//           >
-//             <span className="rule-item-date">
-//               {formatDate(rule.entry_date)}
-//             </span>
-//             <span className="rule-item-text">{rule.rule}</span>
-//           </div>
-//         ))}
-//       </div>
-
-//       {showModal && isEditing && selectedRule && (
-//         <UpdateRule
-//           rule={selectedRule}
-//           onClose={handleCloseModal}
-//           onSave={handleSaveChanges}
-//         />
-//       )}
-
-//       {showModal && !isEditing && (
-//         <NewRule onClose={handleCloseModal} onSave={handleSaveChanges} />
-//       )}
-//     </div>
-//   );
-// };
-
-// export default Rules;

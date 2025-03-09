@@ -24,22 +24,6 @@ const MiniTradeTable = ({ userId }) => {
     getTrades();
   }, []);
 
-  //   const handleOpenModal = () => {
-  //     setShowModal(true);
-  //   };
-
-  //   const handleCloseModal = () => {
-  //     setShowModal(false);
-  //   };
-
-  if (loading) {
-    return <div>Loading trades...</div>;
-  }
-
-  if (error) {
-    return <div>Error fetching trades: {error}</div>;
-  }
-
   return (
     <div className="trade-table-container">
       <div className="header-card">

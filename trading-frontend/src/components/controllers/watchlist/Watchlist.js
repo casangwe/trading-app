@@ -27,7 +27,6 @@ const Watchlist = () => {
     try {
       const data = await fetchWatchlists();
       setWatchlists(data);
-      console.log(data);
     } catch (error) {
       setError("Error fetching watchlists");
     } finally {
@@ -139,12 +138,6 @@ const Watchlist = () => {
                         <div
                           className="watch-item"
                           key={watchlist.id}
-                          // style={{
-                          //   borderLeft:
-                          //     watchlist.target_price > watchlist.price
-                          //       ? "2px solid #4a90e2"
-                          //       : "2px solid red",
-                          // }}
                           onClick={() => handleOpenModal(watchlist)}
                         >
                           <p className="no-id">
@@ -154,17 +147,6 @@ const Watchlist = () => {
                             {watchlist.symbol}
                           </p>
                           <div className="watch-details">
-                            {/* <div className="watch-row">
-                              <div className="watch-entry-date">
-                                <div className="watch-date-icon-label">
-                                  <span className="label">Date:</span>
-                                </div>
-                                <span className="value">
-                                  {formatDate(watchlist.entry_date)}
-                                </span>
-                              </div>
-                            </div> */}
-
                             <div className="watch-row">
                               <div className="watch-price">
                                 <div className="watch-price-icon-label">

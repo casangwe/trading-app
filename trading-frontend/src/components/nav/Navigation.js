@@ -1,5 +1,3 @@
-// src/components/nav/Navigation.js
-
 import React from "react";
 import { Link, useLocation, useNavigate } from "react-router-dom";
 import { FaSignOutAlt } from "react-icons/fa";
@@ -19,7 +17,6 @@ const Navigation = () => {
   return (
     <div className="navigation">
       <div className="nav-container">
-        {/* Logo Section */}
         <div className="nav-logo">
           <Link to="/">
             <img src={Logo} alt="Logo" className="logo-image" />

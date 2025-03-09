@@ -1,5 +1,3 @@
-//components/controllers/func/functions.js
-
 import React from "react";
 import { Navigate } from "react-router-dom";
 
@@ -10,29 +8,6 @@ export const formatDate = (dateStr) => {
   const day = dateParts[2];
   return `${month}/${day}`;
 };
-// export const formatDate = (date) => {
-//   if (typeof date === "string" && date.includes("-")) {
-//     const [year, month, day] = date.split("-");
-//     return `${month}/${day}`;
-//   }
-
-//   if (date instanceof Date && !isNaN(date)) {
-//     const options = { month: "2-digit", day: "2-digit" };
-//     return date.toLocaleDateString(undefined, options);
-//   }
-
-//   return "";
-// };
-
-// export const ProtectedRoute = ({ children }) => {
-//   const token = localStorage.getItem("access_token");
-
-//   if (!token) {
-//     return <Navigate to="/start" replace />;
-//   }
-
-//   return children;
-// };
 
 export const ProtectedRoute = ({ children }) => {
   const token = localStorage.getItem("access_token");

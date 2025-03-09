@@ -24,7 +24,7 @@ const Cash = () => {
   const [cashData, setCashData] = useState(null);
   const [dailyPnls, setDailyPnls] = useState([]);
   const [transactions, setTransactions] = useState([]);
-  const [loading, setLoading] = useState(true); // eslint-disable-next-line
+  const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
 
   useEffect(() => {
@@ -47,8 +47,6 @@ const Cash = () => {
     fetchData();
   }, []);
 
-  // if (loading) return <p>Loading...</p>;
-
   const initialCash = cashData ? calculateInitialCash(cashData) : 0;
   const netPL = dailyPnls.length > 0 ? calculateNetPL(dailyPnls) : 0;
 
@@ -70,86 +68,68 @@ const Cash = () => {
       ? `${calculateROI(totalInvested, netPL).toFixed(2)}%`
       : "0%";
 
-  // const roi =
-  //   initialCash !== 0 && netPL !== 0
-  //     ? `${calculateROI(initialCash, netPL).toFixed(2)}%`
-  //     : "0%";
-
   return (
-    <div className="cash-container">
+    <div className="cash-summary">
       <div className="cash-card-container">
-        {/* Capital Card */}
         <div className="cash-card">
           <div className="card-content">
             <div className="icon-label">
-              {/* <FaCashRegister className="card-icon" /> */}
-              <span className="label">Starting Capital:</span>
+              <span className="label">Principle:</span>
             </div>
             <span className="value">{formatCash(initialCash)}</span>
           </div>
         </div>
+
         <hr className="divider" />
 
-        {/* Cash Card */}
         <div className="cash-card">
           <div className="card-content">
             <div className="icon-label">
-              {/* <FaChartPie className="card-icon" /> */}
               <span className="label">Total Invested:</span>
             </div>
             <span className="value">{cash}</span>
           </div>
         </div>
 
-        {/* Net P/L Card */}
         <div className="cash-card">
           <div className="card-content">
             <div className="icon-label">
-              {/* <FaChartLine className="card-icon" /> */}
-              <span className="label">Net P/L:</span>
-            </div>
-            <span className="value">{formatCash(netPL)}</span>
-          </div>
-        </div>
-
-        {/* Equity Card */}
-        <div className="cash-card">
-          <div className="card-content">
-            <div className="icon-label">
-              {/* <FaMoneyBillWave className="card-icon" /> */}
               <span className="label">Equity:</span>
             </div>
             <span className="value">{cashBalance}</span>
           </div>
         </div>
 
-        {/* RoI Card */}
         <div className="cash-card">
           <div className="card-content">
             <div className="icon-label">
-              {/* <FaPercentage className="card-icon" /> */}
+              <span className="label">Net P/L:</span>
+            </div>
+            <span className="value">{formatCash(netPL)}</span>
+          </div>
+        </div>
+
+        <div className="cash-card">
+          <div className="card-content">
+            <div className="icon-label">
               <span className="label">RoI:</span>
             </div>
             <span className="value">{roi}</span>
           </div>
         </div>
         <hr className="divider" />
-        {/* Deposit Card */}
         <div className="cash-card">
           <div className="card-content">
             <div className="icon-label">
-              {/* <FaChartLine className="card-icon" /> */}
               <span className="label">Deposits:</span>
             </div>
             <span className="value">{formatCash(totalDeposits)}</span>
           </div>
         </div>
 
-        {/* Withdrawls Card */}
         <div className="cash-card">
           <div className="card-content">
             <div className="icon-label">
-              {/* <FaChartLine className="card-icon" /> */}
               <span className="label">Withdrawls:</span>
             </div>
             <span className="value">{formatCash(totalWithdrawals)}</span>
@@ -158,60 +138,6 @@ const Cash = () => {
       </div>
     </div>
   );
-
-  // return (
-  //   <div className="cash-container">
-  //     <div className="cash-card-container">
-  //       {/* Capital Card */}
-  //       <div className="cash-card">
-  //         <div className="card-content">
-  //           <div className="icon-label">
-  //             <FaCashRegister className="card-icon" />
-  //             <span className="label">Capital:</span>
-  //           </div>
-  //           <span className="value">{formatCash(initialCash)}</span>
-  //         </div>
-  //       </div>
-
-  //       {/* Cash Card */}
-  //       <div className="cash-card">
-  //         <div className="card-content">
-  //           <FaChartPie className="card-icon" />
-
-  //           <span className="label">Cash:</span>
-  //           <span className="value">{cash}</span>
-  //         </div>
-  //       </div>
-
-  //       {/* Net P/L Card */}
-  //       <div className="cash-card">
-  //         <div className="card-content">
-  //           <FaChartLine className="card-icon" />
-  //           <span className="label">P/L:</span>
-  //           <span className="value">{formatCash(netPL)}</span>
-  //         </div>
-  //       </div>
-
-  //       {/* Cash Balance Card */}
-  //       <div className="cash-card">
-  //         <div className="card-content">
-  //           <FaMoneyBillWave className="card-icon" />
-  //           <span className="label">Equity:</span>
-  //           <span className="value">{cashBalance}</span>
-  //         </div>
-  //       </div>
-
-  //       {/* RoI Card */}
-  //       <div className="cash-card">
-  //         <div className="card-content">
-  //           <FaPercentage className="card-icon" />
-  //           <span className="label">RoI:</span>
-  //           <span className="value">{roi}</span>
-  //         </div>
-  //       </div>
-  //     </div>
-  //   </div>
-  // );
 };
 
 export default Cash;

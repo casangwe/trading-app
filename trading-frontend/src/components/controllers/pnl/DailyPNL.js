@@ -1,10 +1,4 @@
 import React, { useEffect, useState } from "react";
-import {
-  FaChartLine,
-  FaPercentage,
-  FaUpload,
-  FaMoneyBillWave,
-} from "react-icons/fa";
 import { fetchDailyPnls } from "../api/DailyPNLApi";
 import { formatCash } from "../func/functions";
 import NewDailyPNL from "./NewDailyPNL";
@@ -67,7 +61,6 @@ const DailyPNL = ({ onNewPNL }) => {
           <div className="spinner"></div>
         </div>
       )}
-      {/* Fade-in the DailyPNL-container only after componentLoading */}
 
       <div
         className={`dailypnl-container ${
@@ -86,7 +79,6 @@ const DailyPNL = ({ onNewPNL }) => {
               <p>{error}</p>
             ) : (
               <>
-                {/* Header Section */}
                 <div className="header-card">
                   <p className="title"></p>
                   <div className="tooltip">
@@ -98,19 +90,13 @@ const DailyPNL = ({ onNewPNL }) => {
                     <span className="tooltiptext">New P/L</span>
                   </div>
                 </div>
-                {/* <hr /> */}
 
-                {/* Table or Cards Section */}
                 <div className={`fade-in ${fadeInTable ? "visible" : ""}`}>
                   <div className="daily-pnl-section">
-                    {/* <hr className="divider" /> */}
-
                     <div className="daily-pnl-card-container">
-                      {/* Open Cash Card */}
                       <div className="daily-pnl-card">
                         <div className="card-content">
                           <div className="icon-label">
-                            {/* <FaMoneyBillWave className="card-icon" /> */}
                             <span className="label">Open Cash:</span>
                           </div>
                           <span className="value">
@@ -119,11 +105,9 @@ const DailyPNL = ({ onNewPNL }) => {
                         </div>
                       </div>
 
-                      {/* Close Cash Card */}
                       <div className="daily-pnl-card">
                         <div className="card-content">
                           <div className="icon-label">
-                            {/* <FaUpload className="card-icon" /> */}
                             <span className="label">Close Cash:</span>
                           </div>
                           <span className="value">
@@ -136,11 +120,9 @@ const DailyPNL = ({ onNewPNL }) => {
                     <hr className="divider" />
 
                     <div className="daily-pnl-card-container">
-                      {/* Balance Card */}
                       <div className="daily-pnl-card">
                         <div className="card-content">
                           <div className="icon-label">
-                            {/* <FaChartLine className="card-icon" /> */}
                             <span className="label">P/L:</span>
                           </div>
                           <span className="value">
@@ -149,11 +131,9 @@ const DailyPNL = ({ onNewPNL }) => {
                         </div>
                       </div>
 
-                      {/* ROI Card */}
                       <div className="daily-pnl-card">
                         <div className="card-content">
                           <div className="icon-label">
-                            {/* <FaPercentage className="card-icon" /> */}
                             <span className="label">RoI:</span>
                           </div>
                           <span className="value">
@@ -169,7 +149,6 @@ const DailyPNL = ({ onNewPNL }) => {
           </>
         )}
 
-        {/* Modal for Adding New PNL */}
         {showModal && (
           <NewDailyPNL
             onClose={handleCloseModal}

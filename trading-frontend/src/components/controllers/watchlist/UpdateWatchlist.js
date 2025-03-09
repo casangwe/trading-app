@@ -1,6 +1,4 @@
 import React, { useState } from "react";
-// import UpdateWatchlist from "./UpdateWatchlist";
-
 import { formatDate, formatCash, splitText } from "../func/functions";
 
 const UpdateWatchlist = ({ watchlist, onClose, onSave, handleDelete }) => {
@@ -97,7 +95,8 @@ const UpdateWatchlist = ({ watchlist, onClose, onSave, handleDelete }) => {
                   onChange={(e) =>
                     setFormData((prev) => ({ ...prev, plan: e.target.value }))
                   }
-                  style={{ height: "100%" }}
+                  rows="5"
+                  style={{ width: "98%", overflow: "hidden" }}
                 />
               ) : (
                 <span className="value">{splitText(watchlist.plan)}</span>
@@ -126,11 +125,6 @@ const UpdateWatchlist = ({ watchlist, onClose, onSave, handleDelete }) => {
               <i className="fa-solid fa-cog"></i>
             </span>
           </div>
-          {/* {showUpdateButton && (
-            <button onClick={handleSubmit} className="update-button">
-              Update
-            </button>
-          )} */}
           {showUpdateButton && (
             <button onClick={() => onSave(formData)} className="update-button">
               Update

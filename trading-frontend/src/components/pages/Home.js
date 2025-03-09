@@ -2,12 +2,9 @@ import React, { useEffect, useState } from "react";
 import DailyPNL from "../controllers/pnl/DailyPNL";
 import NewDailyPNL from "../controllers/pnl/NewDailyPNL";
 import Calendar from "../controllers/pnl/Calender";
-import MiniTradeTable from "../controllers/trades/MiniTradeTable";
 import Bars from "../controllers/pnl/Bars";
-import AnalysisDisplay from "../controllers/analysis/AnalysisDisplay";
 import InvestmentChart from "../controllers/pnl/InvestmentChart";
 import EQTCurve from "../controllers/trades/EQTcurve";
-import AnalysisCircle from "../controllers/analysis/AnalysisCircle";
 import AnalysisSummary from "../controllers/analysis/AnalysisSummary";
 
 const Home = ({ onClose }) => {
@@ -36,25 +33,8 @@ const Home = ({ onClose }) => {
 
   return (
     <div className="home">
-      {/* <div className="home-dash">
-        <div className="header-card">
-          {userData && (
-            <p className="title">
-              Welcome {userData.fname || userData.username}
-            </p>
-          )}
-          <div className="tooltip">
-            <i
-              className="btn btn-primary fa-solid fa-plus"
-              id="new-pnl-btn"
-              onClick={handleOpenModal}
-            ></i>
-            <span className="tooltiptext">New P/L</span>
-          </div>
-        </div>
-      </div> */}
-      <div className="dashboard-container">
-        <div className="profit-chart-trade">
+      <div className="investment-and-dailypnl-container">
+        <div className="investment-home">
           <InvestmentChart />
         </div>
         <div className="pnl-home">
@@ -69,8 +49,7 @@ const Home = ({ onClose }) => {
         />
       )}
 
-      {/* Calendar and Bars side by side */}
-      <div className="calendar-bars-container">
+      <div className="bars-and-calendar-container">
         <div className="bars-home">
           <Bars />
         </div>
@@ -79,31 +58,14 @@ const Home = ({ onClose }) => {
         </div>
       </div>
 
-      {/* AnalysisDisplay in full width */}
-      <div className="eqt-analysis-sum-container">
-        <div className="eqt-curve-trade">
+      <div className="eqt-and-summary-container">
+        <div className="eqt-home">
           <EQTCurve />
         </div>
-        <div className="analysis-sum-trade">
+        <div className="summary-home">
           <AnalysisSummary />
         </div>
       </div>
-      {/* <div className="analysis-display-container">
-        <AnalysisDisplay />
-      </div> */}
-      {/* 
-      <div className="analysis-analysis">
-        <AnalysisCircle />
-      </div> */}
-      {/* Trades Table and EQTchat side by side */}
-      {/* <div className="trades-eqt-container">
-        <div className="trades-table">
-          <MiniTradeTable />
-        </div>
-        <div className="eqt-chart">
-          <EQTCurve />
-        </div>
-      </div> */}
     </div>
   );
 };

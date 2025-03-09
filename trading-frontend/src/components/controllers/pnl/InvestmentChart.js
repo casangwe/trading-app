@@ -44,7 +44,7 @@ const InvestmentChart = () => {
               sortedData,
               cashData,
               transactionsResponse
-            ) // Pass transactions
+            )
           );
         } else {
           setError("No daily PNL, cash, or transaction data available");
@@ -53,7 +53,6 @@ const InvestmentChart = () => {
         setError("Error fetching data");
         console.error("Error fetching daily PNL data:", error);
       } finally {
-        // setLoading(false);
         setTimeout(() => setComponentLoading(false), 1000);
       }
     };
@@ -97,8 +96,6 @@ const InvestmentChart = () => {
   };
 
   const formatChartData = (dailyPnls, cashData, transactions = []) => {
-    // console.log("🔥 formatChartData: Raw Data", dailyPnls);
-
     if (dailyPnls.length === 0 || !cashData) {
       return [];
     }
@@ -107,18 +104,14 @@ const InvestmentChart = () => {
     );
 
     if (filteredPnls.length === 0) {
-      console.warn("⚠️ No valid trading days after filtering out 1/1.");
       return [];
     }
-
-    // console.log("📉 Filtered Daily PNL Data (Removed 1/1):", filteredPnls);
 
     const initialCash = calculateInitialCash(cashData);
     const totalDeposits = calculateTotalDeposits(transactions);
     const totalWithdrawals = calculateTotalWithdrawals(transactions);
 
     const totalInvested = initialCash + totalDeposits - totalWithdrawals;
-    // console.log("💰 Total Invested:", totalInvested);
 
     let previousBalance = totalInvested;
     let formattedData = [];
@@ -133,10 +126,6 @@ const InvestmentChart = () => {
         date: formatDate(currentDate),
         closingBalance: previousBalance,
       });
-
-      console.log(
-        `📅 Date: ${currentDate}, PNL Change: ${dailyPNLChange}, Updated Closing Balance: ${previousBalance}`
-      );
     }
 
     console.log("🔥 Final Formatted Data:", formattedData);
@@ -145,8 +134,7 @@ const InvestmentChart = () => {
   };
 
   return (
-    <div className="investment-chart-container">
-      {/* Initial Component Loading Spinner */}
+    <div className="investment-chart">
       {componentLoading ? (
         <div className="component-loading-spinner-wrapper">
           <div className="spinner"></div>
@@ -170,7 +158,6 @@ const InvestmentChart = () => {
             </p>
           </div>
 
-          {/* Chart Section */}
           {error ? (
             <div>{error}</div>
           ) : (

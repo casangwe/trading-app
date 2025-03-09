@@ -1,23 +1,49 @@
-To do:
-Global:
-    Loading Feature:
-    -Give everything a loading and 'fade-In' feature.
-    -Recolor
-Home page:
-    Mini-Trades Section:
-    -Make it visible
-Analysis Page:
-    Bars Section:
-    -Bars should be a histogram similar to the networth tracker chart
-    -Replace that section with the Monthly Trades. Might have to create a new component
+Backlog:
 
-    Watchlist section:
-    -Re-design the watchlist item display 
-        -NoID above the symbol, entry date underneath the symbol, price information on the right
-        -Plan on the center, date on far right, 
-    -Re-design the Watchlist information card.
-networth Page:
-    histogram section:
-    - Try out the line on the histogram first, if it doesn't look good becuase of the blue line dropping
-    due to the $0.00 income on some weeks, then just let it enter the last 5 entries, or just show a filter
+    Back-end:
+        -Print function
+        -Save function
+        -Export funtion (csv/exel/etc)
+        -gracefully handle deleted and (recover / undo delete)
+        - Add "Goals" to the DB. But not everone will have the same goals so how can I generalize it? it should relate to the networth or finanacial section.
+
+
+    Front-end:
+
+        Global:
+            Loading Feature:
+            -Give everything a loading and 'fade-In' feature. - DONE
+            -Implement Print/Save/Export and Delete settings into applicable tables (Trades,Watchlist, Misc, DailyPNL, Transactions, Networth,)
+            -Recolor the light blue entry's 
+        Home page:
+            Mini-Trades Section:
+            -Make it visible
+            Calendar section:
+            -Make it so the calendar modal shows all entries for that day but put it in a 'More details' link 
+            that expands the modal and shows the details when clicked. (so that could be like trades/plans/anything withing that date.)
+            -Make the cash values have a private (visible) option.
+
+        Trades Page:
+            Trades table:
+            -Click to modify or delete each trade (create a security warning for deleting trades (Admin only))
+            Misc section: 
+            -Make it so its only the Plan shows up. - DONE
+        Analysis Page:
+            Bars Section:
+            -Bars should be a histogram similar to the networth tracker chart
+            -Replace that section with the Monthly Trades. Might have to create a new component
+
+            Watchlist section: -DONE
+            -Re-design the watchlist item display 
+                -NoID above the symbol, entry date underneath the symbol, price information on the right
+                -Plan on the center, date on far right, and the hit ot miss should just be sliding there on the watchlist. no need to click settings
+            -Re-design the Watchlist information card.
+            --new
+            -Connect to a free API or Manually add Common named stocks. but print the actual name of the stock on the top right of where the ticker is on the watchlist.
+
+            Analysis Stats section:
+            -Include a place for 'Biggest wins' or 'Biggest Loss' things like that, average contracts, etc.
+        networth Page:
+            histogram section:
+            - Try out the line on the histogram first, if it doesn't look good becuase of the blue line dropping due to the $0.00 income on some weeks, then just let it enter the last 5 entries, or just show a filter
 

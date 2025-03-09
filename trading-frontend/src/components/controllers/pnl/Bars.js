@@ -14,7 +14,6 @@ const Bars = () => {
   const [dailyPNLData, setDailyPNLData] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
-  // const [view, setView] = useState("daily");
   const [view, setView] = useState("weekly");
   const [componentLoading, setComponentLoading] = useState(true);
   const [hasLoaded, setHasLoaded] = useState(false);
@@ -28,7 +27,7 @@ const Bars = () => {
         );
 
         if (filteredData.length === 0) {
-          console.warn("sNo valid trading days after filtering out 1/1.");
+          console.warn("No valid trading days after filtering out 1/1.");
         }
 
         setDailyPNLData(filteredData);

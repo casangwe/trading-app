@@ -57,7 +57,6 @@ const AnalysisCircle = () => {
   return (
     <div className="analysis-container">
       <div className="analysis-circle-row">
-        {/* Win Rate */}
         <ResponsiveContainer width="100%" height={150}>
           <PieChart>
             <Pie
@@ -66,7 +65,6 @@ const AnalysisCircle = () => {
               outerRadius={70}
               startAngle={90}
               endAngle={-270}
-              // stroke="none"
               dataKey="value"
             >
               {winRateData.map((entry, index) => (
@@ -111,65 +109,6 @@ const AnalysisCircle = () => {
           </PieChart>
         </ResponsiveContainer>
 
-        {/* Win Ratio */}
-        <ResponsiveContainer width="100%" height={150}>
-          <PieChart>
-            <Pie
-              data={[
-                { name: "Wins", value: winningTrades, color: "#4a90e2" },
-                { name: "Losses", value: losingTrades, color: "#f44336" },
-              ]}
-              innerRadius={50}
-              outerRadius={70}
-              startAngle={90}
-              endAngle={-270}
-              // stroke="none"
-              dataKey="value"
-            >
-              {[
-                { name: "Wins", value: winningTrades, color: "#4a90e2" },
-                { name: "Losses", value: losingTrades, color: "#f44336" },
-              ].map((entry, index) => (
-                <Cell
-                  key={`winloss-cell-${index}`}
-                  fill={entry.color}
-                  style={{
-                    transition: "filter 0.3s",
-                    cursor: "pointer",
-                  }}
-                  onMouseEnter={(e) => {
-                    e.currentTarget.style.filter = `drop-shadow(0 0 3px ${entry.color})`;
-                  }}
-                  onMouseLeave={(e) => {
-                    e.currentTarget.style.filter = "none";
-                  }}
-                />
-              ))}
-            </Pie>
-
-            <Tooltip
-              cursor={false}
-              content={({ payload }) => {
-                if (payload && payload.length) {
-                  const wins = winningTrades;
-                  const losses = losingTrades;
-                  const winRatio =
-                    losses > 0 ? `${wins} : ${losses}` : `${wins} : 0`;
-
-                  return (
-                    <div className="tooltip-content">
-                      <p>Win Ratio</p>
-                      <p className="amount">{winRatio}</p>
-                    </div>
-                  );
-                }
-                return null;
-              }}
-            />
-          </PieChart>
-        </ResponsiveContainer>
-
-        {/* Average Win / Loss */}
         <ResponsiveContainer width="100%" height={150}>
           <PieChart>
             <Pie
@@ -180,7 +119,6 @@ const AnalysisCircle = () => {
               startAngle={90}
               paddingAngle={1}
               endAngle={-270}
-              // stroke="none"
             >
               {data.map((entry, index) => (
                 <Cell

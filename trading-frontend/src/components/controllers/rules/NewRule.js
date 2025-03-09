@@ -21,7 +21,6 @@ const NewRule = ({ onClose }) => {
     e.preventDefault();
     try {
       const response = await createRule(formData);
-      console.log("Rule created successfully:", response);
       onClose();
       navigate("/accounts", { replace: true });
       window.location.reload();

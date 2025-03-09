@@ -8,8 +8,8 @@ const TradeTable = ({ onNewTrade }) => {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
   const [showModal, setShowModal] = useState(false);
-  const [componentLoading, setComponentLoading] = useState(true); // Controls the initial component spinner
-  const [fadeInTable, setFadeInTable] = useState(false); // Controls fade-in for table content
+  const [componentLoading, setComponentLoading] = useState(true);
+  const [fadeInTable, setFadeInTable] = useState(false);
 
   useEffect(() => {
     setTimeout(() => {
@@ -59,7 +59,6 @@ const TradeTable = ({ onNewTrade }) => {
         </div>
       )}
 
-      {/* Fade-in the trade-table-container only after componentLoading */}
       <div
         className={`trade-table-container ${
           !componentLoading ? "fade-in" : "loading"

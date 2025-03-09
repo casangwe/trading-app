@@ -101,20 +101,17 @@ const Calender = () => {
           entries[entries.length - 1].close_cash || 0
         );
 
-        // Aggregate transactions for the month
         const { totalDeposits, totalWithdrawals } =
           calculateTransactionsForPeriod(startDate, endDate);
 
         monthData.total_deposits = totalDeposits;
         monthData.total_withdrawals = totalWithdrawals;
 
-        // Calculate net deposits and total cash invested
         const totalInvested =
           monthData.total_deposits -
           monthData.total_withdrawals +
           monthData.initial_open_cash;
 
-        // Calculate ROI
         if (totalInvested === 0) {
           monthData.roi = 0;
         } else {
@@ -165,20 +162,17 @@ const Calender = () => {
           entries[entries.length - 1].close_cash || 0
         );
 
-        // Aggregate transactions for the year
         const { totalDeposits, totalWithdrawals } =
           calculateTransactionsForPeriod(startDate, endDate);
 
         yearData.total_deposits = totalDeposits;
         yearData.total_withdrawals = totalWithdrawals;
 
-        // Calculate net deposits and total cash invested
         const totalInvested =
           yearData.total_deposits -
           yearData.total_withdrawals +
           yearData.initial_open_cash;
 
-        // Calculate ROI
         if (totalInvested === 0) {
           yearData.roi = 0;
         } else {
@@ -323,7 +317,6 @@ const Calender = () => {
             tileContent={tileContent}
             onClickDay={(date) => handleTileClick(date, "month")}
             onActiveStartDateChange={({ activeStartDate, view }) =>
-              // handleTileClick(activeStartDate, view)
               setModalDetails(null)
             }
           />
