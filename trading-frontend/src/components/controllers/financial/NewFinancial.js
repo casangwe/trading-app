@@ -1,9 +1,7 @@
 import React, { useState } from "react";
-import { useNavigate } from "react-router-dom";
 import { createFinancial } from "../api/FinancialAPI";
 
-const NewFinancial = ({ onClose, onSuccess }) => {
-  const navigate = useNavigate();
+const NewFinancial = ({ onClose, onNewFinancial }) => {
   const [formData, setFormData] = useState({
     entry_date: "",
     income: "",
@@ -37,7 +35,9 @@ const NewFinancial = ({ onClose, onSuccess }) => {
       });
 
       console.log("Success:", response);
-      onSuccess(response);
+      if (onNewFinancial) {
+        onNewFinancial(response);
+      }
       onClose();
     } catch (error) {
       console.error("Error:", error);

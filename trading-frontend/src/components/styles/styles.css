@@ -2253,7 +2253,6 @@ input:checked + .slider:before {
 .bars-and-calendar-container,
 .investment-and-dailypnl-container,
 .networth-and-cash-container,
-.savings-account-charts-container,
 .transactions-and-rules-container,
 .investment-and-cash-container,
 .eqt-and-summary-container {
@@ -2281,6 +2280,14 @@ input:checked + .slider:before {
   height: 500px;
   background-color: transparent;
   padding: 0;
+}
+
+.savings-account-charts-container {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 0px;
+  padding: 20px;
 }
 
 /******************************Within the Horizontal Containers *****************************/
