@@ -93,10 +93,23 @@ const TransactionDistribution = () => {
             startAngle={90}
             endAngle={-270}
             dataKey="value"
-            paddingAngle={2}
+            paddingAngle={5}
           >
             {transactionData.map((entry, index) => (
-              <Cell key={`cell-${index}`} fill={entry.color} />
+              <Cell
+                key={`cell-${index}`}
+                fill={entry.color}
+                style={{
+                  transition: "filter 0.3s",
+                  cursor: "pointer",
+                }}
+                onMouseEnter={(e) => {
+                  e.currentTarget.style.filter = `drop-shadow(0 0 5px ${entry.color})`;
+                }}
+                onMouseLeave={(e) => {
+                  e.currentTarget.style.filter = "none";
+                }}
+              />
             ))}
           </Pie>
           <Tooltip

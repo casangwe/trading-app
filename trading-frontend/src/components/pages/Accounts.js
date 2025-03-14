@@ -37,7 +37,7 @@ const Accounts = ({ onClose }) => {
         </div>
       </div>
 
-      <div className="transactions-and-rules-container">
+      <div className="transactions-and-distribution-container">
         <div className="transactions-accounts">
           <TransactionTable />
         </div>

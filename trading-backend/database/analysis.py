@@ -90,6 +90,10 @@ def most_active_expirations(df):
     else:
         df["is_opening"] = False 
 
+    # Add Call Put Ratio
+    # Add bullish / bearish sentiment. We will need to analyze what these opening contract / all contracts are.
+    # We understand buying a Call option and selling a Put option is bullish and buying a Put option and selling a Call option is Bearish so we need to keep that in mind.
+    # There will be additional things to add.
     expirations = df.groupby("expiry", as_index=False).agg(
         total_contracts=("size", "sum"),
         total_premium=("premium", "sum"),

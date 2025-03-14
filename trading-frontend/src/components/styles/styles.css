@@ -201,13 +201,9 @@ body::-webkit-scrollbar {
   font-size: 12px;
   background-color: transparent;
   color: black;
-  transition: all 0.3s ease-in-out;
+  transition: all 0.5s ease-in-out;
 }
-
 .search input::placeholder {
-  color: #333;
-}
-.search input::placeholder:focus {
   color: #333;
 }
 
@@ -236,59 +232,6 @@ body::-webkit-scrollbar {
 }
 .nav-links a.active {
   color: #4a90e2;
-}
-.user-dropdown {
-  position: relative;
-}
-
-.user-btn {
-  display: flex;
-  align-items: center;
-  background: none;
-  border: none;
-  color: black;
-  font-size: 12px;
-  cursor: pointer;
-  padding: 0.5rem 1rem;
-  margin-top: 2px;
-  border-radius: 4px;
-  transition: background-color 0.3s ease;
-}
-
-.user-btn:hover {
-  background-color: #333;
-  opacity: 90%;
-  color: #ffffff;
-}
-
-.user-icon {
-  font-size: 12px;
-  margin-right: 0.5rem;
-  color: #3d8fe0;
-}
-
-.dropdown-menu {
-  position: absolute;
-  top: 100%;
-  right: 0;
-  background-color: #333;
-  color: white;
-  border-radius: 4px;
-  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
-  min-width: 160px;
-  z-index: 1000;
-  opacity: 90%;
-}
-
-.dropdown-menu a,
-.dropdown-menu button {
-  display: block;
-  padding: 0.5rem 1rem;
-  text-decoration: none;
-  color: white;
-  cursor: pointer;
-  border: none;
-  background: none;
 }
 
 .logout-btn {
@@ -1408,6 +1351,289 @@ body::-webkit-scrollbar {
   border-top: 1px solid #e6e8ec;
   margin: 2px 0;
 }
+/******************************  Upload Component *******************************/
+.upload-btn {
+  transition: transform 0.3s ease-in-out;
+}
+
+.upload-btn:hover {
+  transform: scale(1.1);
+}
+
+.upload-status {
+  font-size: 12px;
+  margin-top: 10px;
+  color: #4a90e2;
+  text-align: center;
+  font-weight: bold;
+}
+/******************************  Flow Summary Component *******************************/
+.flow-summary-wrapper {
+  position: relative;
+  min-height: 300px;
+  padding: 20px;
+  background-color: transparent;
+  border-radius: 8px;
+  font-family: Arial, sans-serif;
+}
+.flow-summary-container {
+  background-color: transparent;
+  border-radius: 8px;
+  font-family: Arial, sans-serif;
+  padding: 20px;
+  transform: translateY(10px);
+  transition: opacity 1s ease, transform 1s ease;
+  position: relative;
+  min-height: 550px;
+  opacity: 0;
+}
+
+.flow-summary-container.fade-in {
+  opacity: 1;
+  transform: translateY(0);
+}
+
+#flow-upload-btn {
+  font-size: 12px;
+  cursor: pointer;
+  color: black;
+  padding: 6px 10px;
+  border-radius: 5px;
+}
+#flow-upload-btn:hover {
+  font-size: 12px;
+  cursor: pointer;
+  color: #4a90e2;
+}
+.flow-summary-container .title {
+  font-size: 26px;
+  font-weight: 700;
+  color: #4a90e2;
+  margin-top: 6px;
+  padding: 20px;
+}
+
+/******************************** Summary Stats  ********************************/
+.summary-stats-wrapper {
+  margin-top: 10px;
+  background: transparent;
+  padding: 15px;
+}
+
+.summary-stats-grid {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 10px;
+}
+
+.stat-card {
+  background: transparent;
+  padding: 6px;
+  text-align: center;
+  transition: transform 0.2s ease-in-out;
+}
+
+.stat-title {
+  font-size: 10px;
+  color: #555;
+  margin-bottom: 4px;
+}
+
+.stat-value {
+  font-size: 11px;
+  font-weight: bold;
+  color: #333;
+}
+
+.summary-divider {
+  margin: 20px 0;
+  border: none;
+  border-top: 1px solid rgba(0, 0, 0, 0.1);
+}
+
+/******************************** Largest Trade  ********************************/
+.largest-trade-wrapper {
+  margin-top: 15px;
+  background: transparent;
+  padding: 20px;
+  border: 1px solid rgba(0, 0, 0, 0.1);
+  /* border-left: 1px solid rgba(0, 0, 0, 0.1); */
+}
+
+.largest-trade-title {
+  font-size: 11px;
+  padding: 6px;
+  font-weight: bold;
+  margin-bottom: 10px;
+  color: #333;
+}
+
+.largest-trade-table {
+  width: 100%;
+  border-collapse: collapse;
+}
+
+.largest-trade-table td {
+  padding: 6px;
+  border-bottom: 1px solid rgba(0, 0, 0, 0.1);
+}
+
+.trade-label {
+  font-size: 10px;
+  font-weight: bold;
+  color: #555;
+  text-align: left;
+}
+
+.trade-value {
+  font-size: 10px;
+  color: #000;
+  text-align: right;
+}
+/******************************** Expirations  ********************************/
+.expirations-wrapper {
+  margin-top: 15px;
+  background: transparent;
+  padding: 20px;
+}
+
+.expirations-title {
+  font-size: 11px;
+  font-weight: bold;
+  margin-bottom: 10px;
+  color: #333;
+  text-align: left;
+}
+
+.expirations-grid {
+  display: grid;
+  grid-template-columns: repeat(5, 1fr);
+  gap: 10px;
+  align-items: start;
+}
+
+.expiration-card {
+  background: transparent;
+  padding: 12px;
+  border: 1px solid rgba(0, 0, 0, 0.1);
+  text-align: left;
+  transition: transform 0.2s ease-in-out;
+}
+
+.expiration-card:hover {
+  transform: scale(1.03);
+}
+
+.expiration-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  font-size: 10px;
+  font-weight: bold;
+  color: #333;
+}
+
+.expiration-divider {
+  margin: 8px 0;
+  border: none;
+  border-top: 1px solid rgba(0, 0, 0, 0.1);
+}
+
+.expiration-details {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.exp-detail {
+  display: flex;
+  justify-content: space-between;
+  padding: 4px;
+}
+
+.exp-title {
+  font-size: 10px;
+  color: #555;
+  text-align: left;
+}
+
+.exp-value {
+  font-size: 10px;
+  color: black;
+  text-align: right;
+}
+
+@media (max-width: 768px) {
+  .expirations-grid {
+    grid-template-columns: repeat(2, 1fr);
+  }
+}
+
+@media (max-width: 480px) {
+  .expirations-grid {
+    grid-template-columns: repeat(1, 1fr);
+  }
+}
+
+/******************************** Expirations  ********************************/
+/* .expirations-wrapper {
+  margin-top: 15vh;
+  background: transparent;
+  text-align: left;
+}
+
+.expirations-title {
+  font-size: 14px;
+  font-weight: bold;
+  margin-bottom: 10px;
+  color: #333;
+  text-align: left;
+}
+
+.expirations-grid {
+  display: grid;
+  grid-template-columns: repeat(5, 1fr);
+  gap: 8px;
+  align-items: start;
+}
+
+.expiration-column {
+  background: transparent;
+  padding: 10px;
+  text-align: left;
+}
+
+.expiration-column:last-child {
+  border-right: none;
+}
+
+.expiration-header {
+  font-size: 11px;
+  font-weight: bold;
+  margin-bottom: 10px;
+  color: #333;
+}
+
+.expiration-divider {
+  margin: 10px 0;
+  border: none;
+  border-top: 1px solid rgba(0, 0, 0, 0.1);
+}
+
+.expiration-detail {
+  padding: 4px 0;
+}
+
+.exp-title {
+  font-size: 10px;
+  color: #555;
+}
+
+.exp-value {
+  font-size: 11px;
+  font-weight: bold;
+  color: #333;
+} */
 
 /******************************  Financial Table Component ******************************  */
 .financial-table-wrapper {
@@ -1992,7 +2218,6 @@ body::-webkit-scrollbar {
   background-color: transparent;
   color: black;
   border: 1px solid #333;
-  /* border-radius: 4px; */
   cursor: pointer;
   transition: all 0.3s ease-in-out;
   margin-top: 2vh;
@@ -2038,8 +2263,36 @@ body::-webkit-scrollbar {
 
 .tooltip {
   position: relative;
-  display: inline-block;
-  color: transparent;
+  display: flex;
+  align-items: center;
+}
+
+.tooltip .tooltiptext {
+  visibility: hidden;
+  white-space: nowrap;
+  max-width: 220px;
+  background-color: rgba(0, 0, 0, 0.7);
+  color: #fff;
+  text-align: left;
+  border-radius: 6px;
+  padding: 5px 10px;
+  position: absolute;
+  z-index: 1;
+  top: 50%;
+  right: 115%;
+  transform: translateY(-50%);
+  opacity: 0;
+  transition: opacity 0.3s, max-width 0.3s ease-in-out;
+  overflow-wrap: break-word;
+}
+.tooltip:hover .tooltiptext,
+.tooltip.show .tooltiptext {
+  visibility: visible;
+  opacity: 1;
+  background-color: transparent;
+  color: #4a90e2;
+  font-size: 10px;
+  max-width: 250px;
 }
 .fade-out {
   opacity: 0;
@@ -2049,32 +2302,6 @@ body::-webkit-scrollbar {
 .fade-in {
   opacity: 1;
   transition: opacity 0.5s ease-in-out;
-}
-
-.tooltip .tooltiptext {
-  visibility: hidden;
-  width: 50px;
-  background-color: rgba(0, 0, 0, 0.7);
-  color: #fff;
-  text-align: center;
-  border-radius: 6px;
-  padding: 5px;
-  position: absolute;
-  z-index: 1;
-  top: 50%;
-  right: 110%;
-  transform: translateY(-50%);
-  opacity: 0;
-  transition: opacity 0.3s;
-}
-
-.tooltip:hover .tooltiptext {
-  visibility: visible;
-  opacity: 1;
-  background-color: transparent;
-  color: #4a90e2;
-
-  font-size: 10px;
 }
 
 /************************************ Loading Spinner  *************************************/
@@ -2245,15 +2472,16 @@ input:checked + .slider:before {
   color: #4a90e2;
   font-weight: 600;
 }
+
 /*******************************************************************************************/
 /****************************************** Pages ******************************************/
 /*******************************************************************************************/
 
 /* ******************************* Horizontal Containers ***********************************/
+.flow-summary-and-largest-trade-container,
 .bars-and-calendar-container,
 .investment-and-dailypnl-container,
 .networth-and-cash-container,
-.transactions-and-rules-container,
 .investment-and-cash-container,
 .eqt-and-summary-container {
   display: flex;
@@ -2271,6 +2499,14 @@ input:checked + .slider:before {
   }
 }
 
+.savings-account-charts-container,
+.transactions-and-distribution-container {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 0px;
+}
+
 .watchlist-and-misc-container {
   display: flex;
   position: inherit;
@@ -2282,15 +2518,8 @@ input:checked + .slider:before {
   padding: 0;
 }
 
-.savings-account-charts-container {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  gap: 0px;
-  padding: 20px;
-}
-
 /******************************Within the Horizontal Containers *****************************/
+.flow-summary-context,
 .transactions-accounts,
 .networth-chart-networth,
 .eqt-home,
@@ -2309,6 +2538,7 @@ input:checked + .slider:before {
   flex-direction: column;
 }
 
+.largest-trade-context,
 .transaction-distribution-accounts,
 .networth-cash-networth,
 .summary-accounts,
@@ -2340,3 +2570,5 @@ input:checked + .slider:before {
 .account-distribution-chart {
   flex: 1;
 }
+
+/**************************************** Context Page ***************************************/
