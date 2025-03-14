@@ -1456,8 +1456,8 @@ body::-webkit-scrollbar {
   margin-top: 15px;
   background: transparent;
   padding: 20px;
-  border: 1px solid rgba(0, 0, 0, 0.1);
-  /* border-left: 1px solid rgba(0, 0, 0, 0.1); */
+  /* border: 1px solid rgba(0, 0, 0, 0.1); */
+  border-left: 1px solid rgba(0, 0, 0, 0.1);
 }
 
 .largest-trade-title {
