@@ -215,12 +215,12 @@ def categorize_trade(row):
 def compute_sentiment(df):
 
     def is_bullish_unwinding(call_open_premium, call_close_premium, put_open_premium):
-        return put_open_premium > call_open_premium
-        # return call_close_premium > call_open_premium and put_open_premium > put_close_premium
+        # return put_open_premium > call_open_premium
+        return call_close_premium > call_open_premium and put_open_premium > put_close_premium
         # return call_close_premium + put_open_premium > call_open_premium 
     def is_bearish_unwinding(put_open_premium, put_close_premium, call_open_premium):
-        return call_open_premium > put_open_premium
-        # return put_close_premium > put_open_premium and call_open_premium > call_close_premium
+        # return call_open_premium > put_open_premium
+        return put_close_premium > put_open_premium and call_open_premium > call_close_premium
         # return put_close_premium + call_open_premium > put_open_premium 
 
 
