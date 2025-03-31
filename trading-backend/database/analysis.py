@@ -18,6 +18,12 @@ def convert_numpy(obj):
     else:
         return obj
 
+def safe_float(value, default=0.0):
+    try:
+        return float(value)
+    except (ValueError, TypeError):
+        return default
+
 #################################################################################################
 # Data Analysis 
 #################################################################################################
@@ -57,151 +63,91 @@ def highest_premium_trade(df):
 def largest_single_trade(df):
     if df.empty or "premium" not in df.columns:
         return {"largest_trade": None}
+
     df["premium"] = pd.to_numeric(df["premium"], errors="coerce")
     df = df.dropna(subset=["premium"])
     if df.empty:
         return {"largest_trade": None}
+
     largest_trade = df.nlargest(1, "premium")
-    return largest_trade.to_dict(orient="records")[0] if not largest_trade.empty else {"largest_trade": None}
+    trade_dict = largest_trade.to_dict(orient="records")[0]
 
-def unusual_volume(df):
-    if df.empty or "volume" not in df.columns:
-        return {"unusual_trades": []}
-    volume_threshold = df["volume"].quantile(0.95)
-    high_volume_trades = df[df["volume"] > volume_threshold]
-    unusual_condition_trades = df[df["conds"].astype(str).str.contains("unusual", case=False, na=False)]
-    unusual_trades = pd.concat([high_volume_trades, unusual_condition_trades]).drop_duplicates()
-    return {"unusual_trades": unusual_trades.to_dict(orient="records")}
+    if "trade_date" in trade_dict and isinstance(trade_dict["trade_date"], pd.Timestamp):
+        trade_dict["trade_date"] = trade_dict["trade_date"].strftime("%Y-%m-%d")
+    if "trade_time" in trade_dict and isinstance(trade_dict["trade_time"], pd.Timestamp):
+        trade_dict["trade_time"] = trade_dict["trade_time"].strftime("%H:%M:%S")
 
-def most_active_expirations(df):
-    if df.empty or "expiry" not in df.columns:
-        return {"most_active_expirations": []}
-    if not pd.api.types.is_datetime64_any_dtype(df["expiry"]):
-        df["expiry"] = pd.to_datetime(df["expiry"], errors="coerce")
-    df = df.dropna(subset=["expiry"])
-    if df.empty:
-        return {"most_active_expirations": []}
-    today = pd.to_datetime(datetime.today().date())
-    if "conds" in df.columns:
-        df["is_opening"] = df["conds"].astype(str).str.contains("opening", case=False, na=False)
-    else:
-        df["is_opening"] = False
-    expirations = df.groupby("expiry", as_index=False).agg(
-        total_contracts=("size", "sum"),
-        total_premium=("premium", "sum"),
-        total_calls=("put_call", lambda x: (x == "call").sum()),
-        total_puts=("put_call", lambda x: (x == "put").sum()),
-        opening_count=("is_opening", "sum"),
-        opening_premium=("premium", lambda x: x[df["is_opening"]].sum())
-    )
-    expirations["expiry"] = expirations["expiry"].dt.date
-    expirations["days_to_expiry"] = (pd.to_datetime(expirations["expiry"]) - today).dt.days
-    expirations = expirations.sort_values(by="total_contracts", ascending=False).head(5)
-    return {"most_active_expirations": expirations.to_dict(orient="records")}
-
-def opening_contracts(df):
-    if df.empty or "conds" not in df.columns:
-        return {"opening_contracts": []}
-    opening_trades = df[df["conds"].astype(str).str.contains("opening", case=False, na=False)].copy()
-    if "expiry" in opening_trades.columns:
-        opening_trades["expiry"] = pd.to_datetime(opening_trades["expiry"], errors="coerce").dt.strftime("%Y-%m-%d")
-    return {"opening_contracts": opening_trades.to_dict(orient="records")}
+    return trade_dict
 
 
 #################################################################################################
-# Predictive Model / Analysis 
-#################################################################################################
-
-#################################################################################################
-# Utility Function for Safe Float Conversion
-#################################################################################################
-def safe_float(value, default=0.0):
-    try:
-        return float(value)
-    except (ValueError, TypeError):
-        return default
-
-#################################################################################################
-# Postitioning
+# Conditioning & Postitioning
 #################################################################################################
 def is_opening(row):
     size = safe_float(row.get("size"))
     open_int = safe_float(row.get("open_int"))
     conditions = (row.get("conds") or "").lower()
-    return any(x in conditions for x in ["opening", "opening unusual", "opening highly_un"]) or size > open_int
+    return bool(any(x in conditions for x in ["opening", "opening unusual", "opening highly_un"]) or size > open_int)
 
 def is_unusual(row):
     conditions = (row.get("conds") or "").lower()
-    return any(x in conditions for x in ["unusual", "highly_un", "opening unusual", "opening highly_un"])
+    return bool(any(x in conditions for x in ["unusual", "highly_un", "opening unusual", "opening highly_un"]))
 
-def is_adding(row):
-       
-    if is_opening(row) or is_profit_taking(row):        
-        return False    
-       
-    size = safe_float(row.get("size"))
-    open_int = safe_float(row.get("open_int"))
-    volume = safe_float(row.get("volume"))
-    put_call = (row.get("put_call") or "").lower().strip()
-    side = (row.get("side") or "").lower().strip()
+def most_active_expirations(df):
+    if df.empty or "expiry" not in df.columns:
+        return {"most_active_expirations": []}
     
-    condition_volume = (volume >= size or volume > open_int)
-    condition_call = (put_call == "call" and side in ["ask", "mid"] and size < open_int)
+    df["expiry"] = pd.to_datetime(df["expiry"], errors="coerce")
+    df = df.dropna(subset=["expiry"])
+    today = pd.to_datetime(datetime.today().date())
+    df = df[df["expiry"] >= today]
+    if df.empty:
+        return {"most_active_expirations": []}
     
-    return condition_volume or condition_call
+    if "analysis" not in df.columns:
+        df["analysis"] = df.apply(categorize_trade, axis=1)
+        analysis_df = pd.json_normalize(df["analysis"])
+        overlapping_cols = analysis_df.columns.intersection(df.columns)
+        df.drop(columns=overlapping_cols, inplace=True, errors='ignore')
+        df = df.join(analysis_df).drop(columns=["analysis"])
 
-
-def is_profit_taking(row):
-    if is_opening(row):
-        return False
-
-    size = safe_float(row.get("size"))
-    open_int = safe_float(row.get("open_int"))
-    volume = safe_float(row.get("volume"))
-    put_call = (row.get("put_call") or "").lower().strip()
-    side = (row.get("side") or "").lower().strip()
-
-
-    basic_condition = size < open_int
-    volume_condition = volume <= open_int
-
-    if put_call == "call":
-        side_condition = (side == "bid")
-    elif put_call == "put":
-        side_condition = (side == "ask")
-    else:
-        side_condition = side in ["bid", "ask"]
-
-    return basic_condition and volume_condition and side_condition
-
-
-def is_closing(row):
-
-    size = safe_float(row.get("size"))
-    open_int = safe_float(row.get("open_int"))
-    volume = safe_float(row.get("volume"))
-
-    if open_int == 0:
-        return False
-
-    return size == open_int or (size > 0.9 * open_int and volume <= open_int)
-
-def sustained_openings(df, threshold=3):
-    daily_openings = df.groupby("trade_date").apply(lambda x: x.apply(is_opening, axis=1).sum())
-    sustained_days = (daily_openings >= threshold).sum()
-    avg_daily_openings = daily_openings.mean()
-    return sustained_days, avg_daily_openings
+    
+    results = []
+    for expiry_date, group in df.groupby("expiry"):
+        total_contracts = int(group["size"].sum())
+        most_traded_strike = (
+            group.groupby("strike")["size"].sum().idxmax()
+            if "strike" in group and not group.groupby("strike")["size"].sum().empty
+            else None
+        )
+        
+        sentiment_result = compute_sentiment(group)
+        scenario = sentiment_result.get("scenario", "Unknown")
+        metrics = sentiment_result.get("vs_metrics", {})
+        
+        results.append({
+            "expiry": expiry_date.date(),
+            "days_to_expiry": (expiry_date - today).days,
+            "total_contracts": total_contracts,
+            "strike": float(most_traded_strike) if most_traded_strike is not None else None,
+            "scenario": scenario,
+            "metrics": metrics
+        })
+    
+    results = sorted(results, key=lambda x: x["total_contracts"], reverse=True)[:5]
+    return {"most_active_expirations": results}
 
 #################################################################################################
 # Rules Dictionary
 #################################################################################################
+
 RULES = {
     "call": {
         "above": {"order_action": "buy-to-open", "sentiment": "bullish", "description": "Buying to Open Calls. Aggressive execution above the asking price demonstrates strong conviction among buyers."},
         "ask": {"order_action": "buy-to-open", "sentiment": "bullish", "description": "Buying to Open Calls. Initiating a position by buying call options at the ask price, indicating bullish sentiment."},
         "mid": {"order_action": "passive", "sentiment": "neutral", "description": "Passive execution at the midpoint, typically used by institutions."},
         "bid": {
-            True: {"order_action": "sell-to-open", "sentiment": "neutral", "description": "Selling to Open Calls. Significant call-selling volume often indicates a neutral-to-bearish market outlook."},
+            True: {"order_action": "sell-to-open", "sentiment": "bearish", "description": "Selling to Open Calls. Significant call-selling volume often indicates a neutral-to-bearish market outlook."},
             False: {"order_action": "sell-to-close", "sentiment": "bearish", "description": "Selling to Close Calls. Closing long call positions through selling, reducing bullish exposure or adjusting to bearish market conditions."}
         },
         "below": {"order_action": "sell-to-close", "sentiment": "bearish", "description": "Selling to Close Calls. Urgently closing long call positions through selling, reflecting a bearish sentiment and expectations of limited upside potential."}
@@ -221,9 +167,13 @@ RULES = {
     }
 }
 
+
+
+
 #################################################################################################
 # Categorization Function
 #################################################################################################
+
 def categorize_trade(row):
     option = (row.get('put_call') or '').lower().strip()
     side = (row.get('side') or '').lower().strip()
@@ -238,9 +188,6 @@ def categorize_trade(row):
 
     opening = is_opening(row)
     unusual = is_unusual(row)
-    adding = is_adding(row)
-    profit_taking = is_profit_taking(row)
-    closing = is_closing(row)
 
     rule = RULES[option][side]
 
@@ -255,12 +202,7 @@ def categorize_trade(row):
         description += " Opening trade."
     if unusual:
         description += " Unusual volume detected."
-    if adding:
-        description += " Adding to existing position."
-    if profit_taking:
-        description += " Profit-taking activity."
-    if closing:
-        description += " Full position closure detected."
+
 
     return {
         "option_type": option,
@@ -269,10 +211,25 @@ def categorize_trade(row):
         "description": description
     }
 
+
 def compute_sentiment(df):
+
+    def is_bullish_unwinding(call_open_premium, call_close_premium, put_open_premium):
+        return put_open_premium > call_open_premium
+        # return call_close_premium > call_open_premium and put_open_premium > put_close_premium
+        # return call_close_premium + put_open_premium > call_open_premium 
+    def is_bearish_unwinding(put_open_premium, put_close_premium, call_open_premium):
+        return call_open_premium > put_open_premium
+        # return put_close_premium > put_open_premium and call_open_premium > call_close_premium
+        # return put_close_premium + call_open_premium > put_open_premium 
+
 
     df["size"] = pd.to_numeric(df["size"], errors="coerce")
     df["premium"] = pd.to_numeric(df["premium"], errors="coerce")
+    df["sentiment"] = df["sentiment"].str.lower()
+    df["is_opening"] = df.apply(is_opening, axis=1)
+    df["is_unusual"] = df.apply(is_unusual, axis=1)
+
     
     call_open = df[(df["option_type"] == "call") & (df["order_action"] == "buy-to-open")]
     put_open = df[(df["option_type"] == "put") & (df["order_action"] == "buy-to-open")]
@@ -280,211 +237,359 @@ def compute_sentiment(df):
     put_close = df[(df["option_type"] == "put") & (df["order_action"] == "sell-to-close")]
     call_sto = df[(df["option_type"] == "call") & (df["order_action"] == "sell-to-open")]
     put_sto = df[(df["option_type"] == "put") & (df["order_action"] == "sell-to-open")]
-    call_mid = df[(df["option_type"] == "call") & (df["order_action"] == "passive")]
-    put_mid = df[(df["option_type"] == "put") & (df["order_action"] == "passive")]
+
     
     call_open_premium = call_open["premium"].sum()
     put_open_premium = put_open["premium"].sum()
     call_close_premium = call_close["premium"].sum()
     put_close_premium = put_close["premium"].sum()
-    total_call_premium = df[df["option_type"] == "call"]["premium"].sum()
-    total_put_premium = df[df["option_type"] == "put"]["premium"].sum() 
     call_sto_premium = call_sto["premium"].sum()
     put_sto_premium = put_sto["premium"].sum()
-    call_mid_premium = call_mid["premium"].sum()
-    put_mid_premium = put_mid["premium"].sum()
+
+    total_call_premium = df[df["option_type"] == "call"]["premium"].sum()
+    total_put_premium = df[df["option_type"] == "put"]["premium"].sum() 
+
+    net_bullish_premium = call_open_premium + put_sto_premium
+    net_bearish_premium = put_open_premium  + call_sto_premium
     
-    bullish_trades = df[df["sentiment"] == "bullish"].shape[0]
-    bearish_trades = df[df["sentiment"] == "bearish"].shape[0]
-    neutral_trades = df[df["sentiment"] == "neutral"].shape[0]
-    
-    bullish_trades_premium = df[df["sentiment"] == "bullish"]["premium"].sum()
-    bearish_trades_premium = df[df["sentiment"] == "bearish"]["premium"].sum()
-    neutral_trades_premium = df[df["sentiment"] == "neutral"]["premium"].sum()
 
-    opening_count = df.apply(is_opening, axis=1).sum()
-    call_accumulation_count = call_open.shape[0] + df[(df["option_type"] == "call") & (df["order_action"] == "passive")].shape[0]
-
-    bullish_open = df[(df.apply(is_opening, axis=1)) & (df["sentiment"].str.contains("bullish", case=False, na=False))]
-    bearish_open = df[(df.apply(is_opening, axis=1)) & (df["sentiment"].str.contains("bearish", case=False, na=False))]
-    call_mid_open = df[(df["option_type"] == "call") & (df["order_action"] == "passive") & (df.apply(is_opening, axis=1))]
-    put_mid_open = df[(df["option_type"] == "put") & (df["order_action"] == "passive") & (df.apply(is_opening, axis=1))]
-
-    bullish_open_count = bullish_open.shape[0]
-    bearish_open_count = bearish_open.shape[0]
-    bullish_mid_open_count = call_mid_open.shape[0]
-    bearish_mid_open_count = put_mid_open.shape[0]
-
-    bullish_open_premium = bullish_open["premium"].sum()
-    bearish_open_premium = bearish_open["premium"].sum()
-    call_mid_open_premium = call_mid_open["premium"].sum()
-    put_mid_open_premium = put_mid_open["premium"].sum()
-
-
-    net_bullish_premium = call_open_premium + put_sto_premium + put_close_premium + call_mid_open_premium
-    net_bearish_premium = put_open_premium + call_close_premium + put_mid_open_premium
-    
     weight_open = 1.0
     weight_close = 1.2
     weight_sto = 1.1  
-    weight_mid = 0.5  
-    weight_sentiment = 50000 
     
     sentiment_score = (
         (call_open_premium - put_open_premium * weight_open) +
         (put_close_premium - call_close_premium * weight_close) +
         (total_call_premium - total_put_premium) +
-        ((put_sto_premium - call_sto_premium) * weight_sto) +
-        ((call_mid_premium - put_mid_premium) * weight_mid) +
-        ((bullish_trades - bearish_trades) * weight_sentiment)
+        ((put_sto_premium - call_sto_premium) * weight_sto) 
     )
-    
-    
+
+
     scenario = "Neutral"
     details = None
+    metrics= None
+    score = 0
 
     if sentiment_score > 0:
-        if (
-            total_call_premium > total_put_premium and
-            call_open_premium + put_sto_premium > put_open_premium and
-            call_mid_open_premium > put_mid_open_premium and
-            net_bullish_premium > net_bearish_premium and
-            call_open_premium > call_close_premium and
-            (bullish_open_count + bullish_mid_open_count) > (bearish_open_count + bearish_mid_open_count) and 
-            (bullish_open_premium + call_mid_open_premium) > (bearish_open_premium + put_mid_open_premium) and
-            put_close_premium > call_close_premium  # key for bullish strength. Puts are being closed more than calls are closed
 
+        if (
+            call_open_premium > call_close_premium + put_open_premium and
+            put_close_premium > put_open_premium and
+            call_open_premium > call_close_premium and
+            call_open_premium > put_open_premium and 
+            put_close_premium > call_close_premium and
+            call_open_premium + put_sto_premium > put_open_premium + call_sto_premium
         ):
             scenario = "Strong Bullish Flow"
+            score = 3
             details = {
                 "message": (
-                    f"Bullish conditions: The bullish initiation premium (calls buy-to-open + puts sell-to-open) is "
-                    f"(${call_open_premium + put_sto_premium:,.2f}), which exceeds the bearish initiation premium of "
-                    f"(${put_open_premium:,.2f}). Additionally, the puts closing premium is (${put_close_premium:,.2f}) "
-                    f"—higher than the calls closing premium of (${call_close_premium:,.2f}). Overall, the net bullish flow "
-                    f"(calls open + puts sell-to-open + puts close + mid calls) totals (${net_bullish_premium:,.2f}) compared to a net "
-                    f"bearish flow of (${net_bearish_premium:,.2f}), and total call premium (${total_call_premium:,.2f}) exceeds "
-                    f"total put premium (${total_put_premium:,.2f}). Furthermore, of the bullish trades, "
-                    f"{bullish_open_count + bullish_mid_open_count} are opening trades (with a premium of ${bullish_open_premium + call_mid_open_premium:,.2f}) "
-                    f"compared to {bearish_open_count + bearish_mid_open_count } bearish opening trades (with ${bearish_open_premium + put_mid_open_premium:,.2f})."
+                    f"Strong Bullish flow is evident as call opening (${call_open_premium:,.2f}) and put selling opening (${put_sto_premium:,.2f}) "
+                    f"surpasses net bearish opening flow (${net_bearish_premium:,.2f}). Additionally, call opening premium exceeds call closing premium "
+                    f"(${call_close_premium:,.2f}), signaling active accumulation. Meanwhile, bearish positions are being unwound, as put closing premium "
+                    f"(${put_close_premium:,.2f}) is higher than Call Closing Premium (${call_close_premium:,.2f}). "
+                    f"This flow reflects strong institutional bullish conviction and likely directional repositioning."
                 )
             }
-        elif (
-            total_call_premium > total_put_premium and
-            call_open_premium + put_sto_premium > put_open_premium and
-            call_mid_open_premium > put_mid_open_premium and
-            net_bullish_premium > net_bearish_premium and
-            call_open_premium > call_close_premium and # key to bullish continuation 
-            (bullish_open_count + bullish_mid_open_count) > (bearish_open_count + bearish_mid_open_count) and # key to bullish continuation 
-            (bullish_open_premium + call_mid_open_premium) > (bearish_open_premium + put_mid_open_premium)  # key to bullish continuation 
-        ):
-            scenario = "Bullish Continuation"
-            details = {
-                "message": (
-                    f"Bullish continuation: Bullish continuation is seen when bullish initiation premium is "
-                    f"(${call_open_premium + put_sto_premium:,.2f}), which exceeds the bearish initiation premium of "
-                    f"(${put_open_premium:,.2f}), and the total call premium (${total_call_premium:,.2f}) exceeds the total put "
-                    f"premium (${total_put_premium:,.2f}). This suggests sustained bullish demand, with a higher frequency of call open "
-                    f"trades at (${call_open_premium:,.2f}) compared to call closing trades at (${call_close_premium:,.2f}), indicating that market participants are "
-                    f"maintaining their bullish positions. Furthermore, of the bullish trades, "
-                    f"{bullish_open_count + bullish_mid_open_count} are opening trades (with a premium of ${bullish_open_premium + call_mid_open_premium:,.2f}) "
-                    f"compared to {bearish_open_count + bearish_mid_open_count } bearish opening trades (with ${bearish_open_premium + put_mid_open_premium:,.2f})."
-                )
+            metrics = {
+                "left_label": "Bearish Metrics",
+                "right_label": "Bullish Metrics",
+                "left": {
+                    "Call Closing Premium": float(call_close_premium),
+                    "Put Opening Premium": float(put_open_premium),
+                    "Net Bearish Premium": float(put_open_premium + call_close_premium)
+
+                },
+                "right": {
+                    "Call Opening Premium": float(call_open_premium),
+                    "Put Closing Premium": float(put_close_premium),
+                    "Net Bullish Premium": float(call_open_premium + put_close_premium)
+
+                }
             }
 
         elif (
-            total_call_premium > total_put_premium and
-            call_open_premium + put_sto_premium > put_open_premium and
-            call_mid_open_premium > put_mid_open_premium and
-            net_bullish_premium > net_bearish_premium and           
-            bullish_trades > bearish_trades and
-            call_mid_premium > put_mid_premium
+            put_close_premium > put_open_premium and
+            call_open_premium > call_close_premium and
+            call_open_premium > put_open_premium and 
+            put_close_premium > call_close_premium and
+            call_open_premium + put_sto_premium > put_open_premium + call_sto_premium
         ):
-            scenario = "Institutional Bullish Accumulation"
-            details = {
-                "message": (
-                    f"Institutional Accumulation: The combined count of call buy-to-open and passive call orders is "
-                    f"{call_accumulation_count}, which exceeds the put buy-to-open count of {put_open.shape[0]}. "
-                    f"Additionally, the mid premium for calls (${call_mid_premium:,.2f}) exceeds that of puts "
-                    f"(${put_mid_premium:,.2f}), further supporting sustained accumulation by institutions. "
-                    f"Moreover, the call open premium is ${call_open_premium:,.2f}, indicating strong accumulation."
-                )
-            }
+
+            if is_bullish_unwinding(call_open_premium, call_close_premium, put_open_premium):
+                scenario = "Bullish Profit-Taking & Unwinding"
+                score = 2
+                details = {
+                    "message": (
+                        f"Flow resembles accumulation but is distorted by profit-taking activity. "
+                        f"Call closing premium (${call_close_premium:,.2f}) and put buying (${put_open_premium:,.2f}) "
+                        f"exceed new call openings (${call_open_premium:,.2f}). Monitor for confirmation — flow may reverse."
+                    )
+                }
+                metrics = {
+                    "left_label": "Profit-Taking",
+                    "right_label": "Bullish Flow",
+                    "left": {
+                        "Call Closing Premium": float(call_close_premium),
+                        "Put Opening Premium": float(put_open_premium),
+                        "Net Bearish Premium": float(call_close_premium + put_open_premium)
+                    },
+                    "right": {
+                        "Call Opening Premium": float(call_open_premium),
+                        "Put Closing Premium": float(put_close_premium),
+                        "Net Bullish Premium": float(call_open_premium + put_close_premium)
+                    }
+                }
+            else:
+                scenario = "Bullish Accumulation"
+                score = 2
+                details = {
+                    "message": (
+                        f"Evidence of sustained bullish flow as Institutions are accumulating bullish exposure. "
+                        f"Combined call opening premium and put selling is (${(call_open_premium + put_sto_premium):,.2f}) "
+                        f"exceeding put openings (${put_open_premium:,.2f}). Additionally, more capital is entering "
+                        f"call buying (${call_open_premium:,.2f}) than leaving (${call_close_premium:,.2f}), "
+                        f"indicating conviction in upside. This is a strong setup for bullish continuation."
+                    )
+                }
+                metrics = {
+                    "left_label": "Bearish Metrics",
+                    "right_label": "Bullish Metrics",
+                    "left": {
+                        "Call Closing Premium": float(call_close_premium),
+                        "Put Opening Premium": float(put_open_premium),
+                        "Net Bearish Premium": float(call_close_premium + put_open_premium)
+                    },
+                    "right": {
+                        "Call Opening Premium": float(call_open_premium),
+                        "Put Closing Premium": float(put_close_premium),
+                        "Net Bullish Premium": float(call_open_premium + put_close_premium)
+                    }
+                }
 
         elif (
-            bullish_trades_premium > bearish_trades_premium + neutral_trades_premium and
-            total_call_premium > total_put_premium
-            ):
-            scenario = "Bullish"
+            call_open_premium > call_close_premium and
+            call_open_premium > put_open_premium and
+            put_close_premium > call_close_premium and
+            call_open_premium + put_sto_premium > put_open_premium + call_sto_premium
+        ):
+            scenario = "Bullish Positioning"
+            score = 1
             details = {
                 "message": (
-                    f"Bullish Sentiment: Total bullish trades premium (${bullish_trades_premium:,.2f}) exceeds bearish plus neutral "
-                    f"trades premium (${bearish_trades_premium + neutral_trades_premium:,.2f}), with total call premium (${total_call_premium:,.2f}) "
-                    f"exceeding total put premium (${total_put_premium:,.2f})."
+                    f"Bullish positioning is strongly indicated. The call opening premium (${call_open_premium:,.2f}) "
+                    f"exceeds call closing premium (${call_close_premium:,.2f}), showing robust bullish initiations. "
+                    f"Moreover, call openings dominate put openings (${put_open_premium:,.2f}), while put closings (${put_close_premium:,.2f}) "
+                    f"are higher than call closings, suggesting that bearish positions are being actively unwound. "
+                    f"Finally, the net bullish flow (call openings plus put sell-to-open) exceeds the net bearish flow, confirming a "
+                    f"strong upward bias in the option flow."
                 )
             }
+            metrics = {
+                "left_label": "Bearish Metrics",
+                "right_label": "Bullish Metrics",
+                "left": {
+                    "Call Closing Premium": float(call_close_premium),
+                    "Put Opening Premium": float(put_open_premium),
+                    "Net Bearish Premium": float(call_close_premium + put_open_premium)
+                },
+                "right": {
+                    "Call Opening Premium": float(call_open_premium),
+                    "Put Closing Premium": float(put_close_premium),
+                    "Net Bullish Premium": float(call_open_premium + put_close_premium)
+                }
+            }
+
 
         else:
             scenario = "Mildly Bullish"
+            score = 0
             details = {
                 "message": (
-                    f"Mildy Bullish: Mildly bullish sentiment score, but needs accumulation."
+                    f"The sentiment score is positive ({sentiment_score:,.0f}), indicating a mild bullish tilt in the option flow. "
+                    f"Call opening premium (${call_open_premium:,.2f}) exceeds call closing premium (${call_close_premium:,.2f}), "
+                    f"suggesting some bullish commitment, although the overall flow does not decisively favor bullish positions."
                 )
             }
+            metrics = {
+                "left_label": "Bearish Metrics",
+                "right_label": "Bullish Metrics",
+                "left": {
+                    "Call Closing Premium": float(call_close_premium),
+                    "Put Opening Premium": float(put_open_premium),
+                    "Net Bearish Premium": float(call_close_premium + put_open_premium)
+                },
+                "right": {
+                    "Call Opening Premium": float(call_open_premium),
+                    "Put Closing Premium": float(put_close_premium),
+                    "Net Bullish Premium": float(call_open_premium + put_close_premium)
+                }
+            }
+
+
+
+
     elif sentiment_score < 0:
         if (
-            put_open_premium + call_sto_premium > call_open_premium and
+            put_open_premium > put_close_premium + call_open_premium and
+            call_close_premium > call_open_premium and
+            put_open_premium > put_close_premium and
+            put_open_premium > call_open_premium and
             call_close_premium > put_close_premium and
-            net_bearish_premium > net_bullish_premium and
-            total_put_premium > total_call_premium
+            put_open_premium + call_sto_premium > call_open_premium + put_sto_premium
         ):
             scenario = "Strong Bearish Flow"
+            score = -3
             details = {
                 "message": (
-                    f"Bearish conditions: The bearish initiation premium (puts buy-to-open + calls sell-to-open) is "
-                    f"${put_open_premium + call_sto_premium:,.2f}, which exceeds the bullish initiation premium of "
-                    f"${call_open_premium:,.2f}. Additionally, the calls closing premium is ${call_close_premium:,.2f} "
-                    f"—higher than the puts closing premium of ${put_close_premium:,.2f}. Overall, the net bearish flow "
-                    f"(puts open + calls sell-to-open + calls close) totals ${net_bearish_premium:,.2f} compared to a net "
-                    f"bullish flow of ${net_bullish_premium:,.2f}, and total put premium (${total_put_premium:,.2f}) exceeds "
-                    f"total call premium (${total_call_premium:,.2f})."
+                    f"Bearish sentiment is dominant across all flow indicators. The combined put opening (${put_open_premium:,.2f}) "
+                    f"and call selling (${call_sto_premium:,.2f}) adds up to (${net_bearish_premium:,.2f}), surpassing bullish initiation " 
+                    f"flow (${call_open_premium:,.2f}). Additionally, call closing premium (${call_close_premium:,.2f}) is greater than " 
+                    f"put closing premium (${put_close_premium:,.2f}), highlighting a broad retreat from bullish exposure. This pattern " 
+                    f"suggests institutional conviction in downside risk or an emerging market correction scenario. Scan metrics to confirm " 
+                    f"more calls are being closed than puts being opened. It doesn't have to be greater but it shows strong conviction." 
+
                 )
             }
-        elif ( 
-            put_open_premium + call_sto_premium > call_open_premium and
+            metrics = {
+                "left_label": "Bearish Metrics",
+                "right_label": "Bullish Metrics",
+                "left": {
+                    "Put Opening Premium": float(put_open_premium),
+                    "Call Closing Premium": float(call_close_premium),
+                    "Net Bearish Premium": float(put_open_premium + call_close_premium),
+                },
+                "right": {
+                    "Call Opening Premium": float(call_open_premium),
+                    "Put Closing Premium": float(put_close_premium),
+                    "Net Bullish Premium": float(call_open_premium + put_close_premium),
+                }
+            }
+
+
+        elif (
             call_close_premium > call_open_premium and
-            put_open_premium > call_open_premium and 
-            call_close_premium > put_close_premium and total_put_premium > total_call_premium
+            put_open_premium > put_close_premium and
+            put_open_premium > call_open_premium and
+            call_close_premium > put_close_premium and
+            put_open_premium + call_sto_premium > call_open_premium + put_sto_premium
+        ):
+            if is_bearish_unwinding(put_open_premium, put_close_premium, call_open_premium):
+                scenario = "Bearish Profit-Taking & Distribution "
+                score = -2
+                details = {
+                    "message": (
+                        f"Flow resembles bearish accumulation but is distorted by profit-taking activity. "
+                        f"Put closing premium (${put_close_premium:,.2f}) and call buying (${call_open_premium:,.2f}) "
+                        f"exceed new put openings (${put_open_premium:,.2f}). Monitor for confirmation — flow may reverse."
+                    )
+                }
+
+                metrics = {
+                    "left_label": "Profit-Taking",
+                    "right_label": "Bearish Flow",
+                    "left": {
+                        "Put Closing Premium": float(put_close_premium),
+                        "Call Opening Premium": float(call_open_premium),
+                        "Net Bullish Premium": float(put_close_premium + call_open_premium),
+                    },
+                    "right": {
+                        "Put Opening Premium": float(put_open_premium),
+                        "Call Closing Premium": float(call_close_premium),
+                        "Net Bearish Premium": float(put_open_premium + call_close_premium),
+                    }
+                }
+
+            else:
+                scenario = "Bearish Accumulation"
+                score = -2
+                details = {
+                    "message": (
+                        f"The flow indicates bearish positioning and accumulation across the broad. " 
+                        f"Call closing premium (${call_close_premium:,.2f}) is greater than call opening premium " 
+                        f"(${call_open_premium:,.2f}), indicating robust unwinding of bullish positions. Put opening premium " 
+                        f"(${put_open_premium:,.2f}) exceeds put closing premium (${put_close_premium:,.2f}) suggesting aggressive " 
+                        f"bearish bets are being opened. Scan metrics to see if put opening is more than "
+                        f"net bullish premium. That shows strong downward conviction, otherwise, slight profit-taking, "
+                        f"but not enough to reverse the flow. "
+                    )
+                }
+                metrics = {
+                    "left_label": "Bearish Metrics",
+                    "right_label": "Bullish Metrics",
+                    "left": {
+                        "Call Closing Premium": float(call_close_premium),
+                        "Put Opening Premium": float(put_open_premium),
+                        "Net Bearish Premium": float(call_close_premium + put_open_premium)
+                    },
+                    "right": {
+                        "Call Opening Premium": float(call_open_premium),
+                        "Put Closing Premium": float(put_close_premium),
+                        "Net Bullish Premium": float(call_open_premium + put_close_premium)
+                    }
+                }
+
+        elif (
+            put_open_premium > put_close_premium and
+            put_open_premium > call_open_premium and
+            call_close_premium > put_close_premium and
+            put_open_premium + call_sto_premium > call_open_premium + put_sto_premium
             
-            ):
-            scenario = "Bullish Unwinding"
+        ):
+            scenario = "Bearish Positioning"
+            score = -1
             details = {
                 "message": (
-                    f"Bearish conditions: The bearish initiation premium (puts buy-to-open + calls sell-to-open) is "
-                    f"${put_open_premium + call_sto_premium:,.2f}, which exceeds the bullish initiation premium of "
-                    f"${call_open_premium:,.2f}. and the total call premium (${total_call_premium:,.2f}) is less than the total put "
-                    f"premium (${total_put_premium:,.2f}). This suggests less bullish demand, with a lower frequency of call open "
-                    f"trades compared to put open trades, and robust call closing flows $ {call_close_premium:,.2f} indicating that market participants are "
-                    f"exiting their bullish positions."
+                    f"The flow reflects early signs of bearish sentiment. Put opening premium (${put_open_premium:,.2f}) "
+                    f"surpasses put closing premium (${put_close_premium:,.2f}), and call opening (${call_open_premium:,.2f}), " 
+                    f"suggesting a gradual shift toward downside exposure. Additionally, the call closing premium is " 
+                    f"(${call_close_premium:,.2f}) more than the put closing premium (${put_close_premium:,.2f}) and " 
+                    f"may represent early positioning ahead of potential weakness. Consider taking a position if " 
+                    f"supported by broader market metrics and technical analysis."
                 )
             }
-        elif ( 
-            put_open_premium + call_sto_premium > call_open_premium and
-            total_put_premium > total_call_premium and 
-            put_mid_premium > call_mid_premium
-            ):
-            scenario = "Distribution & Bearish Positioning"
-            details = {
-                "message": (
-                    f"Distribution: Calls are being closed than they are openend. The combined count of call buy-to-open and passive call orders is "
-                    f"{call_accumulation_count}, which exceeds the put buy-to-open count of {put_open.shape[0]}. "
-                    f"Additionally, the mid premium for calls (${call_mid_premium:,.2f}) exceeds that of puts "
-                    f"(${put_mid_premium:,.2f}), further supporting sustained accumulation by institutions. "
-                    f"Moreover, the call open premium is ${call_open_premium:,.2f}, indicating strong accumulation."
-                )
+            metrics = {
+                "left_label": "Bearish Metrics",
+                "right_label": "Bullish Metrics",
+                "left": {
+                    "Put Opening Premium": float(put_open_premium),
+                    "Call Closing Premium": float(call_close_premium),
+                    "Net Bearish Premium": float(put_open_premium + call_close_premium)
+                },
+                "right": {
+                    "Put Closing Premium": float(put_close_premium),
+                    "Call Opening Premium": float(call_open_premium),
+                    "Net Bullish Premium": float(put_close_premium + call_open_premium)
+
+                }
             }
+
         else:
             scenario = "Mildly Bearish"
+            score = 0
+            details = {
+                "message": (
+                    f"The sentiment score is negative, indicating a mild bearish tilt in the option flow "
+                    f"but without strong evidence of bearish commitment. Put opening premium (${put_open_premium:,.2f}) while "
+                    f"put closing premium (${put_close_premium:,.2f})."
+                )
+            }
+            metrics = {
+                "left_label": "Bearish Metrics",
+                "right_label": "Bullish Metrics",
+                "left": {
+                    "Put Opening Premium": float(put_open_premium),
+                    "Call Closing Premium": float(call_close_premium),
+                    "Net Bearish Premium": float(put_open_premium + call_close_premium)
+                },
+                "right": {
+                    "Put Closing Premium": float(put_close_premium),
+                    "Call Opening Premium": float(call_open_premium),
+                    "Net Bullish Premium": float(put_close_premium + call_open_premium)
+
+                }
+            }
+
     else:
         scenario = "Neutral"
 
@@ -492,8 +597,9 @@ def compute_sentiment(df):
     sentiment_report = {
         "sentiment_score": sentiment_score,
         "scenario": scenario,
+        "score": score,
         "details": details,
-
+        "vs_metrics": metrics
     }
     
     return sentiment_report
@@ -508,7 +614,7 @@ def analyze_option_flow(db: Session, symbol: str = None, date_range: int = 30):
         return {"message": "No data available for analysis"}
     
     df.columns = df.columns.str.lower()
-    
+
     df['analysis'] = df.apply(lambda row: categorize_trade(row), axis=1)
     analysis_df = pd.json_normalize(df['analysis'])
     
@@ -519,11 +625,19 @@ def analyze_option_flow(db: Session, symbol: str = None, date_range: int = 30):
     df = df.join(analysis_df)
     df = df.drop(columns=['analysis'])
     
+    last_trade = df.sort_values(by=["trade_date", "trade_time"], ascending=False).iloc[0]
+    last_update_date = str(last_trade["trade_date"])
+    last_update_time = str(last_trade["trade_time"])
+
+
     most_active = most_active_expirations(df)["most_active_expirations"]
-    
     sentiment_results = compute_sentiment(df)
-    
+
     result = {
+        "last_update": {
+            "date": last_update_date,
+            "time": last_update_time
+            },
         "market_sentiment": sentiment_results,
         "total_contracts": contracts_flow(df)["total_contracts"],
         "total_premium": total_premium_flow(df)["total_premium"],
@@ -532,7 +646,7 @@ def analyze_option_flow(db: Session, symbol: str = None, date_range: int = 30):
         "put_call_ratio": put_call_ratio(df)["put_call_ratio"],
         "largest_trade": largest_single_trade(df),
         "most_active_expirations": most_active,
-        # "categories": df.to_dict(orient='records'),
+        "categories": df.to_dict(orient='records'),
         "overall_summary": {
             "total_trades_analyzed": len(df),
             "most_active_expiry": most_active[0]["expiry"] if most_active else None,
