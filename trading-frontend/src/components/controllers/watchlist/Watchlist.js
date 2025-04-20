@@ -1,11 +1,22 @@
-import React, { useState, useEffect } from "react";
-import { fetchWatchlists, updateWatchlist } from "../api/WatchlistApi";
+import React, { useState, useEffect, useMemo } from "react";
+import {
+  fetchWatchlists,
+  updateWatchlist,
+  fetchSetups,
+} from "../api/WatchlistApi";
 import NewWatchlist from "./NewWatchlist";
 import UpdateWatchlist from "./UpdateWatchlist";
-import { formatDate, splitText } from "../func/functions";
+import {
+  ResponsiveContainer,
+  ScatterChart,
+  Scatter,
+  XAxis,
+  YAxis,
+} from "recharts";
 
 const Watchlist = () => {
   const [watchlists, setWatchlists] = useState([]);
+  const [setups, setSetups] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
   const [showModal, setShowModal] = useState(false);
@@ -16,24 +27,43 @@ const Watchlist = () => {
   const [itemsLoading, setItemsLoading] = useState(false);
 
   useEffect(() => {
-    setTimeout(() => setComponentLoading(false), 1000);
-    fetchWatchlistData();
-  }, []);
-
-  const fetchWatchlistData = async () => {
-    setLoading(true);
-    setFadeInTable(false);
-
-    try {
-      const data = await fetchWatchlists();
-      setWatchlists(data);
-    } catch (error) {
-      setError("Error fetching watchlists");
-    } finally {
-      setLoading(false);
-      setTimeout(() => setFadeInTable(true), 1000);
+    const cached = localStorage.getItem("cached_setups");
+    if (cached) {
+      try {
+        const parsed = JSON.parse(cached);
+        if (Array.isArray(parsed)) {
+          setSetups(parsed);
+          setTimeout(() => {
+            setLoading(false);
+            setComponentLoading(false);
+          }, 1000);
+          setTimeout(() => {
+            setFadeInTable(true);
+          }, 1300);
+        }
+      } catch (e) {
+        console.warn("Failed to parse cached setups:", e);
+      }
     }
-  };
+
+    const fetchLive = async () => {
+      try {
+        const [watchlistData, setupData] = await Promise.all([
+          fetchWatchlists(),
+          fetchSetups(),
+        ]);
+
+        setWatchlists(watchlistData);
+        setSetups(setupData);
+        localStorage.setItem("cached_setups", JSON.stringify(setupData));
+      } catch (err) {
+        console.error("Failed to fetch fresh setups:", err);
+        setError("Could not refresh signal data.");
+      }
+    };
+
+    fetchLive();
+  }, []);
 
   const handleOpenModal = (watchlist = null) => {
     setSelectedWatchlist(watchlist);
@@ -48,29 +78,29 @@ const Watchlist = () => {
   };
 
   const handleSaveChanges = async (updatedData) => {
-    if (isEditing) {
-      try {
-        setShowModal(false);
-        setFadeInTable(false);
+    try {
+      setShowModal(false);
+      setFadeInTable(false);
 
+      if (isEditing) {
         await updateWatchlist(selectedWatchlist.id, updatedData);
-
-        setWatchlists((prevWatchlists) =>
-          prevWatchlists.map((wl) =>
+        setWatchlists((prev) =>
+          prev.map((wl) =>
             wl.id === selectedWatchlist.id ? { ...wl, ...updatedData } : wl
           )
         );
-        setItemsLoading(true);
-      } catch (error) {
-        console.error("Error updating watchlist:", error);
-      } finally {
-        setTimeout(() => {
-          setItemsLoading(false);
-          setFadeInTable(true);
-        }, 1000);
+      } else {
+        setWatchlists((prev) => [...prev, updatedData]);
       }
-    } else {
-      fetchWatchlistData();
+
+      setItemsLoading(true);
+    } catch (err) {
+      console.error("Error updating or adding watchlist:", err);
+    } finally {
+      setTimeout(() => {
+        setItemsLoading(false);
+        setFadeInTable(true);
+      }, 1000);
     }
   };
 
@@ -79,15 +109,119 @@ const Watchlist = () => {
 
     try {
       await updateWatchlist(id, { target_hit: updatedStatus });
-      setWatchlists((prevWatchlists) =>
-        prevWatchlists.map((wl) =>
+      setWatchlists((prev) =>
+        prev.map((wl) =>
           wl.id === id ? { ...wl, target_hit: updatedStatus } : wl
         )
       );
-    } catch (error) {
-      console.error("Error updating target hit status:", error);
+    } catch (err) {
+      console.error("Error updating target hit status:", err);
     }
   };
+
+  // Prepare chart data based on setups and scores
+  const chartData = useMemo(() => {
+    if (!setups.length) return [];
+
+    const radii = setups.map((s) => 10 * Math.abs(s.score) + 20);
+    const centerRadius = radii[0];
+    const maxChildRadius = Math.max(...radii.slice(1), 0);
+    const ringDistance = centerRadius + maxChildRadius + 20;
+
+    const data = [{ x: 0, y: 0, radius: centerRadius, item: setups[0] }];
+
+    const others = setups.slice(1);
+    const N = others.length;
+    others.forEach((item, i) => {
+      const angle = (2 * Math.PI * i) / N;
+      data.push({
+        x: ringDistance * Math.cos(angle),
+        y: ringDistance * Math.sin(angle),
+        radius: 10 * Math.abs(item.score) + 20,
+        item,
+      });
+    });
+
+    return data;
+  }, [setups]);
+
+  // Custom SVG shape for each circle + label with updated hover styling
+  const renderShape = (props) => {
+    const { cx, cy, payload } = props;
+    const {
+      radius,
+      item: { symbol, score },
+    } = payload;
+    const positive = score > 0;
+    const hoverFill = positive ? "#e6f7ff" : "#fdecea";
+    const hoverStroke = positive ? "#4a90e2" : "#e74c3c";
+    const dropShadow = positive
+      ? `drop-shadow(0 8px 16px rgba(72,144,226,0.3)) drop-shadow(0 14px 28px rgba(72,144,226,0.2))`
+      : `drop-shadow(0 8px 16px rgba(231,76,60,0.3)) drop-shadow(0 14px 28px rgba(231,76,60,0.2))`;
+
+    return (
+      <g>
+        <circle
+          cx={cx}
+          cy={cy}
+          r={radius}
+          fill="transparent"
+          stroke={positive ? "#4a90e2" : "#e74c3c"}
+          strokeWidth={1}
+          style={{ cursor: "pointer", transition: "all 0.3s ease" }}
+          onClick={() => {
+            const wl = watchlists.find(
+              (w) => w.symbol.toUpperCase() === symbol.toUpperCase()
+            );
+            if (wl) handleOpenModal(wl);
+          }}
+          onMouseEnter={(e) => {
+            e.currentTarget.setAttribute("fill", hoverFill);
+            e.currentTarget.setAttribute("stroke", hoverStroke);
+            e.currentTarget.style.filter = dropShadow;
+            e.currentTarget.setAttribute(
+              "transform",
+              `translate(${cx},${cy - 8}) translate(${-cx},${-cy + 8})`
+            );
+          }}
+          onMouseLeave={(e) => {
+            e.currentTarget.setAttribute("fill", "transparent");
+            e.currentTarget.setAttribute(
+              "stroke",
+              positive ? "#4a90e2" : "#e74c3c"
+            );
+            e.currentTarget.style.filter = "none";
+            e.currentTarget.setAttribute("transform", "");
+          }}
+        />
+        <text
+          x={cx}
+          y={cy}
+          textAnchor="middle"
+          dominantBaseline="central"
+          style={{
+            pointerEvents: "none",
+            fontSize: "11px",
+            fill: "#666",
+            fontWeight: "bold",
+            textTransform: "uppercase",
+          }}
+        >
+          {symbol}
+        </text>
+      </g>
+    );
+  };
+
+  // Domain to fit all circles within chart bounds
+  const domainExtent = useMemo(() => {
+    if (!chartData.length) return [-100, 100];
+    const maxCoord = Math.max(
+      ...chartData.map((d) => Math.abs(d.x) + d.radius),
+      ...chartData.map((d) => Math.abs(d.y) + d.radius)
+    );
+    return [-maxCoord, maxCoord];
+  }, [chartData]);
 
   return (
     <div className="watchlist-wrapper">
@@ -115,7 +249,7 @@ const Watchlist = () => {
             ) : (
               <>
                 <div className="header-card">
-                  <p className="title">Watchlist</p>
+                  <p className="title"></p>
                   <div className="tooltip">
                     <i
                       className="btn btn-primary fa-solid fa-plus"
@@ -126,73 +260,32 @@ const Watchlist = () => {
                   </div>
                 </div>
 
-                <hr />
                 <div className={`fade-in ${fadeInTable ? "visible" : ""}`}>
-                  <div className="watch-container">
-                    {itemsLoading ? (
-                      <div className="items-spinner-wrapper">
-                        <div className="items-spinner"></div>
-                      </div>
-                    ) : (
-                      watchlists.map((watchlist) => (
-                        <div
-                          className="watch-item"
-                          key={watchlist.id}
-                          onClick={() => handleOpenModal(watchlist)}
-                        >
-                          <p className="no-id">
-                            N<sup>o</sup>: {`000${watchlist.id}`.slice(-5)}
-                          </p>
-                          <p className="watch-item-symbol">
-                            {watchlist.symbol}
-                          </p>
-                          <div className="watch-details">
-                            <div className="watch-row">
-                              <div className="watch-price">
-                                <div className="watch-price-icon-label">
-                                  <span className="label">Price:</span>
-                                </div>
-                                <span className="value">
-                                  ${watchlist.price.toFixed(2)}
-                                </span>
-                              </div>
-                            </div>
-                            <div className="watch-row">
-                              <div className="watch-target">
-                                <div className="watch-target-icon-label">
-                                  <span className="label">Target:</span>
-                                </div>
-                                <span className="value">
-                                  ${watchlist.target_price.toFixed(2)}
-                                </span>
-                              </div>
-                            </div>
-                            <div className="watch-row">
-                              <div className="watch-target-hit">
-                                <div className="watch-target-hit-icon-label"></div>
-                                <label
-                                  className="toggle-switch"
-                                  onClick={(e) => e.stopPropagation()}
-                                >
-                                  <input
-                                    type="checkbox"
-                                    checked={watchlist.target_hit}
-                                    onChange={() =>
-                                      handleToggleHit(
-                                        watchlist.id,
-                                        watchlist.target_hit
-                                      )
-                                    }
-                                  />
-                                  <span className="slider"></span>
-                                </label>
-                              </div>
-                            </div>
-                          </div>
-                        </div>
-                      ))
-                    )}
-                  </div>
+                  {itemsLoading ? (
+                    <div className="items-spinner-wrapper">
+                      <div className="items-spinner"></div>
+                    </div>
+                  ) : (
+                    <ResponsiveContainer width="100%" height={450}>
+                      <ScatterChart
+                        margin={{ top: 40, right: 40, bottom: 40, left: 40 }}
+                      >
+                        <XAxis
+                          type="number"
+                          dataKey="x"
+                          domain={domainExtent}
+                          hide
+                        />
+                        <YAxis
+                          type="number"
+                          dataKey="y"
+                          domain={domainExtent}
+                          hide
+                        />
+                        <Scatter data={chartData} shape={renderShape} />
+                      </ScatterChart>
+                    </ResponsiveContainer>
+                  )}
                 </div>
 
                 {showModal && isEditing && selectedWatchlist && (

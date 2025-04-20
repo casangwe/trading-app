@@ -601,82 +601,7 @@ body::-webkit-scrollbar {
   position: relative;
   min-height: 450px;
 }
-
-.watch-container {
-  max-height: 400px;
-  overflow-y: auto;
-  display: flex;
-  flex-direction: column;
-  gap: 5px;
-}
-
-.watch-container::-webkit-scrollbar {
-  display: none;
-}
-
-.watch-item {
-  display: flex;
-  flex-direction: column;
-  align-items: flex-start;
-  padding: 10px;
-  background: transparent;
-  transition: transform 0.2s ease-in-out, box-shadow 0.2s ease-in-out;
-  cursor: pointer;
-  box-shadow: 0 4px 10px rgba(255, 255, 255, 0.05);
-}
-.watch-item:hover {
-  transform: scale(1.03) translateY(-4px);
-}
-
-.watch-item .watch-item-symbol {
-  font-weight: bold;
-  font-size: 26px;
-  color: #505050;
-  margin-bottom: 8px;
-}
-.watch-item .no-id {
-  font-size: 8px;
-  color: #333;
-  margin-bottom: 5px;
-}
-
-.watch-item .watch-details {
-  display: flex;
-  flex-direction: row;
-  justify-content: space-around;
-  align-items: center;
-  width: 100%;
-  font-size: 10px;
-  margin-bottom: 10px;
-  gap: 20px;
-}
-
-.watch-item .watch-details > * {
-  flex: 1;
-  text-align: left;
-}
-.watch-item .watch-details > :first-child {
-  text-align: left;
-}
-
-.watch-item .watch-details > :nth-child(2) {
-  text-align: center;
-}
-
-.watch-item .watch-details > :last-child {
-  text-align: right;
-}
-
-.watch-item .watch-row .label {
-  font-weight: 600;
-  color: #333;
-}
-
-.watch-item .watch-row .value {
-  font-weight: 400;
-  color: #333;
-}
-
+/* New Watchlist  */
 #watchlist-new-btn {
   font-size: 12px;
   cursor: pointer;
@@ -698,7 +623,7 @@ body::-webkit-scrollbar {
   padding: 10px;
   transition: all 0.3s ease;
 }
-
+/* Update Watchlist  */
 .watchlist-header {
   display: flex;
   justify-content: space-between;
@@ -713,61 +638,88 @@ body::-webkit-scrollbar {
   font-size: 8px;
   color: #333;
 }
-
 .upd-watch-details {
   display: flex;
-  flex-direction: row;
-  justify-content: space-around;
-  align-items: center;
   width: 100%;
   font-size: 10px;
-  margin-bottom: 10px;
-  gap: 20px;
+  margin-bottom: 0.5rem;
 }
+
 .upd-watch-details > * {
   flex: 1;
+  display: flex;
+  flex-direction: column;
 }
+
 .upd-watch-details > :first-child {
-  text-align: left;
+  align-items: flex-start;
 }
 
 .upd-watch-details > :nth-child(2) {
-  text-align: center;
+  align-items: center;
 }
 
 .upd-watch-details > :last-child {
-  text-align: right;
+  align-items: flex-end;
+}
+
+.upd-watch-details .label,
+.upd-watch-details .value {
+  display: block;
+  width: 100%;
 }
 
 .upd-watch-details .label {
-  font-weight: 600;
-  color: #333;
+  font-size: 9px;
+  color: #666;
+  margin-top: 0.5rem;
 }
 
 .upd-watch-details .value {
-  font-weight: 400;
-  color: #333;
-}
-
-.plan-container {
-  margin-top: 10px;
-  display: block;
-  max-height: 100px;
-  overflow-y: auto;
-}
-
-.plan-container::-webkit-scrollbar {
-  display: none;
-}
-.editable-textarea {
-  width: 100%;
-  resize: none;
-  min-height: 20px;
-  overflow-y: auto;
   font-size: 10px;
+  color: #333;
+  font-weight: 700;
+  margin-bottom: 0.5rem;
 }
-.editable-textarea::-webkit-scrollbar {
-  display: none;
+
+.watch-target-hit .toggle-switch {
+  display: block;
+  margin-top: 5px;
+}
+
+.analysis-section {
+  min-height: 220px;
+  display: flex;
+  flex-direction: column;
+  justify-content: flex-start;
+}
+.analysis-header {
+  display: flex;
+  justify-content: space-between;
+  font-weight: bold;
+  margin-bottom: 4px;
+}
+.analysis-table {
+  width: 100%;
+  border-collapse: collapse;
+}
+.analysis-cell {
+  vertical-align: top;
+}
+.cell-label {
+  font-size: 9px;
+  color: #666;
+  margin-top: 0.2rem;
+}
+.cell-value {
+  font-size: 10px;
+  color: #333;
+  font-weight: 700;
+}
+hr {
+  margin: 4px 0;
+  border: none;
+  border-top: 1px solid #ddd;
 }
 
 .update-button {
@@ -1413,6 +1365,123 @@ body::-webkit-scrollbar {
   padding: 20px;
 }
 
+.flow-message {
+  width: 100%;
+}
+
+/********************************** Message  ************************************/
+.message-wrapper {
+  margin-top: 10px;
+  background: transparent;
+  padding: 15px;
+  display: flex;
+  justify-content: space-between;
+  gap: 1rem;
+}
+.message-content {
+  flex: 0.6;
+}
+
+.message-content .date {
+  margin-bottom: 10px;
+  font-size: 10px;
+  color: #666;
+  padding: 5px;
+}
+.scenario {
+  margin-bottom: 10px;
+  font-weight: 700;
+  font-size: 12px;
+  padding: 5px;
+}
+
+.message {
+  margin-bottom: 10px;
+  font-weight: 400;
+  font-size: 11px;
+  padding: 5px;
+  color: #333;
+}
+
+.vs-view {
+  flex: 0.4;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  align-items: flex-start;
+  background: transparent;
+  gap: 1rem;
+  padding: 1rem;
+  position: relative;
+  border: none;
+  border-left: 1px solid rgba(0, 0, 0, 0.1);
+}
+.vs-comparison {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 1rem;
+  width: 100%;
+}
+.vs-column {
+  flex: 0.5;
+  display: flex;
+  flex-direction: column;
+  width: 100%;
+  padding: 1rem;
+}
+.vs-comparison .label {
+  font-size: 10px;
+  color: #666;
+  margin-top: 0.5rem;
+}
+.vs-comparison .value {
+  font-size: 11px;
+  color: #333;
+  font-weight: 700;
+  margin-top: 0.2rem;
+  margin-bottom: 0.5rem;
+}
+
+/******************************** Sentiment Gauge ********************************/
+/* 
+.sentiment-chart {
+  text-align: center;
+  padding: 15px;
+} */
+
+.sentiment-gauge-bar {
+  display: flex;
+  border-radius: 12px;
+  overflow: hidden;
+  width: 100%;
+  box-shadow: 0 0 2px rgba(0, 0, 0, 0.1);
+}
+
+.gauge-segment {
+  flex: 1;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  padding: 8px 6px;
+  color: white;
+  font-size: 10px;
+  text-align: center;
+  transition: transform 0.2s ease;
+}
+
+.gauge-label {
+  max-width: 60px;
+  line-height: 1.2;
+}
+
+.gauge-segment.active {
+  font-weight: bold;
+  border: 2px solid #fff;
+  transform: scale(1.05);
+  z-index: 1;
+}
+
 /******************************** Summary Stats  ********************************/
 .summary-stats-wrapper {
   margin-top: 10px;
@@ -1490,6 +1559,62 @@ body::-webkit-scrollbar {
   color: #000;
   text-align: right;
 }
+/******************************** Metric Flow  ********************************/
+.metric-flow-cards {
+  display: flex;
+  justify-content: space-between;
+  gap: 16px;
+  padding: 40px;
+  background-color: transparent;
+}
+
+.metric-card {
+  flex: 1;
+  padding: 12px;
+  background-color: transparent;
+}
+
+.metric-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  border-bottom: 1px solid #eee;
+  padding-bottom: 6px;
+  margin-bottom: 20px;
+}
+
+.metric-title {
+  font-size: 11px;
+  font-weight: bold;
+  color: #111;
+  text-align: left;
+}
+
+.session-date {
+  font-size: 10px;
+  color: #888;
+  font-style: italic;
+  text-align: right;
+}
+
+.metric-row {
+  display: flex;
+  flex-direction: column;
+  align-items: left;
+  margin: 6px 0;
+}
+
+.metric-label {
+  font-size: 10px;
+  color: #666;
+  margin-bottom: 2px;
+}
+
+.metric-value {
+  font-size: 10px;
+  font-weight: 600;
+}
+
 /******************************** Expirations  ********************************/
 .expirations-wrapper {
   margin-top: 15px;
@@ -1500,24 +1625,36 @@ body::-webkit-scrollbar {
 .expirations-title {
   font-size: 11px;
   font-weight: bold;
-  margin-bottom: 10px;
+  margin-bottom: 15px;
   color: #333;
   text-align: left;
 }
+.expirations-scroll-container {
+  overflow-x: auto;
+  -webkit-overflow-scrolling: touch;
+  padding-bottom: 10px;
+}
+
+.expirations-scroll-container::-webkit-scrollbar {
+  display: none;
+}
 
 .expirations-grid {
-  display: grid;
-  grid-template-columns: repeat(5, 1fr);
-  gap: 10px;
-  align-items: start;
+  display: flex;
+  flex-wrap: nowrap;
+  padding: 1rem;
+  gap: 2rem;
 }
 
 .expiration-card {
   background: transparent;
-  padding: 12px;
-  border: 1px solid rgba(0, 0, 0, 0.1);
+  width: 250px;
+  padding: 2rem;
   text-align: left;
   transition: transform 0.2s ease-in-out;
+  flex: 0 0 auto;
+  position: relative;
+  border: 1px solid rgba(0, 0, 0, 0.1);
 }
 
 .expiration-card:hover {
@@ -1531,6 +1668,7 @@ body::-webkit-scrollbar {
   font-size: 10px;
   font-weight: bold;
   color: #333;
+  margin-bottom: 10px;
 }
 
 .expiration-divider {
@@ -1540,100 +1678,174 @@ body::-webkit-scrollbar {
 }
 
 .expiration-details {
-  display: flex;
-  flex-direction: column;
-  gap: 4px;
+  font-size: 11px;
+  color: #444;
+  line-height: 1.4;
 }
 
 .exp-detail {
   display: flex;
   justify-content: space-between;
-  padding: 4px;
+  margin-bottom: 8px;
 }
 
 .exp-title {
-  font-size: 10px;
-  color: #555;
+  font-size: 11px;
+  color: #777;
   text-align: left;
 }
 
 .exp-value {
   font-size: 10px;
+  color: #222;
+  text-align: right;
+  font-weight: 600;
+}
+
+.exp-value-scenario {
+  font-size: 10px;
+  font-weight: 700;
   color: black;
   text-align: right;
 }
 
+.vs-exp-view {
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  align-items: flex-start;
+  background: transparent;
+  position: relative;
+  border: none;
+}
+
+.vs-exp-comparison {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  width: 100%;
+}
+
+.vs-exp-column {
+  flex: 0.5;
+  display: flex;
+  flex-direction: column;
+  width: 100%;
+}
+
+.vs-exp-comparison .label {
+  font-size: 10px;
+  color: #666;
+  margin-top: 0.5rem;
+}
+
+.vs-exp-comparison .value {
+  font-size: 11px;
+  color: #333;
+  font-weight: 700;
+  margin-top: 0.2rem;
+  margin-bottom: 0.5rem;
+}
+.vertical-divider {
+  width: 1px;
+  background-color: rgba(0, 0, 0, 0.1);
+  margin: 0 20px;
+}
+
 @media (max-width: 768px) {
-  .expirations-grid {
-    grid-template-columns: repeat(2, 1fr);
+  .expiration-card {
+    width: 200px;
   }
 }
 
 @media (max-width: 480px) {
-  .expirations-grid {
-    grid-template-columns: repeat(1, 1fr);
+  .expiration-card {
+    width: 180px;
   }
 }
-
-/******************************** Expirations  ********************************/
-/* .expirations-wrapper {
-  margin-top: 15vh;
+/******************************** Flow Timeline (Improved) ********************************/
+.flow-timeline-wrapper {
+  margin-top: 15px;
   background: transparent;
-  text-align: left;
+  padding: 20px;
 }
 
-.expirations-title {
-  font-size: 14px;
-  font-weight: bold;
-  margin-bottom: 10px;
-  color: #333;
-  text-align: left;
-}
-
-.expirations-grid {
-  display: grid;
-  grid-template-columns: repeat(5, 1fr);
-  gap: 8px;
-  align-items: start;
-}
-
-.expiration-column {
-  background: transparent;
-  padding: 10px;
-  text-align: left;
-}
-
-.expiration-column:last-child {
-  border-right: none;
-}
-
-.expiration-header {
+.timeline-title {
   font-size: 11px;
   font-weight: bold;
-  margin-bottom: 10px;
+  margin-bottom: 15px;
   color: #333;
+  text-align: left;
 }
 
-.expiration-divider {
-  margin: 10px 0;
+.flow-timeline-scroll-container {
+  overflow-x: auto;
+  -webkit-overflow-scrolling: touch;
+  padding: 10px;
+}
+
+.flow-timeline-scroll-container::-webkit-scrollbar {
+  display: none;
+}
+
+.flow-timeline-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+  gap: 0.5rem;
+}
+
+.flow-timeline-card {
+  background: transparent;
+  padding: 2rem;
+  text-align: left;
+  transition: transform 0.2s ease-in-out;
+  background: white;
+}
+
+.flow-timeline-card:hover {
+  transform: scale(1.03);
+}
+
+.flow-timeline-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  font-size: 10px;
+  font-weight: bold;
+  color: #333;
+  margin-bottom: 10px;
+}
+
+.timeline-divider {
+  margin: 8px 0;
   border: none;
   border-top: 1px solid rgba(0, 0, 0, 0.1);
 }
 
-.expiration-detail {
-  padding: 4px 0;
+.timeline-message {
+  font-size: 10px;
+  color: #444;
+  margin-bottom: 10px;
+}
+
+.exp-detail {
+  display: flex;
+  justify-content: space-between;
+  margin-top: 8px;
 }
 
 .exp-title {
-  font-size: 10px;
-  color: #555;
+  font-size: 11px;
+  color: #777;
+  text-align: left;
 }
 
 .exp-value {
-  font-size: 11px;
-  font-weight: bold;
-  color: #333;
-} */
+  font-size: 10px;
+  color: #222;
+  text-align: right;
+  font-weight: 600;
+}
 
 /******************************  Financial Table Component ******************************  */
 .financial-table-wrapper {
@@ -2155,6 +2367,7 @@ body::-webkit-scrollbar {
   justify-content: space-between;
   align-items: center;
   padding: 20px;
+  min-height: 25px;
 }
 
 .misc-item-footer {
@@ -2473,6 +2686,23 @@ input:checked + .slider:before {
   font-weight: 600;
 }
 
+/*************************************** Flow Tabs  ***************************************/
+
+.flow-tabs .tab-container {
+  display: flex;
+  gap: 50px;
+}
+
+.flow-tabs .tab-button {
+  float: left;
+  background-color: transparent;
+  border: none;
+  padding: 1px 20px;
+  font-size: 10px;
+  font-weight: bold;
+  cursor: pointer;
+  transition: background-color 0.2s ease, color 0.2s ease;
+}
 /*******************************************************************************************/
 /****************************************** Pages ******************************************/
 /*******************************************************************************************/
@@ -2519,7 +2749,7 @@ input:checked + .slider:before {
 }
 
 /******************************Within the Horizontal Containers *****************************/
-.flow-summary-context,
+.flow-summary,
 .transactions-accounts,
 .networth-chart-networth,
 .eqt-home,
@@ -2538,7 +2768,7 @@ input:checked + .slider:before {
   flex-direction: column;
 }
 
-.largest-trade-context,
+.largest-trade,
 .transaction-distribution-accounts,
 .networth-cash-networth,
 .summary-accounts,

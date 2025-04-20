@@ -88,8 +88,8 @@ const TransactionDistribution = () => {
         <PieChart>
           <Pie
             data={transactionData}
-            innerRadius={60}
-            outerRadius={90}
+            innerRadius={50}
+            outerRadius={70}
             startAngle={90}
             endAngle={-270}
             dataKey="value"

@@ -1,5 +1,6 @@
 # main.py
 import pandas as pd
+import math
 from fastapi import FastAPI, Depends, Query, HTTPException, File, UploadFile, Depends
 from sqlalchemy.orm import Session
 from typing import List
@@ -11,6 +12,9 @@ from database.schema import *
 from database.models import *
 from database.crud import *
 from database import crud
+import yfinance as yf
+from functools import lru_cache
+
 
 
 app = FastAPI()
@@ -31,6 +35,97 @@ def get_db():
         yield db
     finally:
         db.close()
+
+def sanitize(val):
+    if isinstance(val, (pd.DataFrame, pd.Series)):
+        val = val.iloc[-1] 
+        if isinstance(val, pd.Series): 
+            val = val.iloc[-1]
+    try:
+        return round(float(val), 2) if pd.notna(val) and not math.isinf(val) else None
+    except:
+        return None
+
+@lru_cache(maxsize=256)
+def price_action(symbol: str, offset: int = 0):
+
+    ticker = yf.Ticker(symbol)
+    historical_data = ticker.history(period="7d")
+
+    if historical_data.empty or len(historical_data) <= offset:
+        return None
+
+    row = historical_data.iloc[-1 - offset]
+    date_str = row.name.strftime("%A, %B %d, %Y")
+    percent_change = ((row["Close"] - row["Open"]) / row["Open"]) * 100
+
+    return {
+        "date": date_str,
+        "close": round(row["Close"], 2),
+        "open": round(row["Open"], 2),
+        "high": round(row["High"], 2),
+        "low": round(row["Low"], 2),
+        "volume": int(row["Volume"]),
+        "percent_change": round(percent_change, 2)
+    }
+
+
+@lru_cache(maxsize=256)
+def get_indicators(symbol: str, interval: str = "1d", period: str = "10d", day_offset: int = 0):
+    try:
+        data = yf.download(tickers=symbol, interval=interval, period="30d", progress=False)
+
+        if data.empty or len(data) < (day_offset + 2):
+            return None
+
+        idx = -1 - day_offset  
+
+        delta = data["Close"].diff()
+        gain = delta.clip(lower=0)
+        loss = -delta.clip(upper=0)
+        avg_gain = gain.rolling(14).mean()
+        avg_loss = loss.rolling(14).mean()
+        rs = avg_gain / avg_loss
+        rsi = 100 - (100 / (1 + rs))
+
+        ema12 = data["Close"].ewm(span=12, adjust=False).mean()
+        ema26 = data["Close"].ewm(span=26, adjust=False).mean()
+        macd = ema12 - ema26
+
+        typical_price = (data["High"] + data["Low"] + data["Close"]) / 3
+        money_flow = typical_price * data["Volume"]
+        pos_flow = money_flow.where(typical_price.diff() > 0, 0)
+        neg_flow = money_flow.where(typical_price.diff() < 0, 0)
+        mfi_ratio = pos_flow.rolling(14).sum() / neg_flow.rolling(14).sum()
+        mfi = 100 - (100 / (1 + mfi_ratio))
+
+        ma_5 = data["Close"].rolling(5).mean()
+        ma_9 = data["Close"].rolling(9).mean()
+
+        return {
+            "mfi": sanitize(mfi.iloc[idx]),
+            "ma_5": sanitize(ma_5.iloc[idx]),
+            "ma_9": sanitize(ma_9.iloc[idx]),
+        }
+
+
+    except Exception as e:
+        print("Indicator Error:", e)
+        return None
+
+def build_block(analysis, indicators, price_info):
+    sentiment = analysis.get("market_sentiment", {})
+    return {
+        "scenario": sentiment.get("scenario"),
+        "score": sentiment.get("score"),
+        # "last_update": analysis.get("last_update", {}),
+        "indicators": indicators or {
+            "mfi": None, "ma_5": None, "ma_9": None
+        },
+        "price_action": price_info or {
+            "date": None, "close": None, "open": None, "high": None, "low": None, "volume": None
+        }
+    }
 
 # Root
 @app.get("/")
@@ -163,6 +258,72 @@ async def read_watchlists(
 ):
     watchlists = crud.get_watchlists(db, user_id=user_id)
     return watchlists
+
+@app.get("/watchlists/setups")
+def get_watchlist_setups(
+    user_id: int,
+    limit: int = 50,
+    db: Session = Depends(get_db)
+):
+
+    SIGNAL_SCENARIOS = {
+        "Strong Bullish Flow",
+        "Bullish Accumulation",
+        "Bullish Positioning",
+        "Bearish Positioning",
+        "Bearish Accumulation",
+        "Strong Bearish Flow"
+    }
+
+    results = []
+    seen_symbols = set()
+    cutoff_date = datetime.utcnow().date() - timedelta(days=14)
+    watchlist = crud.get_watchlists(db, user_id=user_id)
+
+    for item in watchlist:
+        symbol = item.symbol.upper()
+        if symbol in seen_symbols:
+            continue
+
+        try:
+            data = analyze_option_flow(db, symbol=symbol, date_range=3)
+            sentiment = data.get("market_sentiment", {})
+            scenario = sentiment.get("scenario")
+            score = sentiment.get("score")
+            last_update = data.get("last_update")
+
+            last_update_date = None
+            if isinstance(last_update, str):
+                last_update_date = datetime.strptime(last_update, "%Y-%m-%d").date()
+            elif isinstance(last_update, dict) and "date" in last_update:
+                last_update_date = datetime.strptime(last_update["date"], "%Y-%m-%d").date()
+            elif isinstance(last_update, datetime):
+                last_update_date = last_update.date()
+
+            if not scenario or scenario not in SIGNAL_SCENARIOS:
+                continue
+            if last_update_date and last_update_date < cutoff_date:
+                continue
+
+            results.append({
+                "symbol": symbol,
+                "scenario": scenario,
+                "score": score,
+                "last_update": last_update_date.isoformat() if last_update_date else None
+            })
+
+            seen_symbols.add(symbol)
+
+        except Exception as e:
+            print(f"[Setup Detection Error] {symbol}: {e}")
+            continue
+
+        results = sorted(results, key=lambda r: abs(r["score"] or 0), reverse=True)
+        # results = sorted(results, key=lambda r: r["last_update"], reverse=True)
+
+    return results[:limit]
+
+
 
 @app.get("/watchlists/{watchlist_id}", response_model=schema.WatchlistResponse)
 async def read_watchlist(
@@ -370,12 +531,44 @@ async def get_option_flow_analysis(
     symbol: str = Query(None, description="Stock symbol (e.g., AAPL, MSFT)"),
     date_range: int = Query(30, description="Number of days to look back"),
     db: Session = Depends(get_db_connection),
-):
-    """Retrieve option flow analysis results for a given stock."""
-    
+):    
     results = analyze_option_flow(db, symbol, date_range)
-
     if "message" in results:
         raise HTTPException(status_code=404, detail=results["message"])
-
     return results
+
+
+
+@app.get("/watchlists/{symbol}/analysis")
+async def get_watchlist_analysis(symbol: str, db: Session = Depends(get_db)):
+    try:
+        analysis_2d = analyze_option_flow(db, symbol=symbol, date_range=2)
+        analysis_1d = analyze_option_flow(db, symbol=symbol, date_range=1)
+        analysis_live = analyze_option_flow(db, symbol=symbol, date_range=0)
+
+        indicators_2d = get_indicators(symbol, day_offset=2)
+        indicators_1d = get_indicators(symbol, day_offset=1)
+        indicators_live = get_indicators(symbol, day_offset=0)
+
+        price_2d = price_action(symbol, offset=2)
+        price_1d = price_action(symbol, offset=1)
+        price_live = price_action(symbol, offset=0)
+
+        result = {
+            "symbol": symbol.upper(),
+            "2D": build_block(analysis_2d, indicators_2d, price_2d),
+            "1D": build_block(analysis_1d, indicators_1d, price_1d),
+            "Live": build_block(analysis_live, indicators_live, price_live)
+        }
+
+        return result
+
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=str(e))
+
+@app.get("/clear-cache/")
+def clear_cache(symbol: str):
+    price_action.cache_clear()
+    get_indicators.cache_clear()
+    return {"message": f"Cache cleared for {symbol}"}
+

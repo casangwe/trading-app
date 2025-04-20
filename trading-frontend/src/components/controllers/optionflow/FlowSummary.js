@@ -2,11 +2,16 @@ import React, { useState, useEffect, useRef } from "react";
 import { useLocation } from "react-router-dom";
 import {
   fetchOptionFlowAnalysis,
+  fetchWatchlistAnalysis,
   uploadOptionFlow,
 } from "../api/OptionFlowAPI";
 import SummaryStats from "./SummaryStats";
 import Expirations from "./Expirations";
+import MetricFlow from "./MetricFlow";
 import LargestTrade from "./LargestTrade";
+import Message from "./Message";
+import SentimentGauge from "./SentimentGauge";
+import FlowTimeline from "./FlowTimeline";
 
 const FlowSummary = () => {
   const location = useLocation();
@@ -19,6 +24,8 @@ const FlowSummary = () => {
   const [uploadMessage, setUploadMessage] = useState("");
   const [uploading, setUploading] = useState(false);
   const fileInputRef = useRef(null);
+  const [dateRange, setDateRange] = useState(1);
+  const [watchlistAnalysisData, setWatchlistAnalysisData] = useState(null);
 
   const fetchData = async () => {
     if (!symbol) {
@@ -30,14 +37,21 @@ const FlowSummary = () => {
     setComponentLoading(true);
     setError("");
     setAnalysisData(null);
+    setWatchlistAnalysisData(null);
     setHasLoaded(false);
 
     try {
-      const data = await fetchOptionFlowAnalysis(symbol, 30);
-      if (!data || Object.keys(data).length === 0 || data.message) {
-        throw new Error(`No data found for ${symbol}`);
+      const [flowData, enrichedData] = await Promise.all([
+        fetchOptionFlowAnalysis(symbol, dateRange),
+        fetchWatchlistAnalysis(symbol),
+      ]);
+
+      if (!flowData || Object.keys(flowData).length === 0 || flowData.message) {
+        throw new Error(`No option flow data found for ${symbol}`);
       }
-      setAnalysisData(data);
+
+      setAnalysisData(flowData);
+      setWatchlistAnalysisData(enrichedData);
       setError("");
     } catch (err) {
       console.error("Fetching data failed:", err.message);
@@ -46,13 +60,13 @@ const FlowSummary = () => {
       setTimeout(() => {
         setComponentLoading(false);
         setTimeout(() => setHasLoaded(true), 100);
-      }, 1000);
+      }, 100);
     }
   };
 
   useEffect(() => {
     fetchData();
-  }, [symbol]);
+  }, [symbol, dateRange]);
 
   useEffect(() => {
     setSymbol(location.state?.symbol || "");
@@ -125,27 +139,71 @@ const FlowSummary = () => {
               </div>
             </div>
 
+            <div className="flow-message">
+              {analysisData?.market_sentiment && (
+                <Message data={analysisData} />
+              )}
+            </div>
+            <div className="flow-sentiment-guage">
+              {analysisData?.market_sentiment?.score !== undefined && (
+                <SentimentGauge score={analysisData.market_sentiment.score} />
+              )}{" "}
+            </div>
+            <div className="flow-tabs">
+              <div className="tab-container">
+                {[
+                  { label: "Live", value: 0 },
+                  { label: "1D", value: 1 },
+                  { label: "2D", value: 2 },
+                  { label: "3D", value: 3 },
+                  { label: "5D", value: 5 },
+                  { label: "All", value: 30 },
+                ].map((option) => (
+                  <button
+                    key={option.label}
+                    className={`tab-button ${
+                      dateRange === option.value ? "active" : ""
+                    }`}
+                    onClick={() => setDateRange(option.value)}
+                  >
+                    {option.label}
+                  </button>
+                ))}
+              </div>{" "}
+            </div>
+
             <div className="flow-summary-and-largest-trade-container">
-              <div className="flow-summary-context">
+              <div className="flow-summary">
                 {analysisData && <SummaryStats data={analysisData} />}
               </div>
-              <div className="largest-trade-context">
+              <div className="largest-trade">
                 {analysisData?.largest_trade && (
                   <LargestTrade trade={analysisData.largest_trade} />
                 )}
               </div>
             </div>
 
-            <div className="expirations-context">
+            <div className="metrics">
+              {watchlistAnalysisData && (
+                <MetricFlow data={watchlistAnalysisData} />
+              )}
+            </div>
+
+            <div className="expirations">
               {analysisData?.most_active_expirations && (
                 <Expirations
                   expirations={analysisData.most_active_expirations}
                 />
               )}
             </div>
+            <div className="Flow-Timeline">
+              {analysisData?.time_analysis && (
+                <FlowTimeline snapshots={analysisData.time_analysis} />
+              )}
+            </div>
 
             <div className={`fade-in ${hasLoaded ? "visible" : ""}`}>
-              {error && <p className="error-message">{error}</p>}
+              {error && <div className="error-message">{error}</div>}
               <input
                 type="file"
                 accept=".csv"

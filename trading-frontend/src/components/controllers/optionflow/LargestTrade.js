@@ -2,8 +2,18 @@ import React from "react";
 
 const formatDate = (dateStr) => {
   if (!dateStr) return "N/A";
-  const [year, month, day] = dateStr.split("-");
+  const cleanDate = dateStr.split("T")[0];
+  const [year, month, day] = cleanDate.split("-");
   return `${month}/${day}/${year}`;
+};
+
+const formatTime = (timeStr) => {
+  if (!timeStr) return "N/A";
+  const [hour, minute, second] = timeStr.split(":");
+  let h = parseInt(hour, 10);
+  const ampm = h >= 12 ? "PM" : "AM";
+  h = h % 12 || 12;
+  return `${h}:${minute} ${ampm}`;
 };
 
 const LargestTrade = ({ trade }) => {
@@ -62,7 +72,9 @@ const LargestTrade = ({ trade }) => {
           </tr>
           <tr>
             <td className="trade-label">Trade Time:</td>
-            <td className="trade-value">{trade.trade_time || "N/A"}</td>
+            <td className="trade-value">
+              {formatTime(trade.trade_time || "N/A")}
+            </td>
           </tr>
           <tr>
             <td className="trade-label">Put/Call:</td>
