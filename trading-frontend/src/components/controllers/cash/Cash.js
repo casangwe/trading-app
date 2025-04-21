@@ -1,11 +1,4 @@
 import React, { useEffect, useState } from "react";
-import {
-  FaMoneyBillWave,
-  FaChartLine,
-  FaCashRegister,
-  FaPercentage,
-  FaChartPie,
-} from "react-icons/fa";
 import { getCash } from "../api/CashApi";
 import { fetchDailyPnls } from "../api/DailyPNLApi";
 import { fetchTransactions } from "../api/TransactionsAPI";

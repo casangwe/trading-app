@@ -73,7 +73,7 @@ const FinancialTable = ({ onNewFinancial }) => {
             )}
 
             {!loading && error ? (
-              <p>{error}</p>
+              <div className="error-message">{error}</div>
             ) : (
               <>
                 <div className="header-card">

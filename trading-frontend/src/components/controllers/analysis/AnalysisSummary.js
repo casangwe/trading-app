@@ -52,7 +52,7 @@ const AnalysisSummary = () => {
               <p>
                 {analysisData
                   ? `${analysisData.sharpeRatio.toFixed(2)}`
-                  : "Sharpe Ratio: N/A"}
+                  : "N/A"}
               </p>
               <h3>Sharpe Ratio</h3>
             </div>
@@ -60,7 +60,7 @@ const AnalysisSummary = () => {
               <p>
                 {analysisData
                   ? `${analysisData.riskRewardRatio.toFixed(2)}`
-                  : "R/R: N/A"}
+                  : "N/A"}
               </p>
               <h3>Risk Reward</h3>
             </div>
@@ -68,12 +68,12 @@ const AnalysisSummary = () => {
               <p>
                 {analysisData
                   ? `${analysisData.avgDaysInTrade.toFixed(0)}`
-                  : "Avg. Days: N/A"}
+                  : "N/A"}
               </p>
               <h3>Days</h3>
             </div>
           </div>
-          {error && <div className="error-message">{error}</div>}
+          {/* {error && <div className="error-message">{error}</div>} */}
         </>
       )}
     </div>

@@ -39,7 +39,7 @@ const NewCash = ({ onClose, onNewCash }) => {
     <div className="modal">
       <div className="new-cash-container">
         <div className="header-card">
-          <p className="title">Add Cash</p>
+          <p className="title">Cash</p>
           <p className="close-btn" onClick={onClose}>
             &times;
           </p>

@@ -104,7 +104,7 @@ const TransactionTable = () => {
             )}
 
             {!loading && error ? (
-              <p>Error fetching transactions: {error}</p>
+              <div className="error-message">{error}</div>
             ) : (
               <>
                 <div className="header-card">

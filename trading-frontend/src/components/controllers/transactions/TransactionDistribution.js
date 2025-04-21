@@ -80,7 +80,7 @@ const TransactionDistribution = () => {
     fetchTransactionData();
   }, []);
 
-  if (error) return <p>{error}</p>;
+  if (error) return <div className="error-message">{error}</div>;
 
   return (
     <div className="transaction-distribution">

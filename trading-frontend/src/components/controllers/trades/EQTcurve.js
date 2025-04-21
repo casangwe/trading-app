@@ -57,7 +57,9 @@ const EQTCurve = () => {
             winRate: analysisResults.winRate.toFixed(2),
           });
         } else {
-          setError("No trade, cash, or transaction data available");
+          setError(
+            "No historical trading data found. Please add at least one trade or deposit to see your equity curve."
+          );
         }
       } catch (error) {
         setError("Error fetching trade, cash, or transaction data");
@@ -118,11 +120,13 @@ const EQTCurve = () => {
               </span>
               <span className="trade-label"> Trades</span>
             </p>
-            <p className="eqt-rate">{tradeSummary.winRate}%</p>
+            <p className="eqt-rate">
+              {tradeSummary?.winRate != null && `${tradeSummary.winRate}%`}
+            </p>
           </div>
 
           {error ? (
-            <div>{error}</div>
+            <div className="error-message">{error}</div>
           ) : (
             <ResponsiveContainer width="100%" height={300}>
               <ComposedChart data={chartData}>

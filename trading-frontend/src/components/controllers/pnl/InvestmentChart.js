@@ -12,6 +12,7 @@ import {
   calculateTotalWithdrawals,
   calculateROI,
 } from "../cash/CashCalc";
+import NewCash from "../cash/NewCash";
 
 const InvestmentChart = () => {
   const [error, setError] = useState(null);
@@ -19,6 +20,7 @@ const InvestmentChart = () => {
   const [investmentSummary, setInvestmentSummary] = useState(null);
   const [componentLoading, setComponentLoading] = useState(true);
   const [transactions, setTransactions] = useState([]);
+  const [showNewCashModal, setShowNewCashModal] = useState(false);
 
   useEffect(() => {
     const fetchInvestmentData = async () => {
@@ -47,10 +49,12 @@ const InvestmentChart = () => {
             )
           );
         } else {
-          setError("No daily PNL, cash, or transaction data available");
+          setError(
+            "No cash data. Please make a deposit to see your cash details."
+          );
         }
       } catch (error) {
-        setError("Error fetching data");
+        setError("Error fetching cash data.");
         console.error("Error fetching daily PNL data:", error);
       } finally {
         setTimeout(() => setComponentLoading(false), 1000);
@@ -150,16 +154,28 @@ const InvestmentChart = () => {
                 ? `${formatCash(investmentSummary.pnl || 0)} (${
                     investmentSummary.roi
                   }%)`
-                : "Loading..."}
+                : "N/A"}
             </p>
 
             <p className="investment-date">
-              {investmentSummary?.latestDate || "Loading..."}
+              {investmentSummary?.latestDate || "N/A"}
             </p>
           </div>
 
           {error ? (
-            <div>{error}</div>
+            <div className="error-section">
+              <p className="error-message">{error}</p>
+              <div className="header-card">
+                <div className="tooltip">
+                  <span className="tooltiptext">Add Cash</span>
+                  <i
+                    className="btn btn-primary fa-solid fa-plus"
+                    id="cash-new-btn"
+                    onClick={() => setShowNewCashModal(true)}
+                  ></i>
+                </div>
+              </div>
+            </div>
           ) : (
             <ResponsiveContainer width="100%" height={300}>
               <LineChart data={chartData} style={{ background: "transparent" }}>
@@ -188,6 +204,15 @@ const InvestmentChart = () => {
                 />
               </LineChart>
             </ResponsiveContainer>
+          )}
+          {showNewCashModal && (
+            <NewCash
+              onClose={() => setShowNewCashModal(false)}
+              onNewCash={() => {
+                setShowNewCashModal(false);
+                window.location.reload(); // or refetch the data if you want SPA behavior
+              }}
+            />
           )}
         </>
       )}
