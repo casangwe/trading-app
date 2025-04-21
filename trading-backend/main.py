@@ -60,7 +60,7 @@ def price_action(symbol: str, offset: int = 0):
     percent_change = ((row["Close"] - row["Open"]) / row["Open"]) * 100
 
     return {
-        "date": date_str,
+        "date": date_str,  
         "close": round(row["Close"], 2),
         "open": round(row["Open"], 2),
         "high": round(row["High"], 2),
@@ -319,7 +319,7 @@ def get_watchlist_setups(
             continue
 
         results = sorted(results, key=lambda r: abs(r["score"] or 0), reverse=True)
-        # results = sorted(results, key=lambda r: r["last_update"], reverse=True)
+        # results = sorted(results, key=lambda r: r["last_update"], reverse=True) 
 
     return results[:limit]
 
