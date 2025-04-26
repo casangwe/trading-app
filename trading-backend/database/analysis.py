@@ -344,7 +344,7 @@ def compute_sentiment(df):
             score = 2
             details = {
                     "message": (
-                        f"Bullish accumulation is building as call opening premium (${call_open_premium:,.2f}) exceeds"
+                        f"Bullish accumulation is building as call opening premium (${call_open_premium:,.2f}) exceeds "
                         f"both call closing (${call_close_premium:,.2f}) and put opening (${put_open_premium:,.2f}), reflecting "
                         f"net new bullish positioning and a preference for upside exposure. Additionally, put closing premium "
                         f"(${put_close_premium:,.2f}) is elevated relative to put openings, indicating a rotation out of bearish trades. "

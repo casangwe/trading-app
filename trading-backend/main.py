@@ -286,7 +286,10 @@ def get_watchlist_setups(
             continue
 
         try:
-            data = analyze_option_flow(db, symbol=symbol, date_range=3)
+            # data = analyze_option_flow(db, symbol=symbol, date_range=0)
+            data = analyze_option_flow(db, symbol=symbol, date_range=1)
+            # data = analyze_option_flow(db, symbol=symbol, date_range=5)
+            # data = analyze_option_flow(db, symbol=symbol, date_range=3)
             sentiment = data.get("market_sentiment", {})
             scenario = sentiment.get("scenario")
             score = sentiment.get("score")
