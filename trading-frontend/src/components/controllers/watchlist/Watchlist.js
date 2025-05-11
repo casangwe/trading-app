@@ -14,6 +14,15 @@ import {
   YAxis,
 } from "recharts";
 
+const tabs = [
+  { label: "Live", value: 0 },
+  { label: "1D", value: 1 },
+  { label: "2D", value: 2 },
+  { label: "3D", value: 3 },
+  // { label: "5D", value: 5 },
+  // { label: "All", value: 30 },
+];
+
 const Watchlist = () => {
   const [watchlists, setWatchlists] = useState([]);
   const [setups, setSetups] = useState([]);
@@ -25,45 +34,59 @@ const Watchlist = () => {
   const [componentLoading, setComponentLoading] = useState(true);
   const [fadeInTable, setFadeInTable] = useState(false);
   const [itemsLoading, setItemsLoading] = useState(false);
+  const [dateRange, setDateRange] = useState(1);
 
   useEffect(() => {
+    const fetchAll = async () => {
+      setLoading(true);
+      setError(null);
+
+      try {
+        const watchlistData = await fetchWatchlists();
+        setWatchlists(watchlistData);
+
+        const setupData = await fetchSetups(dateRange);
+        setSetups(setupData);
+
+        localStorage.setItem(
+          "cached_setups",
+          JSON.stringify({ dateRange, data: setupData })
+        );
+      } catch (err) {
+        console.error("Failed to fetch:", err);
+        setError("Could not load watchlists or setups.");
+      } finally {
+        setLoading(false);
+        setComponentLoading(false);
+        setTimeout(() => setFadeInTable(true), 300);
+      }
+    };
+
     const cached = localStorage.getItem("cached_setups");
     if (cached) {
       try {
-        const parsed = JSON.parse(cached);
-        if (Array.isArray(parsed)) {
-          setSetups(parsed);
+        const { dateRange: dR, data } = JSON.parse(cached);
+        if (dR === dateRange && Array.isArray(data)) {
+          fetchWatchlists()
+            .then(setWatchlists)
+            .catch((err) =>
+              console.error("Watchlists cache-fetch failed:", err)
+            );
+
+          setSetups(data);
           setTimeout(() => {
             setLoading(false);
             setComponentLoading(false);
           }, 1000);
-          setTimeout(() => {
-            setFadeInTable(true);
-          }, 1300);
+          setTimeout(() => setFadeInTable(true), 1300);
+
+          return;
         }
-      } catch (e) {
-        console.warn("Failed to parse cached setups:", e);
-      }
+      } catch {}
     }
 
-    const fetchLive = async () => {
-      try {
-        const [watchlistData, setupData] = await Promise.all([
-          fetchWatchlists(),
-          fetchSetups(),
-        ]);
-
-        setWatchlists(watchlistData);
-        setSetups(setupData);
-        localStorage.setItem("cached_setups", JSON.stringify(setupData));
-      } catch (err) {
-        console.error("Failed to fetch fresh setups:", err);
-        setError("Could not refresh signal data.");
-      }
-    };
-
-    fetchLive();
-  }, []);
+    fetchAll();
+  }, [dateRange]);
 
   const handleOpenModal = (watchlist = null) => {
     setSelectedWatchlist(watchlist);
@@ -245,11 +268,28 @@ const Watchlist = () => {
             )}
 
             {!loading && error ? (
-              <div>Error: {error}</div>
+              <div className="error-message">{error}</div>
             ) : (
               <>
                 <div className="header-card">
-                  <p className="title"></p>
+                  <p className="title">
+                    {/* <div className="flow-tabs">
+                      {tabs.map(({ label, value }) => (
+                        <button
+                          key={value}
+                          className={`tab-button ${
+                            dateRange === value ? "active" : ""
+                          }`}
+                          onClick={() => {
+                            setFadeInTable(false);
+                            setDateRange(value);
+                          }}
+                        >
+                          {label}
+                        </button>
+                      ))}
+                    </div> */}
+                  </p>
                   <div className="tooltip">
                     <i
                       className="btn btn-primary fa-solid fa-plus"
@@ -287,10 +327,27 @@ const Watchlist = () => {
                     </ResponsiveContainer>
                   )}
                 </div>
+                <div className="flow-tabs">
+                  {tabs.map(({ label, value }) => (
+                    <button
+                      key={value}
+                      className={`tab-button ${
+                        dateRange === value ? "active" : ""
+                      }`}
+                      onClick={() => {
+                        setFadeInTable(false);
+                        setDateRange(value);
+                      }}
+                    >
+                      {label}
+                    </button>
+                  ))}
+                </div>
 
                 {showModal && isEditing && selectedWatchlist && (
                   <UpdateWatchlist
                     watchlist={selectedWatchlist}
+                    dateRange={dateRange}
                     onClose={handleCloseModal}
                     onSave={handleSaveChanges}
                   />

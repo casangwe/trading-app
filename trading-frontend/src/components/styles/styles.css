@@ -584,7 +584,7 @@ body::-webkit-scrollbar {
 /*********************************** Watchlist Component *****************************************/
 .watchlist-wrapper {
   position: relative;
-  min-height: 300px;
+  min-height: 500px;
 }
 .watchlist-wrapper.fade-in {
   opacity: 1;
@@ -600,7 +600,7 @@ body::-webkit-scrollbar {
   transform: translateY(10px);
   transition: opacity 1s ease, transform 1s ease;
   position: relative;
-  min-height: 450px;
+  min-height: 500px;
 }
 /* New Watchlist  */
 #watchlist-new-btn {
@@ -688,35 +688,44 @@ body::-webkit-scrollbar {
   margin-top: 5px;
 }
 
-.analysis-section {
+.flow-section {
   min-height: 220px;
+}
+
+.vs-container {
+  display: flex;
+  align-items: stretch;
+  margin-top: 1rem;
+  gap: 1rem;
+}
+
+.vs-left,
+.vs-right {
+  flex: 1;
+}
+
+.vs-divider {
+  width: 1px;
+  background-color: #ddd;
+}
+
+.vs-row {
   display: flex;
   flex-direction: column;
-  justify-content: flex-start;
+  margin-bottom: 0.5rem;
 }
-.analysis-header {
-  display: flex;
-  justify-content: space-between;
-  font-weight: bold;
-  margin-bottom: 4px;
-}
-.analysis-table {
-  width: 100%;
-  border-collapse: collapse;
-}
-.analysis-cell {
-  vertical-align: top;
-}
-.cell-label {
-  font-size: 9px;
-  color: #666;
-  margin-top: 0.2rem;
-}
-.cell-value {
+
+.vs-row .label {
   font-size: 10px;
-  color: #333;
-  font-weight: 700;
+  color: #666;
 }
+
+.vs-row .value {
+  font-size: 11px;
+  font-weight: 700;
+  color: #333;
+}
+
 hr {
   margin: 4px 0;
   border: none;
@@ -754,14 +763,12 @@ hr {
 
 .misc-wrapper {
   position: relative;
-  min-height: 300px;
+  min-height: 500px;
   background-color: transparent;
-  border-radius: 8px;
-  font-family: Arial, sans-serif;
 }
 
 .misc-container {
-  padding: 20px;
+  padding: 10px;
   background-color: transparent;
   border-radius: 8px;
   font-family: Arial, sans-serif;
@@ -769,7 +776,7 @@ hr {
   transform: translateY(10px);
   transition: opacity 1s ease, transform 1s ease;
   position: relative;
-  min-height: 450px;
+  min-height: 500px;
   flex: 1;
 }
 
@@ -781,7 +788,6 @@ hr {
   display: flex;
   flex-direction: row;
   align-items: flex-start;
-  gap: 15px;
   width: 100%;
 }
 
@@ -799,9 +805,9 @@ hr {
   overflow-y: auto;
   display: flex;
   flex-direction: column;
-  gap: 5px;
+  /* gap: 5px; */
   position: relative;
-  width: 90%;
+  width: 100%;
   flex-grow: 1;
   align-items: flex-start;
 }
@@ -819,7 +825,7 @@ hr {
   cursor: pointer;
   height: 450px;
   margin-top: 10px;
-  padding: 40px;
+  padding: 30px;
   transition: transform 0.3s, background-color 0.3s;
 }
 
@@ -960,11 +966,6 @@ hr {
   padding: 1px 0;
 }
 
-.title {
-  font-size: 14px;
-  font-weight: bold;
-}
-
 #trade-new-btn {
   font-size: 12px;
   cursor: pointer;
@@ -1001,6 +1002,7 @@ hr {
   text-align: left;
   padding: 10px 0px;
   z-index: 1;
+  font-size: 10px;
 }
 .trade-table tbody {
   display: block;
@@ -1445,11 +1447,12 @@ hr {
 }
 
 /******************************** Sentiment Gauge ********************************/
-/* 
+
 .sentiment-chart {
   text-align: center;
-  padding: 15px;
-} */
+  /* padding: 15px; */
+  margin-bottom: 40px;
+}
 
 .sentiment-gauge-bar {
   display: flex;
@@ -1883,7 +1886,7 @@ hr {
 }
 
 .title {
-  font-size: 14px;
+  font-size: 12px;
   font-weight: bold;
 }
 
@@ -1924,6 +1927,7 @@ hr {
   text-align: left;
   padding: 10px 0px;
   z-index: 1;
+  font-size: 10px;
 }
 
 .financial-table tbody {
@@ -2201,6 +2205,7 @@ hr {
   font-size: 11px;
   text-align: left;
   padding: 10px 0px;
+  font-size: 10px;
 }
 .transaction-table td {
   padding: 5px 0px;
@@ -2696,7 +2701,7 @@ input:checked + .slider:before {
   background-color: transparent;
   border: none;
   padding: 1px 0;
-  font-size: 14px;
+  font-size: 12px;
   font-weight: bold;
   cursor: pointer;
   transition: background-color 0.2s ease, color 0.2s ease;
@@ -2717,6 +2722,7 @@ input:checked + .slider:before {
 .flow-tabs .tab-container {
   display: flex;
   gap: 50px;
+  /* padding-top: 40px; */
 }
 
 .flow-tabs .tab-button {
@@ -2729,6 +2735,7 @@ input:checked + .slider:before {
   cursor: pointer;
   transition: background-color 0.2s ease, color 0.2s ease;
 }
+
 /*******************************************************************************************/
 /****************************************** Pages ******************************************/
 /*******************************************************************************************/
@@ -2739,7 +2746,8 @@ input:checked + .slider:before {
 .investment-and-dailypnl-container,
 .networth-and-cash-container,
 .investment-and-cash-container,
-.eqt-and-summary-container {
+.eqt-and-summary-container,
+.watchlist-and-misc-container {
   display: flex;
   justify-content: space-between;
   align-items: center;
@@ -2763,7 +2771,7 @@ input:checked + .slider:before {
   gap: 0px;
 }
 
-.watchlist-and-misc-container {
+/* .watchlist-and-misc-container {
   display: flex;
   position: inherit;
   gap: 1rem;
@@ -2772,7 +2780,7 @@ input:checked + .slider:before {
   height: 500px;
   background-color: transparent;
   padding: 0;
-}
+} */
 
 /******************************Within the Horizontal Containers *****************************/
 .flow-summary,
@@ -2788,7 +2796,9 @@ input:checked + .slider:before {
 }
 
 .bars-home,
-.calendar-home {
+.calendar-home,
+.watchlist-trades,
+.misc-trades {
   flex: 0.5;
   display: flex;
   flex-direction: column;
@@ -2806,19 +2816,19 @@ input:checked + .slider:before {
   flex: 0.3;
 }
 
-.watchlist-trades {
+/* .watchlist-trades {
   flex: 0.35;
   padding-left: 2vw;
   padding-top: 2vh;
   box-sizing: border-box;
 }
 
-.misc-trades {
+, {
   flex: 0.65;
   padding-right: 2vw;
   padding-top: 2vh;
   box-sizing: border-box;
-}
+} */
 
 /**************************************** Pie Charts ***************************************/
 

@@ -34,12 +34,12 @@ const Navigation = () => {
           >
             Trades
           </Link>
-          <Link
+          {/* <Link
             to="/context"
             className={location.pathname === "/context" ? "active" : ""}
           >
             Context
-          </Link>
+          </Link> */}
           <Link
             to="/analysis"
             className={location.pathname === "/analysis" ? "active" : ""}

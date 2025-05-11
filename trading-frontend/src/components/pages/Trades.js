@@ -8,14 +8,17 @@ import AnalysisSummary from "../controllers/analysis/AnalysisSummary";
 const Trades = () => {
   return (
     <div className="trades">
-      <div className="watchlist-and-misc-container">
+      <div className="setup-trades">
+        <Watchlist />
+      </div>
+      {/* <div className="watchlist-and-misc-container">
         <div className="watchlist-trades">
           <Watchlist />
         </div>
         <div className="misc-trades">
           <Misc />
         </div>
-      </div>
+      </div> */}
       <div className="eqt-and-summary-container">
         <div className="eqt-trades">
           <EQTCurve />

@@ -183,11 +183,11 @@ const FlowSummary = () => {
               </div>
             </div>
 
-            <div className="metrics">
+            {/* <div className="metrics">
               {watchlistAnalysisData && (
                 <MetricFlow data={watchlistAnalysisData} />
               )}
-            </div>
+            </div> */}
 
             <div className="expirations">
               {analysisData?.most_active_expirations && (
