@@ -46,85 +46,12 @@ def sanitize(val):
     except:
         return None
 
-@lru_cache(maxsize=256)
-def price_action(symbol: str, offset: int = 0):
-
-    ticker = yf.Ticker(symbol)
-    historical_data = ticker.history(period="7d")
-
-    if historical_data.empty or len(historical_data) <= offset:
-        return None
-
-    row = historical_data.iloc[-1 - offset]
-    date_str = row.name.strftime("%A, %B %d, %Y")
-    percent_change = ((row["Close"] - row["Open"]) / row["Open"]) * 100
-
-    return {
-        "date": date_str,  
-        "close": round(row["Close"], 2),
-        "open": round(row["Open"], 2),
-        "high": round(row["High"], 2),
-        "low": round(row["Low"], 2),
-        "volume": int(row["Volume"]),
-        "percent_change": round(percent_change, 2)
-    }
-
-
-@lru_cache(maxsize=256)
-def get_indicators(symbol: str, interval: str = "1d", period: str = "10d", day_offset: int = 0):
-    try:
-        data = yf.download(tickers=symbol, interval=interval, period="30d", progress=False)
-
-        if data.empty or len(data) < (day_offset + 2):
-            return None
-
-        idx = -1 - day_offset  
-
-        delta = data["Close"].diff()
-        gain = delta.clip(lower=0)
-        loss = -delta.clip(upper=0)
-        avg_gain = gain.rolling(14).mean()
-        avg_loss = loss.rolling(14).mean()
-        rs = avg_gain / avg_loss
-        rsi = 100 - (100 / (1 + rs))
-
-        ema12 = data["Close"].ewm(span=12, adjust=False).mean()
-        ema26 = data["Close"].ewm(span=26, adjust=False).mean()
-        macd = ema12 - ema26
-
-        typical_price = (data["High"] + data["Low"] + data["Close"]) / 3
-        money_flow = typical_price * data["Volume"]
-        pos_flow = money_flow.where(typical_price.diff() > 0, 0)
-        neg_flow = money_flow.where(typical_price.diff() < 0, 0)
-        mfi_ratio = pos_flow.rolling(14).sum() / neg_flow.rolling(14).sum()
-        mfi = 100 - (100 / (1 + mfi_ratio))
-
-        ma_5 = data["Close"].rolling(5).mean()
-        ma_9 = data["Close"].rolling(9).mean()
-
-        return {
-            "mfi": sanitize(mfi.iloc[idx]),
-            "ma_5": sanitize(ma_5.iloc[idx]),
-            "ma_9": sanitize(ma_9.iloc[idx]),
-        }
-
-
-    except Exception as e:
-        print("Indicator Error:", e)
-        return None
-
-def build_block(analysis, indicators, price_info):
+def build_block(analysis):
     sentiment = analysis.get("market_sentiment", {})
     return {
         "scenario": sentiment.get("scenario"),
         "score": sentiment.get("score"),
-        # "last_update": analysis.get("last_update", {}),
-        "indicators": indicators or {
-            "mfi": None, "ma_5": None, "ma_9": None
-        },
-        "price_action": price_info or {
-            "date": None, "close": None, "open": None, "high": None, "low": None, "volume": None
-        }
+        "last_update": analysis.get("last_update", {}),
     }
 
 # Root
@@ -262,10 +189,14 @@ async def read_watchlists(
 @app.get("/watchlists/setups")
 def get_watchlist_setups(
     user_id: int,
-    limit: int = 50,
-    db: Session = Depends(get_db)
+    date_range: int = Query(
+        1,
+        ge=0,
+        description="Number of days back to analyze (0 = Live)",
+    ),
+    limit: int = Query(50, gt=0, le=200),
+    db: Session = Depends(get_db),
 ):
-
     SIGNAL_SCENARIOS = {
         "Strong Bullish Flow",
         "Bullish Accumulation",
@@ -286,10 +217,7 @@ def get_watchlist_setups(
             continue
 
         try:
-            # data = analyze_option_flow(db, symbol=symbol, date_range=0)
-            data = analyze_option_flow(db, symbol=symbol, date_range=1)
-            # data = analyze_option_flow(db, symbol=symbol, date_range=5)
-            # data = analyze_option_flow(db, symbol=symbol, date_range=3)
+            data = analyze_option_flow(db, symbol=symbol, date_range=date_range)
             sentiment = data.get("market_sentiment", {})
             scenario = sentiment.get("scenario")
             score = sentiment.get("score")
@@ -321,9 +249,9 @@ def get_watchlist_setups(
             print(f"[Setup Detection Error] {symbol}: {e}")
             continue
 
-        results = sorted(results, key=lambda r: abs(r["score"] or 0), reverse=True)
+        # results = sorted(results, key=lambda r: abs(r["score"] or 0), reverse=True)
         # results = sorted(results, key=lambda r: r["last_update"], reverse=True) 
-
+    results = sorted(results, key=lambda r: abs(r["score"] or 0), reverse=True)
     return results[:limit]
 
 
@@ -549,19 +477,11 @@ async def get_watchlist_analysis(symbol: str, db: Session = Depends(get_db)):
         analysis_1d = analyze_option_flow(db, symbol=symbol, date_range=1)
         analysis_live = analyze_option_flow(db, symbol=symbol, date_range=0)
 
-        indicators_2d = get_indicators(symbol, day_offset=2)
-        indicators_1d = get_indicators(symbol, day_offset=1)
-        indicators_live = get_indicators(symbol, day_offset=0)
-
-        price_2d = price_action(symbol, offset=2)
-        price_1d = price_action(symbol, offset=1)
-        price_live = price_action(symbol, offset=0)
-
         result = {
             "symbol": symbol.upper(),
-            "2D": build_block(analysis_2d, indicators_2d, price_2d),
-            "1D": build_block(analysis_1d, indicators_1d, price_1d),
-            "Live": build_block(analysis_live, indicators_live, price_live)
+            "2D": build_block(analysis_2d),
+            "1D": build_block(analysis_1d),
+            "Live": build_block(analysis_live)
         }
 
         return result
@@ -571,7 +491,7 @@ async def get_watchlist_analysis(symbol: str, db: Session = Depends(get_db)):
 
 @app.get("/clear-cache/")
 def clear_cache(symbol: str):
-    price_action.cache_clear()
-    get_indicators.cache_clear()
+    # price_action.cache_clear()
+    # get_indicators.cache_clear()
     return {"message": f"Cache cleared for {symbol}"}
 

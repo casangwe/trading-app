@@ -200,7 +200,11 @@ RULES = {
             True: {"order_action": "sell-to-open", "sentiment": "bearish", "description": "Selling to Open Calls. Significant call-selling volume often indicates a neutral-to-bearish market outlook."},
             False: {"order_action": "sell-to-close", "sentiment": "bearish", "description": "Selling to Close Calls. Closing long call positions through selling, reducing bullish exposure or adjusting to bearish market conditions."}
         },
-        "below": {"order_action": "sell-to-close", "sentiment": "bearish", "description": "Selling to Close Calls. Urgently closing long call positions through selling, reflecting a bearish sentiment and expectations of limited upside potential."}
+        "below": {
+            True: {"order_action": "sell-to-open", "sentiment": "bearish", "description": "Selling to Open Calls. Traders initiating new short call positions below the bid price, reflecting bearish sentiment."},
+            False: {"order_action": "sell-to-close", "sentiment": "bearish", "description": "Selling to Close Calls. Urgently closing long call positions through selling, reflecting a bearish sentiment and expectations of limited upside potential."}
+        }
+        # "below": {"order_action": "sell-to-close", "sentiment": "bearish", "description": "Selling to Close Calls. Urgently closing long call positions through selling, reflecting a bearish sentiment and expectations of limited upside potential."}
     },
     "put": {
         "below": {
@@ -379,7 +383,7 @@ def compute_sentiment(df):
                     f"Bullish positioning is emerging as the call opening premium (${call_open_premium:,.2f}) exceeds "
                     f"put opening (${put_open_premium:,.2f}), indicating a growing preference for upside exposure. "
                     f"Additionally, more calls are being opened than closed, with call closing premium at "
-                    f"${call_close_premium:,.2f}, suggesting that traders are initiating new bullish positions rather than simply "
+                    f"(${call_close_premium:,.2f}), suggesting that traders are initiating new bullish positions rather than simply "
                     f"exiting existing ones. This may reflect early-stage conviction or directional interest in the underlying asset."
                 )
             }
