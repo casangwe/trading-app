@@ -1,8 +1,10 @@
 # main.py
+import select
 import pandas as pd
 import math
 from fastapi import FastAPI, Depends, Query, HTTPException, File, UploadFile, Depends
 from sqlalchemy.orm import Session
+from sqlalchemy import select, distinct
 from typing import List
 from fastapi.middleware.cors import CORSMiddleware
 from database.auth import router as auth_router
@@ -177,6 +179,70 @@ async def delete_trade(user_id: int, trade_id: int, db: Session = Depends(get_db
         raise HTTPException(status_code=404, detail="Trade not found")
     return deleted_trade
 
+# Global Setups
+@app.get("/setups/global")
+def get_global_setups(
+    date_range: int = Query(
+        1, ge=0, description="Days back to analyze (0 = Live)"
+    ),
+    limit: int = Query(50, gt=0, le=200),
+    db = Depends(get_db_connection),
+):
+    SIGNAL_SCENARIOS = {
+        "Strong Bullish Flow",
+        "Bullish Accumulation",
+        "Bullish Positioning",
+        "Bearish Positioning",
+        "Bearish Accumulation",
+        "Strong Bearish Flow",
+    }
+
+    symbols = [
+        row[0]
+        for row in db.execute(
+            select(distinct(Options.symbol))
+        ).all()
+    ]
+
+    results = []
+    seen = set()
+    cutoff = (datetime.utcnow() - timedelta(days=14)).date()
+
+    for symbol in symbols:
+        sym = symbol.upper()
+        if sym in seen:
+            continue
+        try:
+            data = analyze_option_flow(db, symbol=sym, date_range=date_range)
+            sentiment = data.get("market_sentiment", {})
+            scenario = sentiment.get("scenario")
+            score = sentiment.get("score")
+            last_upd = data.get("last_update", {})
+            last_date = None
+
+            if isinstance(last_upd, dict) and "date" in last_upd:
+                last_date = datetime.fromisoformat(last_upd["date"]).date()
+            if scenario not in SIGNAL_SCENARIOS or (
+                last_date and last_date < cutoff
+            ):
+                continue
+
+            results.append({
+                "symbol": sym,
+                "scenario": scenario,
+                "score": score,
+                "last_update": last_date.isoformat() if last_date else None,
+            })
+            seen.add(sym)
+
+        except Exception as e:
+            print(f"[Global Setup Error] {sym}: {e}")
+            continue
+
+    results = sorted(results, key=lambda r: abs(r["score"] or 0), reverse=True)
+    return results[:limit]
+
+    
 # Watchlist Endpoints
 @app.get("/watchlists/", response_model=List[schema.WatchlistResponse])
 async def read_watchlists(
