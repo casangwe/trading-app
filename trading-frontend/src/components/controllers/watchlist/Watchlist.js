@@ -272,24 +272,7 @@ const Watchlist = () => {
             ) : (
               <>
                 <div className="header-card">
-                  <p className="title">
-                    {/* <div className="flow-tabs">
-                      {tabs.map(({ label, value }) => (
-                        <button
-                          key={value}
-                          className={`tab-button ${
-                            dateRange === value ? "active" : ""
-                          }`}
-                          onClick={() => {
-                            setFadeInTable(false);
-                            setDateRange(value);
-                          }}
-                        >
-                          {label}
-                        </button>
-                      ))}
-                    </div> */}
-                  </p>
+                  <p className="title"></p>
                   <div className="tooltip">
                     <i
                       className="btn btn-primary fa-solid fa-plus"

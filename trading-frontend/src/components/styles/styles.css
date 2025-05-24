@@ -581,6 +581,40 @@ body::-webkit-scrollbar {
   margin-top: 10px;
   margin-bottom: 5px;
 }
+/*********************************** Setups Component *****************************************/
+.setups-wrapper {
+  position: relative;
+  min-height: 800px;
+}
+.setups-wrapper.fade-in {
+  opacity: 1;
+  transform: translateY(0);
+}
+
+.setups-container {
+  padding: 20px;
+  background-color: transparent;
+  border-radius: 8px;
+  font-family: Arial, sans-serif;
+  opacity: 0;
+  transform: translateY(10px);
+  transition: opacity 1s ease, transform 1s ease;
+  position: relative;
+  min-height: 800px;
+}
+/* New upload  */
+#upload-new-btn {
+  font-size: 12px;
+  cursor: pointer;
+  color: black;
+  padding: 6px 10px;
+  border-radius: 5px;
+}
+#upload-new-btn:hover {
+  font-size: 12px;
+  cursor: pointer;
+  color: #4a90e2;
+}
 /*********************************** Watchlist Component *****************************************/
 .watchlist-wrapper {
   position: relative;
@@ -2300,19 +2334,72 @@ hr {
   cursor: pointer;
 }
 
-/***************************************** Modal View ******************************************/
-.modal-container {
+/***************************************** Flow Modal View ******************************************/
+
+.flow-modal-container {
   position: fixed;
   top: 0;
   left: 0;
-  width: 100%;
-  height: 100%;
+  width: 100vw;
+  height: 100vh;
   background-color: transparent;
   backdrop-filter: blur(5px);
   display: flex;
   justify-content: center;
   align-items: center;
   z-index: 1000;
+  animation: fadeIn 0.5s forwards;
+}
+.flow-modal-content {
+  width: 90vw;
+  height: 90vh;
+  display: flex;
+  flex-direction: column;
+  background: #fefefe;
+  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.15);
+  font-family: Arial, Helvetica, sans-serif;
+  overflow: hidden;
+}
+
+.flow-modal-header {
+  padding: 20px;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  background: #fefefe;
+  position: sticky;
+  top: 0;
+  z-index: 10;
+}
+
+.flow-modal-body {
+  flex: 1;
+  overflow-y: auto;
+  padding: 20px;
+  scrollbar-width: thin;
+  scrollbar-color: transparent transparent;
+}
+
+.flow-modal-body::-webkit-scrollbar {
+  width: 4px;
+}
+
+.flow-modal-body::-webkit-scrollbar-thumb {
+  background-color: transparent;
+}
+/***************************************** Modal View ******************************************/
+.modal-container {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100vw;
+  height: 100vh;
+  background-color: transparent;
+  backdrop-filter: blur(5px);
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  z-index: 9999;
   animation: fadeIn 0.5s forwards;
 }
 

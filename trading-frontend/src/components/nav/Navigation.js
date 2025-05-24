@@ -1,13 +1,27 @@
-import React from "react";
+import React, { useState } from "react";
 import { Link, useLocation, useNavigate } from "react-router-dom";
 import { FaSignOutAlt } from "react-icons/fa";
 import "../styles/styles.css";
 import Logo from "../assets/T-bg.png";
 import Search from "./Search";
+import FlowSummary from "../controllers/optionflow/FlowSummary";
 
 const Navigation = () => {
   const location = useLocation();
   const navigate = useNavigate();
+
+  const [showModal, setShowModal] = useState(false);
+  const [searchSymbol, setSearchSymbol] = useState(null);
+
+  const handleOpenModal = (symbol) => {
+    setSearchSymbol(symbol);
+    setShowModal(true);
+  };
+
+  const handleCloseModal = () => {
+    setSearchSymbol(null);
+    setShowModal(false);
+  };
 
   const handleLogout = () => {
     localStorage.removeItem("access_token");
@@ -23,7 +37,7 @@ const Navigation = () => {
             <img src={Logo} alt="Logo" className="logo-image" />
           </Link>
         </div>
-        <Search />
+        <Search onSymbolSubmit={handleOpenModal} />
         <div className="nav-links">
           <Link to="/" className={location.pathname === "/" ? "active" : ""}>
             Home
@@ -63,6 +77,13 @@ const Navigation = () => {
           </button>
         </div>
       </div>
+      {showModal && (
+        <FlowSummary
+          symbol={searchSymbol}
+          dateRange={1} // or a sensible default
+          onClose={handleCloseModal}
+        />
+      )}
     </div>
   );
 };

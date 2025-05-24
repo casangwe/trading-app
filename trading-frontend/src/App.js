@@ -8,7 +8,6 @@ import {
 import "./components/styles/styles.css";
 import Home from "./components/pages/Home";
 import Trades from "./components/pages/Trades";
-import Context from "./components/pages/Context";
 import Analysis from "./components/pages/Analysis";
 import Accounts from "./components/pages/Accounts";
 import Landing from "./components/pages/Landing";
@@ -45,14 +44,6 @@ const AppContent = () => {
               </ProtectedRoute>
             }
           />{" "}
-          <Route
-            path="/context"
-            element={
-              <ProtectedRoute>
-                <Context />
-              </ProtectedRoute>
-            }
-          />
           <Route
             path="/analysis"
             element={

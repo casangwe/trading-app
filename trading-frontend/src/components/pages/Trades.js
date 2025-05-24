@@ -1,6 +1,7 @@
 import React from "react";
 import TradeTable from "../controllers/trades/TradeTable";
 import Watchlist from "../controllers/watchlist/Watchlist";
+import Setups from "../controllers/optionflow/Setups";
 import Misc from "../controllers/misc/Misc";
 import EQTCurve from "../controllers/trades/EQTcurve";
 import AnalysisSummary from "../controllers/analysis/AnalysisSummary";
@@ -9,7 +10,7 @@ const Trades = () => {
   return (
     <div className="trades">
       <div className="setup-trades">
-        <Watchlist />
+        <Setups />
       </div>
       {/* <div className="watchlist-and-misc-container">
         <div className="watchlist-trades">
