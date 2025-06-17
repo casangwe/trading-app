@@ -602,6 +602,7 @@ body::-webkit-scrollbar {
   position: relative;
   min-height: 800px;
 }
+
 /* New upload  */
 #upload-new-btn {
   font-size: 12px;

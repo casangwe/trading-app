@@ -91,6 +91,13 @@ const Setups = () => {
       setUploadMessage(err.message || "Upload error");
     } finally {
       setUploading(false);
+      setFile(null);
+      if (fileInputRef.current) {
+        fileInputRef.current.value = null;
+      }
+      setTimeout(() => {
+        setUploadMessage("Select File");
+      }, 20000);
     }
   };
 
@@ -230,11 +237,19 @@ const Setups = () => {
                   <div className="tooltip">
                     <i
                       className={`btn btn-primary fa-solid ${
-                        file ? "fa-check" : "fa-plus"
+                        uploading
+                          ? "fa-spinner fa-spin"
+                          : file
+                          ? "fa-check"
+                          : "fa-plus"
                       } upload-btn`}
                       id="flow-upload-btn"
-                      onClick={file ? handleUpload : handleOpenFileExplorer}
-                    ></i>
+                      onClick={
+                        file && !uploading
+                          ? handleUpload
+                          : handleOpenFileExplorer
+                      }
+                    />
                     <span className="tooltiptext">
                       {uploadMessage ||
                         (file ? `Upload ${file.name}` : "Select File")}
