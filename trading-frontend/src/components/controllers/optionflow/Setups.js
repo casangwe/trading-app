@@ -111,13 +111,40 @@ const Setups = () => {
     setSelectedSymbol(null);
   };
 
+  // const chartData = useMemo(() => {
+  //   if (!setups.length) return [];
+
+  //   const radii = setups.map((s) => 10 * Math.abs(s.score) + 20);
+  //   const centerRadius = radii[0];
+  //   const maxChildRadius = Math.max(...radii.slice(1), 0);
+  //   const ringDistance = centerRadius + maxChildRadius + 20;
+
+  //   const data = [{ x: 0, y: 0, radius: centerRadius, item: setups[0] }];
+
+  //   const others = setups.slice(1);
+  //   const N = others.length;
+  //   others.forEach((item, i) => {
+  //     const angle = (2 * Math.PI * i) / N;
+  //     data.push({
+  //       x: ringDistance * Math.cos(angle),
+  //       y: ringDistance * Math.sin(angle),
+  //       radius: 10 * Math.abs(item.score) + 20,
+  //       item,
+  //     });
+  //   });
+
+  //   return data;
+  // }, [setups]);
+
   const chartData = useMemo(() => {
     if (!setups.length) return [];
 
     const radii = setups.map((s) => 10 * Math.abs(s.score) + 20);
     const centerRadius = radii[0];
     const maxChildRadius = Math.max(...radii.slice(1), 0);
-    const ringDistance = centerRadius + maxChildRadius + 20;
+
+    const spacingFactor = 1;
+    const ringDistance = (centerRadius + maxChildRadius + 20) * spacingFactor;
 
     const data = [{ x: 0, y: 0, radius: centerRadius, item: setups[0] }];
 
@@ -286,6 +313,21 @@ const Setups = () => {
                       <Scatter data={chartData} shape={renderShape} />
                     </ScatterChart>
                   </ResponsiveContainer>
+                  {setups.length === 0 && (
+                    <div
+                      style={{
+                        position: "absolute",
+                        top: "50%",
+                        left: "50%",
+                        transform: "translate(-50%, -50%)",
+                        fontSize: "12px",
+                        color: "#888",
+                        fontWeight: "500",
+                      }}
+                    >
+                      No data available yet. Upload a file to get started.
+                    </div>
+                  )}
                 </div>
 
                 <div className="flow-tabs">
