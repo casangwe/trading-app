@@ -30,17 +30,18 @@ const Setups = () => {
   const [file, setFile] = useState(null);
   const [uploadMessage, setUploadMessage] = useState("");
   const [uploading, setUploading] = useState(false);
+  const [alignedOnly, setAlignedOnly] = useState(false);
 
   useEffect(() => {
     setFadeInTable(false);
     loadSetups();
-  }, [activeTab]);
+  }, [activeTab, alignedOnly]);
 
   const loadSetups = async () => {
     setError(null);
     setLoading(true);
     try {
-      const data = await fetchGlobalSetups(activeTab, 100);
+      const data = await fetchGlobalSetups(activeTab, 100, alignedOnly);
       setSetups(data);
     } catch (err) {
       console.error("Error fetching global setups:", err);
@@ -325,7 +326,8 @@ const Setups = () => {
                         fontWeight: "500",
                       }}
                     >
-                      No data available yet. Upload a file to get started.
+                      No strong directional flows detected yet for this time
+                      range.
                     </div>
                   )}
                 </div>
@@ -343,6 +345,14 @@ const Setups = () => {
                         {label}
                       </button>
                     ))}
+                    <label className="aligned-switch">
+                      <input
+                        type="checkbox"
+                        checked={alignedOnly}
+                        onChange={() => setAlignedOnly((v) => !v)}
+                      />
+                      <span className="slider" />
+                    </label>
                   </div>
                 </div>
                 {showModal && (

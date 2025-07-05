@@ -602,6 +602,47 @@ body::-webkit-scrollbar {
   position: relative;
   min-height: 800px;
 }
+.aligned-switch {
+  position: relative;
+  display: inline-block;
+  width: 34px;
+  height: 18px;
+  margin-left: 12px;
+}
+
+.aligned-switch input {
+  opacity: 0;
+  width: 0;
+  height: 0;
+}
+
+.aligned-switch .slider {
+  position: absolute;
+  cursor: pointer;
+  inset: 0;
+  background-color: #ccc;
+  border-radius: 18px;
+  transition: background-color 0.3s;
+}
+
+.aligned-switch .slider::before {
+  content: "";
+  position: absolute;
+  height: 14px;
+  width: 14px;
+  left: 2px;
+  bottom: 2px;
+  background-color: #fff;
+  border-radius: 50%;
+  transition: transform 0.3s;
+}
+
+.aligned-switch input:checked + .slider {
+  background-color: #1e90ff;
+}
+.aligned-switch input:checked + .slider::before {
+  transform: translateX(16px);
+}
 
 /* New upload  */
 #upload-new-btn {

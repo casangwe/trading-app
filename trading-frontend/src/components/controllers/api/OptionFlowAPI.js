@@ -1,5 +1,5 @@
-const API_BASE_URL = "http://localhost:8000";
-// const API_BASE_URL = "http://54.209.237.174:8000";
+// const API_BASE_URL = "http://localhost:8000";
+const API_BASE_URL = "http://54.209.237.174:8000";
 
 // Upload Option Flow CSV File
 export const uploadOptionFlow = async (file) => {
@@ -42,3 +42,66 @@ export const fetchOptionFlowAnalysis = async (symbol, dateRange = 30) => {
     throw error;
   }
 };
+
+export const fetchWatchlistAnalysis = async (symbol) => {
+  try {
+    const response = await fetch(
+      `${API_BASE_URL}/watchlists/${symbol}/analysis`
+    );
+    if (!response.ok) {
+      const errorData = await response.json();
+      throw new Error(errorData.detail || "Error fetching watchlist analysis");
+    }
+    return await response.json();
+  } catch (error) {
+    console.error("Fetch Watchlist Analysis Error:", error);
+    throw error;
+  }
+};
+
+export const fetchGlobalSetups = async (
+  dateRange = 1,
+  limit = 50,
+  alignedOnly = false
+) => {
+  try {
+    let url = `${API_BASE_URL}/setups/global?date_range=${dateRange}&limit=${limit}`;
+    if (alignedOnly) url += "&aligned_only=true"; // append only when needed
+
+    const response = await fetch(url); // ← use the built URL
+
+    if (!response.ok) {
+      const errorData = await response.json();
+      throw new Error(errorData.detail || "Error fetching global setups");
+    }
+
+    return await response.json();
+  } catch (error) {
+    console.error("Fetch Global Setups Error:", error);
+    throw error;
+  }
+};
+
+// export const fetchGlobalSetups = async (
+//   dateRange = 1,
+//   limit = 50,
+//   alignedOnly = false
+// ) => {
+//   try {
+//     let url = `${API_BASE_URL}/setups/global?date_range=${dateRange}&limit=${limit}`;
+//     if (alignedOnly) url += "&aligned_only=true";
+//     const response = await fetch(
+//       `${API_BASE_URL}/setups/global?date_range=${dateRange}&limit=${limit}`
+//     );
+
+//     if (!response.ok) {
+//       const errorData = await response.json();
+//       throw new Error(errorData.detail || "Error fetching global setups");
+//     }
+
+//     return await response.json();
+//   } catch (error) {
+//     console.error("Fetch Global Setups Error:", error);
+//     throw error;
+//   }
+// };
