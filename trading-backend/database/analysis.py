@@ -6,6 +6,37 @@ from .crud import fetch_option_flow
 # import yfinance as yf
 
 
+# ──────────────────────────────────────────────────────────────────────
+# Directional scenario map & helpers
+# ──────────────────────────────────────────────────────────────────────
+BULLISH_SCENARIOS = {
+    "Strong Bullish Flow",
+    "Bullish Accumulation",
+    "Bullish Positioning",
+}
+BEARISH_SCENARIOS = {
+    "Strong Bearish Flow",
+    "Bearish Accumulation",
+    "Bearish Positioning",
+}
+
+def scenario_polarity(name: str) -> str:
+    if name in BULLISH_SCENARIOS:
+        return "bullish"
+    if name in BEARISH_SCENARIOS:
+        return "bearish"
+    return "neutral"
+
+def expirations_aligned(main_scenario: str, expirations: list[dict]) -> bool:
+    base = scenario_polarity(main_scenario)
+    if base == "neutral":
+        return False
+    return all(
+        scenario_polarity(exp.get("scenario")) == base
+        for exp in expirations
+        if exp
+    )
+
 #################################################################################################
 # Helper Function 
 #################################################################################################

@@ -502,8 +502,9 @@ def convert_premium(value):
 def clean_value(value):
     return None if (pd.isna(value) or value is np.nan) else value
 
+from sqlalchemy.exc import IntegrityError
+import io
 
-# Process and Insert CSV Data
 def process_option_flow_csv(contents: bytes, db: Session):    
     df = pd.read_csv(io.StringIO(contents.decode("utf-8")))
 
@@ -531,7 +532,16 @@ def process_option_flow_csv(contents: bytes, db: Session):
     df["premium"] = df["premium"].apply(convert_premium)
     df["price"] = df["price"].astype(str).str.replace("$", "").astype(float)
     df["premium"] = df["premium"].apply(convert_premium)
-    df["conds"] = df["conds"].apply(clean_value) 
+    df["conds"] = df["conds"].apply(clean_value)
+
+    # ✅ Deduplicate within the batch to avoid same-row reinsert
+    df.drop_duplicates(
+        subset=[
+            'trade_date', 'trade_time', 'symbol', 'expiry', 'strike',
+            'put_call', 'side', 'spot', 'size', 'price', 'sweep_block_split'
+        ],
+        inplace=True
+    )
 
     new_records = 0
     for _, row in df.iterrows():
@@ -569,10 +579,84 @@ def process_option_flow_csv(contents: bytes, db: Session):
 
         if not existing_record:
             db.add(option_flow_entry)
-            new_records += 1
+            try:
+                db.commit()
+                new_records += 1
+            except IntegrityError:
+                db.rollback()
 
-    db.commit()
     return {"message": f"{new_records} new records inserted successfully!"}
+
+# Process and Insert CSV Data
+# def process_option_flow_csv(contents: bytes, db: Session):    
+#     df = pd.read_csv(io.StringIO(contents.decode("utf-8")))
+
+#     df.rename(columns={
+#         "date": "trade_date",
+#         "time": "trade_time",
+#         "symbol": "symbol",
+#         "expiry": "expiry",
+#         "strike": "strike",
+#         "put_call": "put_call",
+#         "side": "side",
+#         "spot": "spot",
+#         "size": "size",
+#         "price": "price",
+#         "premium": "premium",
+#         "sweep_block_split": "sweep_block_split",
+#         "volume": "volume",
+#         "open_int": "open_int",
+#         "conds": "conds"
+#     }, inplace=True)
+
+#     df["trade_date"] = pd.to_datetime(df["trade_date"]).dt.date
+#     df["trade_time"] = pd.to_datetime(df["trade_time"], format="%I:%M:%S %p").dt.time
+#     df["expiry"] = pd.to_datetime(df["expiry"]).dt.date
+#     df["premium"] = df["premium"].apply(convert_premium)
+#     df["price"] = df["price"].astype(str).str.replace("$", "").astype(float)
+#     df["premium"] = df["premium"].apply(convert_premium)
+#     df["conds"] = df["conds"].apply(clean_value) 
+
+#     new_records = 0
+#     for _, row in df.iterrows():
+#         option_flow_entry = Options(
+#             trade_date=row["trade_date"],
+#             trade_time=row["trade_time"],
+#             symbol=row["symbol"],
+#             expiry=row["expiry"],
+#             strike=row["strike"],
+#             put_call=row["put_call"],
+#             side=row["side"],
+#             spot=row["spot"],
+#             size=row["size"],
+#             price=row["price"],
+#             premium=row["premium"],
+#             sweep_block_split=row["sweep_block_split"],
+#             volume=row["volume"],
+#             open_int=row["open_int"],
+#             conds=row["conds"]
+#         )
+
+#         existing_record = db.query(Options).filter(
+#             Options.trade_date == row["trade_date"],
+#             Options.trade_time == row["trade_time"],
+#             Options.symbol == row["symbol"],
+#             Options.expiry == row["expiry"],
+#             Options.strike == row["strike"],
+#             Options.put_call == row["put_call"],
+#             Options.side == row["side"],
+#             Options.spot == row["spot"],
+#             Options.size == row["size"],
+#             Options.price == row["price"],
+#             Options.sweep_block_split == row["sweep_block_split"]
+#         ).first()
+
+#         if not existing_record:
+#             db.add(option_flow_entry)
+#             new_records += 1
+
+#     db.commit()
+#     return {"message": f"{new_records} new records inserted successfully!"}
 
 
 # Flow Data Retrieval
