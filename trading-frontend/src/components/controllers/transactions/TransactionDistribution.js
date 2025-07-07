@@ -53,16 +53,11 @@ const TransactionDistribution = () => {
           value: transactionTotals.Deposit || 0,
           color: "#B0C4DE",
         };
-
         const withdrawalEntry = {
           name: "Withdrawals",
-          value:
-            transactionTotals.Withdrawal > 0
-              ? transactionTotals.Withdrawal
-              : 100,
+          value: transactionTotals.Withdrawal || 0,
           color: "#89CFF0",
         };
-
         const updatedData = [
           initialCashEntry,
           tradeEntry,
