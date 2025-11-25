@@ -9,13 +9,15 @@ from typing import List
 from fastapi.middleware.cors import CORSMiddleware
 from database.auth import router as auth_router
 from database.database import get_db_connection
-from database.analysis import analyze_option_flow, expirations_aligned
+# from database.analysis import expirations_aligned, analyze_option_flow
 from database.schema import *
 from database.models import *
 from database.crud import *
 from database import crud
 import yfinance as yf
 from functools import lru_cache
+from database.daily_features_router import router as daily_features_router
+
 
 
 
@@ -30,6 +32,9 @@ app.add_middleware(
 )
 
 app.include_router(auth_router, prefix="/auth")
+
+app.include_router(daily_features_router)
+
 
 def get_db():
     db = next(get_db_connection())
@@ -179,77 +184,77 @@ async def delete_trade(user_id: int, trade_id: int, db: Session = Depends(get_db
         raise HTTPException(status_code=404, detail="Trade not found")
     return deleted_trade
 
-@app.get("/setups/global")
-def get_global_setups(
-    date_range: int = Query(1, ge=0, description="Days back to analyze (0 = Live)"),
-    limit: int = Query(50, gt=0, le=200),
-    aligned_only: bool = Query(False, description="Filter for full bullish/bearish alignment"),
-    db=Depends(get_db_connection),
-):
-    SIGNAL_SCENARIOS = {
-        "Strong Bullish Flow",
-        "Bullish Accumulation",
-        "Bullish Positioning",
-        "Bearish Positioning",
-        "Bearish Accumulation",
-        "Strong Bearish Flow",
-    }
+# @app.get("/setups/global")
+# def get_global_setups(
+#     date_range: int = Query(1, ge=0, description="Days back to analyze (0 = Live)"),
+#     limit: int = Query(50, gt=0, le=200),
+#     aligned_only: bool = Query(False, description="Filter for full bullish/bearish alignment"),
+#     db=Depends(get_db_connection),
+# ):
+#     SIGNAL_SCENARIOS = {
+#         "Strong Bullish Flow",
+#         "Bullish Accumulation",
+#         "Bullish Positioning",
+#         "Bearish Positioning",
+#         "Bearish Accumulation",
+#         "Strong Bearish Flow",
+#     }
 
-    symbols = [
-        row[0]
-        for row in db.execute(select(distinct(Options.symbol))).all()
-    ]
+#     symbols = [
+#         row[0]
+#         for row in db.execute(select(distinct(Options.symbol))).all()
+#     ]
 
-    results = []
-    seen = set()
-    cutoff = (datetime.utcnow() - timedelta(days=14)).date()
+#     results = []
+#     seen = set()
+#     cutoff = (datetime.utcnow() - timedelta(days=14)).date()
 
-    for symbol in symbols:
-        sym = symbol.upper()
-        if sym in seen:
-            continue
+#     for symbol in symbols:
+#         sym = symbol.upper()
+#         if sym in seen:
+#             continue
 
-        try:
-            data = analyze_option_flow(db, symbol=sym, date_range=date_range)
+#         try:
+#             data = analyze_option_flow(db, symbol=sym, date_range=date_range)
 
-            sentiment      = data.get("market_sentiment", {})
-            scenario       = sentiment.get("scenario")
-            score          = sentiment.get("score")
-            most_active    = data.get("most_active_expirations", [])  # ← used below
-            last_upd       = data.get("last_update", {})
-            last_date      = None
+#             sentiment      = data.get("market_sentiment", {})
+#             scenario       = sentiment.get("scenario")
+#             score          = sentiment.get("score")
+#             most_active    = data.get("most_active_expirations", [])  # ← used below
+#             last_upd       = data.get("last_update", {})
+#             last_date      = None
 
-            if isinstance(last_upd, dict) and "date" in last_upd:
-                last_date = datetime.fromisoformat(last_upd["date"]).date()
+#             if isinstance(last_upd, dict) and "date" in last_upd:
+#                 last_date = datetime.fromisoformat(last_upd["date"]).date()
 
-            # ------------------------------------------------------------------
-            #  Skip if (a) scenario isn’t one of the six signal scenarios,
-            #          (b) data is stale,
-            #          (c) toggle is on AND expirations are not fully aligned.
-            # ------------------------------------------------------------------
-            if (
-                scenario not in SIGNAL_SCENARIOS
-                or (last_date and last_date < cutoff)
-                or (aligned_only and not expirations_aligned(scenario, most_active))
-            ):
-                continue
+#             # ------------------------------------------------------------------
+#             #  Skip if (a) scenario isn’t one of the six signal scenarios,
+#             #          (b) data is stale,
+#             #          (c) toggle is on AND expirations are not fully aligned.
+#             # ------------------------------------------------------------------
+#             if (
+#                 scenario not in SIGNAL_SCENARIOS
+#                 or (last_date and last_date < cutoff)
+#                 or (aligned_only and not expirations_aligned(scenario, most_active))
+#             ):
+#                 continue
 
-            results.append(
-                {
-                    "symbol": sym,
-                    "scenario": scenario,
-                    "score": score,
-                    "last_update": last_date.isoformat() if last_date else None,
-                }
-            )
-            seen.add(sym)
+#             results.append(
+#                 {
+#                     "symbol": sym,
+#                     "scenario": scenario,
+#                     "score": score,
+#                     "last_update": last_date.isoformat() if last_date else None,
+#                 }
+#             )
+#             seen.add(sym)
 
-        except Exception as e:
-            print(f"[Global Setup Error] {sym}: {e}")
-            continue
+#         except Exception as e:
+#             print(f"[Global Setup Error] {sym}: {e}")
+#             continue
 
-    results.sort(key=lambda r: abs(r["score"] or 0), reverse=True)
-    return results[:limit]
+#     results.sort(key=lambda r: abs(r["score"] or 0), reverse=True)
+#     return results[:limit]
 
 # Global Setups
 # @app.get("/setups/global")
@@ -324,73 +329,73 @@ async def read_watchlists(
     watchlists = crud.get_watchlists(db, user_id=user_id)
     return watchlists
 
-@app.get("/watchlists/setups")
-def get_watchlist_setups(
-    user_id: int,
-    date_range: int = Query(
-        1,
-        ge=0,
-        description="Number of days back to analyze (0 = Live)",
-    ),
-    limit: int = Query(50, gt=0, le=200),
-    db: Session = Depends(get_db),
-):
-    SIGNAL_SCENARIOS = {
-        "Strong Bullish Flow",
-        "Bullish Accumulation",
-        "Bullish Positioning",
-        "Bearish Positioning",
-        "Bearish Accumulation",
-        "Strong Bearish Flow"
-    }
+# @app.get("/watchlists/setups")
+# def get_watchlist_setups(
+#     user_id: int,
+#     date_range: int = Query(
+#         1,
+#         ge=0,
+#         description="Number of days back to analyze (0 = Live)",
+#     ),
+#     limit: int = Query(50, gt=0, le=200),
+#     db: Session = Depends(get_db),
+# ):
+#     SIGNAL_SCENARIOS = {
+#         "Strong Bullish Flow",
+#         "Bullish Accumulation",
+#         "Bullish Positioning",
+#         "Bearish Positioning",
+#         "Bearish Accumulation",
+#         "Strong Bearish Flow"
+#     }
 
-    results = []
-    seen_symbols = set()
-    cutoff_date = datetime.utcnow().date() - timedelta(days=14)
-    watchlist = crud.get_watchlists(db, user_id=user_id)
+#     results = []
+#     seen_symbols = set()
+#     cutoff_date = datetime.utcnow().date() - timedelta(days=14)
+#     watchlist = crud.get_watchlists(db, user_id=user_id)
 
-    for item in watchlist:
-        symbol = item.symbol.upper()
-        if symbol in seen_symbols:
-            continue
+#     for item in watchlist:
+#         symbol = item.symbol.upper()
+#         if symbol in seen_symbols:
+#             continue
 
-        try:
-            data = analyze_option_flow(db, symbol=symbol, date_range=date_range)
-            sentiment = data.get("market_sentiment", {})
-            scenario = sentiment.get("scenario")
-            score = sentiment.get("score")
-            last_update = data.get("last_update")
+#         try:
+#             data = analyze_option_flow(db, symbol=symbol, date_range=date_range)
+#             sentiment = data.get("market_sentiment", {})
+#             scenario = sentiment.get("scenario")
+#             score = sentiment.get("score")
+#             last_update = data.get("last_update")
 
-            last_update_date = None
-            if isinstance(last_update, str):
-                last_update_date = datetime.strptime(last_update, "%Y-%m-%d").date()
-            elif isinstance(last_update, dict) and "date" in last_update:
-                last_update_date = datetime.strptime(last_update["date"], "%Y-%m-%d").date()
-            elif isinstance(last_update, datetime):
-                last_update_date = last_update.date()
+#             last_update_date = None
+#             if isinstance(last_update, str):
+#                 last_update_date = datetime.strptime(last_update, "%Y-%m-%d").date()
+#             elif isinstance(last_update, dict) and "date" in last_update:
+#                 last_update_date = datetime.strptime(last_update["date"], "%Y-%m-%d").date()
+#             elif isinstance(last_update, datetime):
+#                 last_update_date = last_update.date()
 
-            if not scenario or scenario not in SIGNAL_SCENARIOS:
-                continue
-            if last_update_date and last_update_date < cutoff_date:
-                continue
+#             if not scenario or scenario not in SIGNAL_SCENARIOS:
+#                 continue
+#             if last_update_date and last_update_date < cutoff_date:
+#                 continue
 
-            results.append({
-                "symbol": symbol,
-                "scenario": scenario,
-                "score": score,
-                "last_update": last_update_date.isoformat() if last_update_date else None
-            })
+#             results.append({
+#                 "symbol": symbol,
+#                 "scenario": scenario,
+#                 "score": score,
+#                 "last_update": last_update_date.isoformat() if last_update_date else None
+#             })
 
-            seen_symbols.add(symbol)
+#             seen_symbols.add(symbol)
 
-        except Exception as e:
-            print(f"[Setup Detection Error] {symbol}: {e}")
-            continue
+#         except Exception as e:
+#             print(f"[Setup Detection Error] {symbol}: {e}")
+#             continue
 
-        # results = sorted(results, key=lambda r: abs(r["score"] or 0), reverse=True)
-        # results = sorted(results, key=lambda r: r["last_update"], reverse=True) 
-    results = sorted(results, key=lambda r: abs(r["score"] or 0), reverse=True)
-    return results[:limit]
+#         # results = sorted(results, key=lambda r: abs(r["score"] or 0), reverse=True)
+#         # results = sorted(results, key=lambda r: r["last_update"], reverse=True) 
+#     results = sorted(results, key=lambda r: abs(r["score"] or 0), reverse=True)
+#     return results[:limit]
 
 
 
@@ -587,49 +592,53 @@ async def delete_financial(user_id: int, financial_id: int, db: Session = Depend
 # Flow Endpoints
 ####################################################################
 
-# Upload option flow
-@app.post("/upload-option-flow/")
-async def upload_option_flow(file: UploadFile = File(...), db: Session = Depends(get_db_connection)):
-    contents = await file.read()  
-    response = process_option_flow_csv(contents, db) 
-    return response
+# # Upload option flow
+# @app.post("/upload-option-flow/")
+# async def upload_option_flow(file: UploadFile = File(...), db: Session = Depends(get_db_connection)):
+#     contents = await file.read()  
+#     response = process_option_flow_csv(contents, db) 
+#     return response
 
-# Option Flow Analysis 
-@app.get("/analysis/")
-async def get_option_flow_analysis(
-    symbol: str = Query(None, description="Stock symbol (e.g., AAPL, MSFT)"),
-    date_range: int = Query(30, description="Number of days to look back"),
-    db: Session = Depends(get_db_connection),
-):    
-    results = analyze_option_flow(db, symbol, date_range)
-    if "message" in results:
-        raise HTTPException(status_code=404, detail=results["message"])
-    return results
+# # Option Flow Analysis 
+# @app.get("/analysis/")
+# async def get_option_flow_analysis(
+#     symbol: str = Query(None, description="Stock symbol (e.g., AAPL, MSFT)"),
+#     date_range: int = Query(30, description="Number of days to look back"),
+#     db: Session = Depends(get_db_connection),
+# ):    
+#     results = analyze_option_flow(db, symbol, date_range)
+#     if "message" in results:
+#         raise HTTPException(status_code=404, detail=results["message"])
+#     return results
 
 
 
-@app.get("/watchlists/{symbol}/analysis")
-async def get_watchlist_analysis(symbol: str, db: Session = Depends(get_db)):
-    try:
-        analysis_2d = analyze_option_flow(db, symbol=symbol, date_range=2)
-        analysis_1d = analyze_option_flow(db, symbol=symbol, date_range=1)
-        analysis_live = analyze_option_flow(db, symbol=symbol, date_range=0)
+# @app.get("/watchlists/{symbol}/analysis")
+# async def get_watchlist_analysis(symbol: str, db: Session = Depends(get_db)):
+#     try:
+#         analysis_2d = analyze_option_flow(db, symbol=symbol, date_range=2)
+#         analysis_1d = analyze_option_flow(db, symbol=symbol, date_range=1)
+#         analysis_live = analyze_option_flow(db, symbol=symbol, date_range=0)
 
-        result = {
-            "symbol": symbol.upper(),
-            "2D": build_block(analysis_2d),
-            "1D": build_block(analysis_1d),
-            "Live": build_block(analysis_live)
-        }
+#         result = {
+#             "symbol": symbol.upper(),
+#             "2D": build_block(analysis_2d),
+#             "1D": build_block(analysis_1d),
+#             "Live": build_block(analysis_live)
+#         }
 
-        return result
+#         return result
 
-    except Exception as e:
-        raise HTTPException(status_code=500, detail=str(e))
+#     except Exception as e:
+#         raise HTTPException(status_code=500, detail=str(e))
 
-@app.get("/clear-cache/")
-def clear_cache(symbol: str):
-    # price_action.cache_clear()
-    # get_indicators.cache_clear()
-    return {"message": f"Cache cleared for {symbol}"}
+# @app.get("/clear-cache/")
+# def clear_cache(symbol: str):
+#     # price_action.cache_clear()
+#     # get_indicators.cache_clear()
+#     return {"message": f"Cache cleared for {symbol}"}
 
+
+####################################################################
+# Indicator / modeling
+####################################################################

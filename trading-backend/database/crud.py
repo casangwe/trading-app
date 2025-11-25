@@ -6,6 +6,7 @@ from fastapi import HTTPException
 from sqlalchemy.orm import Session
 from sqlalchemy.exc import NoResultFound
 from sqlalchemy import text, desc
+from sqlalchemy.dialects.mysql import insert as mysql_insert
 from . import models, schema
 from .schema import *
 from .auth import *
@@ -677,3 +678,90 @@ def fetch_option_flow(db: Session, symbol: str = None, date_range: int = 30):
     df.drop(columns=["_sa_instance_state"], inplace=True)  
 
     return df
+
+
+# =========================
+# Daily Features (Indicators)
+# =========================
+
+def upsert_daily_features_bulk(db: Session, features: list[schema.DailyFeatureCreate]) -> int:
+    """
+    Bulk upsert daily_features rows.
+    Used by your offline loader (daily_derived.py) or internal tooling.
+
+    Natural key:
+      (user_id, ticker, session_date, features_version)
+
+    If a row exists => overwrite with new values.
+    """
+    if not features:
+        return 0
+
+    table = models.DailyFeature.__table__
+
+    # Convert Pydantic models to plain dicts
+    rows = [f.dict() for f in features]
+
+    stmt = mysql_insert(table).values(rows)
+
+    # On duplicate key, update all non-PK cols
+    update_cols = {
+        c.name: stmt.inserted[c.name]
+        for c in table.c
+        if c.name not in ("id",)  # never touch PK
+    }
+
+    upsert_stmt = stmt.on_duplicate_key_update(**update_cols)
+
+    result = db.execute(upsert_stmt)
+    db.commit()
+    return result.rowcount
+
+
+def get_daily_features(
+    db: Session,
+    user_id: int,
+    ticker: str,
+    start_date: date | None = None,
+    end_date: date | None = None,
+    limit: int = 250,
+) -> list[schema.DailyFeatureResponse]:
+    """
+    Fetch derived daily features for a user+ticker, ordered by session_date.
+    This is what your frontend / analysis layer will usually hit.
+    """
+    q = (
+        db.query(models.DailyFeature)
+        .filter(
+            models.DailyFeature.user_id == user_id,
+            models.DailyFeature.ticker == ticker,
+            models.DailyFeature.features_version == "v1",
+        )
+    )
+
+    if start_date:
+        q = q.filter(models.DailyFeature.session_date >= start_date)
+    if end_date:
+        q = q.filter(models.DailyFeature.session_date <= end_date)
+
+    q = q.order_by(models.DailyFeature.session_date.asc()).limit(limit)
+
+    rows = q.all()
+    return [schema.DailyFeatureResponse.from_orm(r) for r in rows]
+
+def get_latest_daily_feature(
+    db: Session,
+    user_id: int,
+    ticker: str,
+) -> Optional[schema.DailyFeatureResponse]:
+    row = (
+        db.query(models.DailyFeature)
+        .filter(
+            models.DailyFeature.user_id == user_id,
+            models.DailyFeature.ticker == ticker,
+            models.DailyFeature.features_version == "v1",
+        )
+        .order_by(models.DailyFeature.session_date.desc())
+        .first()
+    )
+    return schema.DailyFeatureResponse.from_orm(row) if row else None

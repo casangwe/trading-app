@@ -8,6 +8,7 @@ import {
   XAxis,
   YAxis,
 } from "recharts";
+import { createToast } from "../func/functions";
 
 const tabs = [
   { label: "Live", value: 0 },
@@ -78,10 +79,17 @@ const Setups = () => {
 
     try {
       const response = await uploadOptionFlow(file);
-      setUploadMessage(response.message || "Upload successful!");
+      const message = response.message || "Upload successful!";
+
+      // update inline message
+      setUploadMessage(message);
+      // fire a toast
+      createToast(message, "success");
+
       setFile(null);
       setFadeInTable(false);
       setFadeOutTable(true);
+
       setTimeout(async () => {
         await loadSetups();
         setFadeOutTable(false);
@@ -89,7 +97,12 @@ const Setups = () => {
       }, 1000);
     } catch (err) {
       console.error("Upload failed:", err);
-      setUploadMessage(err.message || "Upload error");
+      const errMsg = err.message || "Upload failed";
+
+      // update inline message
+      setUploadMessage(errMsg);
+      // fire an error toast
+      createToast(errMsg, "error");
     } finally {
       setUploading(false);
       setFile(null);
@@ -101,6 +114,41 @@ const Setups = () => {
       }, 20000);
     }
   };
+
+  // const handleUpload = async () => {
+  //   if (!file) {
+  //     setUploadMessage("Please select a CSV file first.");
+  //     return;
+  //   }
+
+  //   setUploading(true);
+  //   setUploadMessage(`Uploading ${file.name}...`);
+
+  //   try {
+  //     const response = await uploadOptionFlow(file);
+  //     setUploadMessage(response.message || "Upload successful!");
+  //     setFile(null);
+  //     setFadeInTable(false);
+  //     setFadeOutTable(true);
+  //     setTimeout(async () => {
+  //       await loadSetups();
+  //       setFadeOutTable(false);
+  //       setFadeInTable(true);
+  //     }, 1000);
+  //   } catch (err) {
+  //     console.error("Upload failed:", err);
+  //     setUploadMessage(err.message || "Upload error");
+  //   } finally {
+  //     setUploading(false);
+  //     setFile(null);
+  //     if (fileInputRef.current) {
+  //       fileInputRef.current.value = null;
+  //     }
+  //     setTimeout(() => {
+  //       setUploadMessage("Select File");
+  //     }, 20000);
+  //   }
+  // };
 
   const handleOpenModal = (symbol) => {
     setSelectedSymbol(symbol);

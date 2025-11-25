@@ -250,3 +250,86 @@ class Options(Base):
         Index('idx_expiry', 'expiry'),
         Index('idx_time', 'trade_time')
     )
+
+
+# Indicators
+class BuySellArrow(enum.Enum):
+    Buy = "Buy"
+    Sell = "Sell"
+    None_ = "None"   # mapped manually because "None" is reserved in py
+
+class SmaCrossDir(enum.Enum):
+    up = "up"
+    down = "down"
+    none = "none"
+
+class VwapState(enum.Enum):
+    above = "above"
+    below = "below"
+    hold = "hold"
+
+
+class DailyFeature(Base):
+    __tablename__ = "daily_features"
+
+    id = Column(Integer, primary_key=True, autoincrement=True)
+
+    # Identity
+    user_id = Column(Integer, ForeignKey("Users.id", ondelete="CASCADE"), nullable=False)
+    ticker = Column(String(15), nullable=False)
+    session_date = Column(Date, nullable=False)
+    row_index = Column(Integer, nullable=False)
+    features_version = Column(String(8), nullable=False, default="v1")
+
+    # Pure snapshot
+    open = Column(DECIMAL(12, 6))
+    high = Column(DECIMAL(12, 6))
+    low = Column(DECIMAL(12, 6))
+    close = Column(DECIMAL(12, 6))
+    adj_close = Column(DECIMAL(12, 6))
+    volume = Column(Integer)
+
+    buy_sell_arrow = Column(Enum(BuySellArrow), nullable=True)
+
+    sma5 = Column(DECIMAL(12, 6))
+    sma9 = Column(DECIMAL(12, 6))
+    fast_vwap = Column(DECIMAL(12, 6))
+    slow_vwap = Column(DECIMAL(12, 6))
+    mfi14 = Column(DECIMAL(6, 2))
+    rsi14 = Column(DECIMAL(6, 2))
+    macd_hist = Column(DECIMAL(12, 6))
+
+    catalyst = Column(String(255))
+
+    # Derived structure
+    sma_delta = Column(DECIMAL(12, 6))
+    sma_cross_dir_calc = Column(Enum(SmaCrossDir), nullable=True)
+    slope5 = Column(DECIMAL(12, 6))
+    slope9 = Column(DECIMAL(12, 6))
+    days_since_sma_cross = Column(Integer)
+    days_since_macd_cross = Column(Integer)
+
+    # Derived price/volatility
+    daily_pct_change = Column(DECIMAL(10, 6))
+    range_pct = Column(DECIMAL(10, 6))
+    vol10_avg = Column(Integer)
+    atr10 = Column(DECIMAL(12, 6))
+
+    # Derived VWAP relationship
+    vwap_state = Column(Enum(VwapState), nullable=True)
+    vwap_delta_fast = Column(DECIMAL(12, 6))
+    vwap_delta_fast_pct = Column(DECIMAL(10, 6))
+    vwap_contacts_total = Column(Integer)
+
+    user = relationship("User", backref="daily_features")
+
+    __table_args__ = (
+        UniqueConstraint("user_id", "ticker", "session_date", "features_version",
+                         name="uq_daily_features_user_ticker_date_version"),
+        Index("idx_df_user_ticker_date", "user_id", "ticker", "session_date"),
+        Index("idx_df_ticker_date", "ticker", "session_date"),
+        Index("idx_df_user_date", "user_id", "session_date"),
+        Index("idx_df_features_version", "features_version"),
+        Index("idx_df_sma_cross_dir", "sma_cross_dir_calc"),
+        Index("idx_df_vwap_state", "vwap_state"),
+    )

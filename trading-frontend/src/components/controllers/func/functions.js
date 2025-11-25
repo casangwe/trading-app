@@ -63,3 +63,19 @@ export const splitText = (text) => {
     </p>
   ));
 };
+
+export function createToast(message, type = "success", duration = 60000) {
+  const toast = document.createElement("div");
+  toast.className = `custom-toast ${type}`;
+  toast.textContent = message;
+  document.body.appendChild(toast);
+
+  // trigger slide‐in
+  requestAnimationFrame(() => toast.classList.add("show"));
+
+  // auto‐dismiss
+  setTimeout(() => {
+    toast.classList.remove("show");
+    toast.addEventListener("transitionend", () => toast.remove());
+  }, duration);
+}

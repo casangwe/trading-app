@@ -303,3 +303,81 @@ class FinancialResponse(BaseModel):
     class Config:
         orm_mode = True
         from_attributes = True
+
+
+# Daily Features (Indicators)
+
+class VwapState(str, Enum):
+    above = "above"
+    below = "below"
+    hold = "hold"
+
+class SmaCrossDir(str, Enum):
+    up = "up"
+    down = "down"
+    none = "none"
+
+class BuySellArrowEnum(str, Enum):
+    Buy = "Buy"
+    Sell = "Sell"
+    None_ = "None"   # maps to DB 'None' via value
+
+
+class DailyFeatureBase(BaseModel):
+    user_id: int
+    ticker: str
+    session_date: date
+    row_index: int
+    features_version: str = "v1"
+
+    open: Optional[Decimal] = None
+    high: Optional[Decimal] = None
+    low: Optional[Decimal] = None
+    close: Optional[Decimal] = None
+    adj_close: Optional[Decimal] = None
+    volume: Optional[int] = None
+
+    buy_sell_arrow: Optional[BuySellArrowEnum] = None
+
+    sma5: Optional[Decimal] = None
+    sma9: Optional[Decimal] = None
+    fast_vwap: Optional[Decimal] = None
+    slow_vwap: Optional[Decimal] = None
+    mfi14: Optional[Decimal] = None
+    rsi14: Optional[Decimal] = None
+    macd_hist: Optional[Decimal] = None
+
+    catalyst: Optional[str] = None
+
+    sma_delta: Optional[Decimal] = None
+    sma_cross_dir_calc: Optional[SmaCrossDir] = None
+    slope5: Optional[Decimal] = None
+    slope9: Optional[Decimal] = None
+    days_since_sma_cross: Optional[int] = None
+    days_since_macd_cross: Optional[int] = None
+
+    daily_pct_change: Optional[Decimal] = None
+    range_pct: Optional[Decimal] = None
+    vol10_avg: Optional[int] = None
+    atr10: Optional[Decimal] = None
+
+    vwap_state: Optional[VwapState] = None
+    vwap_delta_fast: Optional[Decimal] = None
+    vwap_delta_fast_pct: Optional[Decimal] = None
+    vwap_contacts_total: Optional[int] = None
+
+
+class DailyFeatureCreate(DailyFeatureBase):
+    """
+    For internal/offline loader use.
+    Normal users won't POST this manually.
+    """
+    pass
+
+
+class DailyFeatureResponse(DailyFeatureBase):
+    id: int
+
+    class Config:
+        orm_mode = True
+        from_attributes = True

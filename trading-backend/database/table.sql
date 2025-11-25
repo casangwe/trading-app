@@ -160,3 +160,99 @@ CREATE TABLE IF NOT EXISTS Options (
     INDEX idx_time (trade_time)
 );
 
+-- Indicators tables
+CREATE TABLE IF NOT EXISTS daily_features (
+    id                   INT AUTO_INCREMENT PRIMARY KEY,
+    user_id              INT           NOT NULL,
+    ticker               VARCHAR(15)   NOT NULL,
+    session_date         DATE          NOT NULL,
+    row_index            INT           NOT NULL,
+    features_version     VARCHAR(8)    NOT NULL DEFAULT 'v1',
+
+    open                 DECIMAL(12,6) NULL,
+    high                 DECIMAL(12,6) NULL,
+    low                  DECIMAL(12,6) NULL,
+    close                DECIMAL(12,6) NULL,
+    adj_close            DECIMAL(12,6) NULL,
+    volume               BIGINT        NULL,
+
+    buy_sell_arrow       ENUM('Buy','Sell','None') NULL,
+
+    sma5                 DECIMAL(12,6) NULL,
+    sma9                 DECIMAL(12,6) NULL,
+    fast_vwap            DECIMAL(12,6) NULL,
+    slow_vwap            DECIMAL(12,6) NULL,
+    mfi14                DECIMAL(6,2)  NULL,
+    rsi14                DECIMAL(6,2)  NULL,
+    macd_hist            DECIMAL(12,6) NULL,
+
+    catalyst             VARCHAR(255)  NULL,  
+
+    sma_delta            DECIMAL(12,6) NULL,   
+    sma_cross_dir_calc   ENUM('up','down','none') NULL,
+    slope5               DECIMAL(12,6) NULL,  
+    slope9               DECIMAL(12,6) NULL,  
+    days_since_sma_cross INT            NULL,
+    days_since_macd_cross INT           NULL,
+
+    daily_pct_change     DECIMAL(10,6) NULL,   
+    range_pct            DECIMAL(10,6) NULL,   
+    vol10_avg            BIGINT        NULL,   
+    atr10                DECIMAL(12,6) NULL,   
+
+    vwap_state           ENUM('above','below','hold') NULL,
+    vwap_delta_fast      DECIMAL(12,6) NULL,  
+    vwap_delta_fast_pct  DECIMAL(10,6) NULL,   
+    vwap_contacts_total  INT            NULL, 
+
+    CONSTRAINT uq_daily_features UNIQUE (user_id, ticker, session_date, features_version),
+
+    FOREIGN KEY (user_id) REFERENCES Users(id) ON DELETE CASCADE,
+
+    INDEX idx_user_ticker_date (user_id, ticker, session_date),
+    INDEX idx_ticker_date (ticker, session_date),
+    INDEX idx_user_date (user_id, session_date),
+    INDEX idx_features_version (features_version),
+    INDEX idx_cross_dir (sma_cross_dir_calc),
+    INDEX idx_vwap_state (vwap_state)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+
+-- Options Contract tables
+CREATE TABLE IF NOT EXISTS OptionDaily (
+    id INT AUTO_INCREMENT PRIMARY KEY,
+
+    user_id        INT         NOT NULL,
+    ticker         VARCHAR(15) NOT NULL,   
+    session_date   DATE        NOT NULL,   
+    expiry         DATE        NOT NULL,  
+    strike         DECIMAL(12, 2) NOT NULL CHECK (strike >= 0),
+    put_call       ENUM('CALL', 'PUT') NOT NULL,
+
+    underlying_price DECIMAL(12, 4) DEFAULT NULL,
+
+    bid            DECIMAL(12, 4) DEFAULT NULL,
+    ask            DECIMAL(12, 4) DEFAULT NULL,
+    mark           DECIMAL(12, 4) DEFAULT NULL,
+    last_trade     DECIMAL(12, 4) DEFAULT NULL,
+    prev_close     DECIMAL(12, 4) DEFAULT NULL,
+    high           DECIMAL(12, 4) DEFAULT NULL,
+    low            DECIMAL(12, 4) DEFAULT NULL,
+
+    iv             DECIMAL(6, 2)  DEFAULT NULL,
+
+    volume         INT DEFAULT NULL,
+    open_interest  INT DEFAULT NULL,
+
+    delta          DECIMAL(8, 4) DEFAULT NULL,
+
+    FOREIGN KEY (user_id) REFERENCES Users(id) ON DELETE CASCADE,
+
+    CONSTRAINT uq_optiondaily UNIQUE (
+        user_id, ticker, session_date, expiry, strike, put_call
+    ),
+
+    INDEX idx_optiondaily_user_ticker_date (user_id, ticker, session_date),
+    INDEX idx_optiondaily_ticker_date (ticker, session_date),
+    INDEX idx_optiondaily_expiry (expiry),
+    INDEX idx_optiondaily_liquidity (volume, open_interest)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;

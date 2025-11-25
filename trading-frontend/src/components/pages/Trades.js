@@ -9,9 +9,9 @@ import AnalysisSummary from "../controllers/analysis/AnalysisSummary";
 const Trades = () => {
   return (
     <div className="trades">
-      <div className="setup-trades">
+      {/* <div className="setup-trades">
         <Setups />
-      </div>
+      </div> */}
       {/* <div className="watchlist-and-misc-container">
         <div className="watchlist-trades">
           <Watchlist />

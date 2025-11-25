@@ -1,5 +1,5 @@
-// const API_BASE_URL = "http://localhost:8000";
-const API_BASE_URL = "http://54.209.237.174:8000";
+const API_BASE_URL = "http://localhost:8000";
+// const API_BASE_URL = "http://54.209.237.174:8000";
 
 // Retrieve userId from localStorage
 const getUserId = () => {
@@ -99,6 +99,25 @@ export const fetchWatchlistById = async (watchlistId) => {
     return await response.json();
   } catch (error) {
     console.error("Fetch Watchlist Error:", error);
+    throw error;
+  }
+};
+
+export const fetchSetups = async (dateRange = 1, limit = 50) => {
+  try {
+    const response = await fetch(
+      `${API_BASE_URL}/watchlists/setups?user_id=${userId}` +
+        `&date_range=${dateRange}&limit=${limit}`
+    );
+
+    if (!response.ok) {
+      const errorData = await response.json();
+      throw new Error(errorData.detail || "Error fetching setups");
+    }
+
+    return await response.json();
+  } catch (error) {
+    console.error("Fetch Setups Error:", error);
     throw error;
   }
 };
