@@ -7,7 +7,8 @@ import {
   calculateNetworthDifference,
   calculateNetworthPercentChange,
 } from "./NetworthCalc";
-import { formatCash } from "../func/functions";
+// import { formatCash } from "../../../func/functions";
+import { formatCash, formatDate } from "../../../func/formatters";
 
 const NetworthCash = () => {
   const [networthData, setNetworthData] = useState({

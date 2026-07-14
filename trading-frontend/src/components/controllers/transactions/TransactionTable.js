@@ -2,8 +2,9 @@ import React, { useState, useEffect } from "react";
 import { fetchTransactions } from "../api/TransactionsAPI";
 import { fetchTrades } from "../api/TradesAPI";
 import { getCash } from "../api/CashApi";
-import { formatDate, formatCash } from "../func/functions";
+// import { formatDate, formatCash } from "../../../func/functions";
 import NewTransaction from "./NewTransaction";
+import { formatCash, formatDate } from "../../../func/formatters";
 
 const TransactionTable = () => {
   const [transactions, setTransactions] = useState([]);

@@ -11,7 +11,9 @@ import {
   calculateTotalWithdrawals,
   calculateROI,
 } from "./CashCalc";
-import { formatCash } from "../func/functions";
+// import { formatCash } from "../../../func/functions";
+import { formatCash, formatDate } from "../../../func/formatters";
+
 
 const Cash = () => {
   const [cashData, setCashData] = useState(null);
@@ -123,7 +125,7 @@ const Cash = () => {
         <div className="cash-card">
           <div className="card-content">
             <div className="icon-label">
-              <span className="label">Withdrawls:</span>
+              <span className="label">Withdrawals:</span>
             </div>
             <span className="value">{formatCash(totalWithdrawals)}</span>
           </div>

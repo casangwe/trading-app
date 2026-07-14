@@ -8,7 +8,8 @@ import {
   ResponsiveContainer,
   YAxis,
 } from "recharts";
-import { formatCash, formatDate } from "../func/functions";
+// import { formatCash, formatDate } from "../../../func/functions";
+import { formatCash, formatDate } from "../../../func/formatters";
 
 const Bars = () => {
   const [dailyPNLData, setDailyPNLData] = useState([]);
@@ -182,7 +183,8 @@ const Bars = () => {
           </button>
         </div>
       </div>
-
+      {/* <hr /> */}
+      <br />
       <ResponsiveContainer width="100%" height={400}>
         <BarChart
           data={barsData}

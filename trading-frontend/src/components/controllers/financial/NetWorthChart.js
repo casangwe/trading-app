@@ -1,7 +1,9 @@
 import React, { useState, useEffect } from "react";
 import { fetchFinancials } from "../api/FinancialAPI";
 import { LineChart, Line, XAxis, Tooltip, ResponsiveContainer } from "recharts";
-import { formatCash, formatDate } from "../func/functions";
+// import { formatCash, formatDate } from "../../../func/functions";
+import { formatCash, formatDate } from "../../../func/formatters";
+
 
 const NetWorthChart = () => {
   const [loading, setLoading] = useState(true);

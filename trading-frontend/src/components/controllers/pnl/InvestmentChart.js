@@ -3,7 +3,9 @@ import { fetchDailyPnls } from "../api/DailyPNLApi";
 import { getCash } from "../api/CashApi";
 import { fetchTransactions } from "../api/TransactionsAPI";
 import { LineChart, Line, XAxis, Tooltip, ResponsiveContainer } from "recharts";
-import { formatCash, formatDate } from "../func/functions";
+// import { formatCash, formatDate } from "../../../func/functions";
+import { formatCash, formatDate } from "../../../func/formatters";
+
 import {
   calculateInitialCash,
   calculateNetPL,

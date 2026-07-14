@@ -1,7 +1,8 @@
 import React, { useState, useEffect } from "react";
 import { fetchTrades } from "../api/TradesAPI";
-import { formatDate, formatCash } from "../func/functions";
+// import { formatDate, formatCash } from "../../../func/functions";
 import NewTrade from "./NewTrade";
+import { formatCash, formatDate } from "../../../func/formatters";
 
 const TradeTable = ({ onNewTrade }) => {
   const [trades, setTrades] = useState([]);

@@ -3,7 +3,8 @@ import Calendar from "react-calendar";
 import { FaArrowUp, FaArrowDown } from "react-icons/fa";
 import { fetchDailyPnls } from "../api/DailyPNLApi";
 import { fetchTransactions } from "../api/TransactionsAPI";
-import { formatCash, formatDate } from "../func/functions";
+// import { formatCash, formatDate } from "../../../func/functions";
+import { formatCash, formatDate } from "../../../func/formatters";
 
 const Calender = () => {
   const [dailyPNLData, setDailyPNLData] = useState([]);

@@ -1,7 +1,9 @@
 import React, { useState, useEffect } from "react";
 import { fetchFinancials } from "../api/FinancialAPI";
-import { formatDate, formatCash } from "../func/functions";
+// import { formatDate, formatCash } from "../../../func/functions";
 import NewFinancial from "./NewFinancial";
+import { formatCash, formatDate } from "../../../func/formatters";
+
 
 const FinancialTable = ({ onNewFinancial }) => {
   const [financials, setFinancials] = useState([]);

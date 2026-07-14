@@ -1,6 +1,8 @@
 import React, { useEffect, useState } from "react";
 import { fetchDailyPnls } from "../api/DailyPNLApi";
-import { formatCash } from "../func/functions";
+// import { formatCash } from "../../../func/functions";
+import { formatCash, formatDate } from "../../../func/formatters";
+
 import NewDailyPNL from "./NewDailyPNL";
 
 const DailyPNL = ({ onNewPNL }) => {

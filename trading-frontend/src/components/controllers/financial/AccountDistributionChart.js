@@ -1,7 +1,8 @@
 import React, { useState, useEffect } from "react";
 import { PieChart, Pie, Cell, Tooltip, ResponsiveContainer } from "recharts";
 import { fetchFinancials } from "../api/FinancialAPI";
-import { formatCash } from "../func/functions";
+// import { formatCash } from "../../../func/functions";
+import { formatCash, formatDate } from "../../../func/formatters";
 
 const AccountDistributionChart = () => {
   const [accountData, setAccountData] = useState([]);

@@ -3,7 +3,9 @@ import { PieChart, Pie, Cell, Tooltip, ResponsiveContainer } from "recharts";
 import { fetchTransactions } from "../api/TransactionsAPI";
 import { fetchTrades } from "../api/TradesAPI";
 import { getCash } from "../api/CashApi";
-import { formatCash } from "../func/functions";
+// import { formatCash } from "../../../func/functions";
+
+import { formatCash, formatDate } from "../../../func/formatters";
 
 const TransactionDistribution = () => {
   const [transactionData, setTransactionData] = useState([]);

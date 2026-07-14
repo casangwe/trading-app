@@ -11,7 +11,8 @@ import {
   ComposedChart,
   YAxis,
 } from "recharts";
-import { formatCash, formatDate } from "../func/functions";
+// import { formatCash, formatDate } from "../../../func/functions";
+import { formatCash, formatDate } from "../../../func/formatters";
 
 const EQTCurve = () => {
   const [chartData, setChartData] = useState([]);

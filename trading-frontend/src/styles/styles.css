@@ -1,0 +1,4952 @@
+/* src/styles/styles.css
+
+/* =========================
+Global
+========================= */
+
+* {
+  font-family: Arial, Helvetica, sans-serif;
+  box-sizing: border-box;
+}
+
+body {
+  margin: 0;
+}
+
+body::-webkit-scrollbar {
+  display: none;
+}
+
+/* =========================
+Navigation (Shared)
+========================= */
+
+.navigation {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  background-color: transparent;
+  padding: 0.5rem 1rem;
+  z-index: 1000;
+  backdrop-filter: blur(10px);
+  border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+  position: sticky;
+  top: 0;
+}
+
+.nav-container {
+  display: flex;
+  align-items: center;
+  width: 100%;
+}
+
+.nav-logo {
+  display: flex;
+  align-items: center;
+  margin-right: 20px;
+}
+
+.logo-image {
+  height: 30px;
+  width: auto;
+  object-fit: contain;
+}
+
+.nav-links {
+  display: flex;
+  gap: 0.75rem;
+  align-items: center;
+}
+
+.nav-links a {
+  color: black;
+  text-decoration: none;
+  font-size: 11px;
+  padding: 0.5rem 1rem;
+}
+
+.nav-links a:hover,
+.nav-links a.active {
+  color: #4a90e2;
+}
+
+.logout-btn {
+  background: none;
+  border: none;
+  cursor: pointer;
+  padding: 5px;
+}
+
+.logout-icon {
+  font-size: 12px;
+  color: #4a90e2;
+}
+
+/* =========================
+Search
+========================= */
+
+.search {
+  flex: 1;
+  margin-right: 1rem;
+}
+
+.search input {
+  width: 50%;
+  padding: 0.3rem;
+  border: none;
+  border-bottom: 1px solid black;
+  font-size: 12px;
+  background-color: transparent;
+  transition: all 0.5s ease-in-out;
+}
+
+.search input::placeholder {
+  color: #333;
+}
+
+.search input:focus {
+  outline: none;
+  width: 100%;
+  border-bottom: 1px solid #4a90e2;
+}
+
+/* =========================
+Landing Page
+========================= */
+
+.landing {
+  min-height: calc(100vh - 56px);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.landing-container {
+  width: 100%;
+  max-width: 1000px;
+  padding: 0 48px;
+
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  align-items: center;
+  gap: 80px;
+}
+
+/* Branding (Left) */
+.landing-brand {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+
+.landing-logo {
+  width: 56px;
+}
+
+.landing-title {
+  font-size: 40px;
+  font-weight: 600;
+  letter-spacing: -0.02em;
+  margin: 0;
+ color: #5a5a5a
+}
+
+.landing-tagline {
+  font-size: 16px;
+  color: #9aa0a6;
+  max-width: 420px;
+  line-height: 1.6;
+}
+
+/* Auth CTA (Right) */
+.landing-auth {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 24px;
+}
+
+.landing-auth-actions {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.landing-btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+
+  width: 220px;
+  height: 44px;
+
+  font-size: 14px;
+  font-weight: 500;
+  text-decoration: none;
+
+  border-radius: 6px;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+/* Primary CTA */
+.landing-btn.primary {
+  background-color: #4a90e2;
+
+  color: #000000;
+}
+
+.landing-btn.primary:hover {
+  background-color: #165599; 
+  
+}
+
+/* Secondary CTA */
+.landing-btn.secondary {
+  background-color: transparent;
+  color: #000000;
+  border: 1px solid #333;
+}
+
+.landing-btn.secondary:hover {
+  color: #ffffff;
+  background-color: #111;
+}
+
+/* Responsive */
+@media (max-width: 900px) {
+  .landing-container {
+    grid-template-columns: 1fr;
+    gap: 48px;
+    text-align: center;
+  }
+
+  .landing-brand,
+  .landing-auth {
+    align-items: center;
+  }
+
+  .landing-tagline {
+    max-width: 100%;
+  }
+}
+
+/* =========================
+Auth Pages (Login / Register)
+========================= */
+
+.auth-container {
+  display: flex;
+  flex-direction: column;
+  gap: 1.5rem;
+}
+
+.auth-form {
+  display: flex;
+  flex-direction: column;
+  gap: 0.75rem;
+  padding: 1rem 0;
+  border-top: 1px solid #e5e7eb;
+  border-bottom: 1px solid #e5e7eb;
+}
+
+.auth-form input {
+  padding: 11px;
+  font-size: 12px;
+  border: 1px solid #d1d5db;
+  border-radius: 6px;
+}
+
+.auth-form select {
+  font-size: 12px;
+  padding: 10px 5px;
+  border: none;
+  border-bottom: 1px solid #d1d5db;
+  background-color: transparent;
+}
+
+.auth-form input:focus,
+.auth-form select:focus {
+  outline: none;
+  border-color: #4a90e2;
+}
+
+.auth-form .btn {
+  padding: 11px;
+  font-size: 12px;
+  border-radius: 6px;
+  background-color: #4a90e2;
+  color: white;
+  cursor: pointer;
+}
+
+.auth-form .btn:hover {
+  background-color: #165599;
+}
+
+.link-btn {
+  background: none;
+  border: none;
+  color: #1f2937;
+  font-size: 12px;
+  cursor: pointer;
+  text-decoration: none;
+}
+
+.link-btn:hover {
+  color: #4a90e2;
+}
+
+.error-message {
+  color: #dc2626;
+  font-size: 10px;
+  padding: 10px;
+}
+
+/* =========================
+Auth Page Layout Alignment
+========================= */
+
+.auth-page {
+  min-height: calc(100vh - 56px);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.auth-page-container {
+  width: 100%;
+  max-width: 420px;
+  padding: 0 24px;
+
+  display: flex;
+  flex-direction: column;
+  gap: 24px;
+}
+
+/* =========================
+Auth Typography
+========================= */
+
+.auth-title {
+  font-size: 20px;
+  font-weight:600;
+  margin: 0;
+ color: #5a5a5a
+}
+
+.auth-subtitle {
+  font-size: 14px;
+  color: #9aa0a6;
+  line-height: 1.5;
+}
+
+/* =========================
+Auth Form Refinement
+========================= */
+
+.auth-form {
+  gap: 12px;
+  border: none;
+  padding: 0;
+}
+
+.auth-form input,
+.auth-form select {
+  height: 44px;
+}
+
+.auth-form .btn {
+  height: 44px;
+  font-weight: 500;
+  border: none;
+}
+/* =========================
+Empty State
+========================= */
+
+.empty-state {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+
+  padding: 64px 48px;
+  margin-top: 24px;
+}
+
+.empty-state-text h2 {
+  font-size: 20px;
+  font-weight: 600;
+  margin: 0 0 6px 0;
+  color: #4a90e2;
+
+}
+
+.empty-state-text p {
+  font-size: 13px;
+  color: #6b7280;
+  margin: 0;
+  line-height: 1.5;
+}
+
+/* Action button */
+.empty-state-action {
+  margin-top: 18px;
+
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+
+  background: transparent;
+  border: none;
+  padding: 0;
+
+  cursor: pointer;
+  color: #000;
+}
+
+/* Plus */
+.empty-plus {
+  font-size: 20px;
+  font-weight: 300;
+  line-height: 1;
+  transition: color 0.2s ease;
+}
+
+/* Hidden text */
+.empty-plus-text {
+  font-size: 10px;
+  color: #4a90e2;
+
+  opacity: 0;
+  max-width: 0;
+  overflow: hidden;
+  white-space: nowrap;
+
+  transform: translateX(-6px);
+  transition:
+    opacity 0.2s ease,
+    max-width 0.25s ease,
+    transform 0.25s ease;
+}
+
+/* Hover interaction */
+.empty-state-action:hover .empty-plus {
+  color: #4a90e2;
+}
+
+.empty-state-action:hover .empty-plus-text {
+  opacity: 1;
+  max-width: 160px;
+  transform: translateX(0);
+}
+
+/* =========================
+Spinner
+========================= */
+
+.spinner-overlay,
+.spinner-inline {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 100%;
+}
+
+.spinner {
+  border: 4px solid #e5e7eb;
+  border-top-color: #4a90e2;
+  border-radius: 50%;
+  animation: spin 0.8s linear infinite;
+}
+
+@keyframes spin {
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+/* =========================
+Modal
+========================= */
+
+.modal-overlay {
+  position: fixed;
+  inset: 0;
+  background: rgba(0, 0, 0, 0.25);
+  backdrop-filter: blur(2px);
+
+  display: flex;
+  align-items: center;
+  justify-content: center;
+
+  z-index: 2000;
+}
+
+.modal-card {
+  background: #ffffff;
+  width: 400px;
+  max-width: 90%;
+
+  /* border-radius: 10px; */
+  border-radius: 2px;
+  padding: 24px 24px 28px;
+  position: relative;
+
+  animation: modalFadeIn 0.2s ease;
+}
+
+@keyframes modalFadeIn {
+  from {
+    opacity: 0;
+    transform: translateY(6px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.modal-title {
+  font-size: 12px;
+  font-weight: 600;
+  margin: 0 0 20px 0;
+  color: #333;
+
+}
+
+.modal-close {
+  position: absolute;
+  top: 14px;
+  right: 16px;
+
+  background: none;
+  border: none;
+  font-size: 18px;
+  cursor: pointer;
+  color: #6b7280;
+}
+
+.modal-close:hover {
+  color: #000;
+}
+
+.modal-content {
+  margin-top: 8px;
+}
+
+/* =========================
+Edit Modal - Icons
+========================= */
+
+/* Edit Modal */
+.edit-actions {
+  display: flex;
+  justify-content: flex-end;
+  gap: 12px;
+  margin-top: 16px;
+}
+
+.icon-btn {
+  background: transparent;
+  border: none;
+  cursor: pointer;
+  font-size: 16px;
+  position: relative;
+}
+
+.icon-btn:hover {
+  color: #4a90e2;
+}
+
+.icon-btn.danger:hover {
+  color: #dc2626;
+}
+
+/* =========================
+Entry Forms
+========================= */
+
+.entry-form {
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+
+  background: transparent;
+}
+
+.entry-form label {
+  font-size: 11px;
+  color: #6b7280;
+}
+
+.entry-form input {
+  background: transparent;
+  border: none;
+  border-bottom: 1px solid #d1d5db;
+
+  padding: 6px 0;
+  font-size: 10px;
+  outline: none;
+}
+
+.entry-form input:focus {
+  border-bottom-color: #4a90e2;
+}
+
+/* Option type toggle (CALL | PUT) */
+.option-toggle {
+  display: flex;
+  width: 100%;
+  border-bottom: 1px solid #d1d5db;
+  margin-bottom: 6px;
+}
+
+/* Divider between CALL and PUT */
+.option-divider {
+  width: 1px;
+  background: #e5e7eb;
+  background: transparent;
+}
+
+/* Buttons */
+.option-btn {
+  flex: 1;
+  background: transparent;
+  border: none;
+  padding: 6px 0;
+
+  font-size: 10px;
+  color: #111827;
+
+  cursor: pointer;
+  outline: none;
+
+  border-bottom: 2px solid transparent;
+  transition: border-color 0.15s ease, color 0.15s ease;
+}
+
+/* Active state */
+.option-btn.active {
+  border-bottom-color: #4a90e2;
+  color: #4a90e2;
+}
+
+/* Hover (subtle, optional) */
+.option-btn:hover {
+  color: #4a90e2;
+}
+
+/* Submit button (matches auth buttons) */
+.entry-form .btn.primary {
+  margin-top: 16px;
+  padding: 11px;
+  font-size: 13px;
+  font-weight: 500;
+
+  background-color: #4a90e2;
+  color: white;
+  border: none;
+  border-radius: 6px;
+  cursor: pointer;
+
+  transition: background-color 0.2s ease;
+}
+
+.entry-form .btn.primary:hover {
+  background-color: #165599;
+}
+
+/* =========================
+Edit form
+========================= */
+
+.form-edit {
+  display: flex;
+  justify-content: flex-end;
+  flex-direction: column;
+  gap: 12px;
+  margin-top: 16px;
+}
+
+.form-edit label {
+  font-size: 11px;
+  color: #6b7280;
+}
+
+.form-edit input {
+  background: transparent;
+  border: none;
+  border-bottom: 1px solid #d1d5db;
+  padding: 6px 0;
+  font-size: 10px;
+  outline: none;
+}
+
+.form-edit input:focus {
+  border-bottom-color: #4a90e2;
+}
+
+.form-edit:focus {
+  outline: none;
+}
+
+.form-edit:focus-visible {
+  outline: none;
+}
+
+/* =========================
+Portfolio Summary
+========================= */
+
+.portfolio-summary {
+  position: relative;
+  max-width: 100%;
+  padding: 24px 32px;
+}
+
+/* + button */
+.portfolio-summary-add {
+  position: absolute;
+  top: 8px;
+  right: 8px;
+
+  background: transparent;
+  border: none;
+  font-size: 22px;
+  cursor: pointer;
+  color: #9aa0a6;
+
+  transition: color 0.2s ease, transform 0.2s ease;
+}
+
+.portfolio-summary-add:hover {
+  color: #4a90e2;
+  transform: scale(1.1);
+}
+
+/* Rows */
+.summary-row {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 48px;
+}
+
+/* Divider */
+.divider {
+  height: 1px;
+  background: #e5e7eb;
+  margin: 20px 0;
+}
+
+/* Metric */
+.metric {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  cursor: pointer;
+
+  transition: transform 0.15s ease, color 0.15s ease;
+}
+
+.metric:hover {
+  transform: translateY(-2px);
+}
+
+.metric.full {
+  grid-column: 1 / -1;
+}
+
+
+/* Label */
+.metric .label {
+  font-size: 10px;
+  font-weight: 600;
+  letter-spacing: 0.05em;
+  color: #333;
+}
+
+/* Value */
+.summary-row .metric .value {
+  font-size: 10px;
+  font-weight: 500;
+  color: #111827;
+}
+
+/* Date (bottom right) */
+.summary-date {
+  margin-top: 18px;
+  text-align: right;
+  font-size: 11px;
+  color: #9aa0a6;
+}
+
+/* Hover affordance */
+.metric {
+  border-radius: 6px;
+  padding: 6px;
+}
+
+.metric .value {
+  transition: transform 0.2s ease, color 0.2s ease;
+}
+
+.metric.updated .value {
+  color: #4a90e2;
+  transform: scale(1.05);
+}
+/* Animated values */
+.value.animate {
+  transition: all 0.25s ease;
+}
+
+/* =========================
+   Custom Tooltip
+========================= */
+
+/* Tooltip text */
+.has-tooltip::after {
+  content: attr(data-tooltip);
+  position: absolute;
+
+  bottom: calc(100% + 6px);
+  left: 50%;
+  transform: translateX(-50%) translateY(4px);
+
+  font-size: 9px;
+  color: #4a90e2;
+
+  white-space: nowrap;
+  pointer-events: none;
+
+  opacity: 0;
+  transition: opacity 0.15s ease, transform 0.15s ease;
+}
+
+/* Show on hover */
+.has-tooltip:hover::after {
+  opacity: 1;
+  transform: translateX(-50%) translateY(0);
+}
+
+/* Default tooltip (blue) */
+.icon-btn.has-tooltip::after {
+  color: #4a90e2;
+}
+
+/* Danger tooltip (red) */
+.icon-btn.danger.has-tooltip::after {
+  color: #dc2626;
+}
+
+/* =========================
+Calendar
+========================= */
+
+.calendar-container{
+  justify-content: center;
+  padding: 10px;
+
+}
+
+/* Calendar must respect its parent width */
+.calendar-container,
+.calendar-container .react-calendar {
+  width: 100%;
+  max-width: 100%;
+}
+
+.calendar-container .react-calendar__tile {
+  border: 1px solid #e5e7eb;
+  border-radius: 10px;
+  min-height: 74px;
+  background: #fff;
+  transition: transform 0.15s ease, box-shadow 0.15s ease, border-color 0.15s ease;
+}
+
+.calendar-container .react-calendar__tile abbr {
+  font-size: 10px;
+}
+
+
+.calendar-container .react-calendar__tile:hover {
+  transform: translateY(-2px);
+  border-color: rgba(74, 144, 226, 0.35);
+  box-shadow: 0 8px 16px rgba(0, 0, 0, 0.06);
+  cursor: pointer;
+}
+.calendar-container .react-calendar__month-view__weekdays__weekday:nth-child(6),
+.calendar-container .react-calendar__month-view__weekdays__weekday:nth-child(7) {
+  display: none;
+}
+
+.calendar-container .react-calendar__month-view__days__day--weekend {
+  display: none;
+}
+
+.calendar-container .react-calendar__month-view__weekdays {
+  display: grid !important;
+  grid-template-columns: repeat(5, 1fr) !important;
+  justify-items: center; 
+  text-align: center;
+  margin-bottom: 10px;
+}
+
+
+.calendar-container .react-calendar__month-view__days {
+  display: grid !important;
+  grid-template-columns: repeat(5, 1fr) !important;
+}
+
+.calendar-container .react-calendar__month-view__weekdays__weekday {
+  font-size: 11px;
+  justify-items: center; 
+  text-align: center;
+  color:#5a5a5a;
+
+}
+
+.calendar-container .react-calendar__month-view__weekdays__weekday abbr {
+  font-size: 11px;
+  justify-items: center; 
+  text-align: center;
+  text-decoration: none !important;
+  border-bottom: none !important;
+}
+
+.calendar-container .react-calendar__year-view .react-calendar__tile,
+.calendar-container .react-calendar__year-view .react-calendar__tile abbr,
+.calendar-container .react-calendar__decade-view .react-calendar__tile,
+.calendar-container .react-calendar__decade-view .react-calendar__tile abbr,
+.calendar-container .react-calendar__tile.react-calendar__century-view__decades__decade,
+.calendar-container .react-calendar__tile.react-calendar__century-view__decades__decade abbr {
+  font-size: 10px;
+}
+
+.cal-tile-weekend {
+  display: none !important;
+}
+
+.cal-tile-empty {
+  opacity: 0.45;
+}
+
+.pnl-tile {
+  margin-top: 6px;
+  display: flex;
+  justify-content: center;
+}
+
+.pnl-value {
+  font-size: 10px;
+  font-weight: 700;
+  color:#5a5a5a;
+}
+
+.calendar-container .react-calendar__tile.pos-1 { background: rgba(74,144,226,0.06) !important; }
+.calendar-container .react-calendar__tile.pos-2 { background: rgba(74,144,226,0.10) !important; }
+.calendar-container .react-calendar__tile.pos-3 { background: rgba(74,144,226,0.14) !important; }
+.calendar-container .react-calendar__tile.pos-4 { background: rgba(74,144,226,0.18) !important; }
+.calendar-container .react-calendar__tile.pos-5 { background: rgba(74,144,226,0.24) !important; }
+
+.calendar-container .react-calendar__tile.neg-1 { background: rgba(244,67,54,0.05) !important; }
+.calendar-container .react-calendar__tile.neg-2 { background: rgba(244,67,54,0.09) !important; }
+.calendar-container .react-calendar__tile.neg-3 { background: rgba(244,67,54,0.13) !important; }
+.calendar-container .react-calendar__tile.neg-4 { background: rgba(244,67,54,0.17) !important; }
+.calendar-container .react-calendar__tile.neg-5 { background: rgba(244,67,54,0.22) !important; }
+
+
+.calendar-container .react-calendar__navigation {
+  display: flex;
+  align-items: center;
+  justify-content: center; 
+  gap: 50px; 
+  margin-bottom: 12px;
+  
+}
+
+.calendar-container .react-calendar__navigation button {
+  background: transparent;
+  border: none;
+  padding: 1px 0;
+  font-size: 12px;
+  font-weight: 700;
+  cursor: pointer;
+  transition: color 0.2s ease;
+  padding-bottom: 10px;
+}
+
+.calendar-container .react-calendar__navigation button:hover {
+  color: #4a90e2;
+  background: transparent;
+}
+
+.calendar-container .react-calendar__navigation__label {
+  font-weight: 600; 
+  color: #5a5a5a;
+}
+
+.calendar-container .react-calendar__navigation__label:hover {
+  color: #4a90e2;
+}
+
+.calendar-container .react-calendar__navigation button:disabled {
+  opacity: 0.35;
+  cursor: default;
+}
+
+.calendar-container .react-calendar__navigation__prev2-button,
+.calendar-container .react-calendar__navigation__next2-button {
+  display: none;
+}
+/* Force the calendar card to be the same height as the hold-time card */
+.profile-chart-shell.calendar-shell {
+  height: 520px;        /* pick your row height */
+}
+
+/* Make sure the content takes the FULL shell height */
+.profile-chart-shell.calendar-shell .profile-chart-content {
+  height: 100% !important;
+  min-height: 100% !important;
+}
+
+/* Optional: calendar content fade hooks (uses same is-pre/is-visible/is-fading classes) */
+.calendar-fade {
+  opacity: 1;
+  transform: none;
+  transition: opacity 0.22s ease, transform 0.22s ease;
+}
+
+.calendar-fade.is-pre {
+  opacity: 0;
+  transform: translateY(6px);
+}
+
+.calendar-fade.is-visible {
+  opacity: 1;
+  transform: translateY(0);
+}
+
+.calendar-fade.is-fading {
+  opacity: 0;
+  transform: translateY(6px);
+}
+.profile-chart-shell.calendar-shell .calendar-container {
+  height: 100%;
+  width: 100%;
+  padding: 10px;
+  box-sizing: border-box;
+  display: flex;
+  justify-content: center;
+  align-items: flex-start;
+}
+
+/* Make the calendar itself fit inside the container */
+.profile-chart-shell.calendar-shell .calendar-container .react-calendar {
+  width: 100%;
+  max-width: 100%;
+  height: 100%;
+}
+/********************************
+ ACCOUNT SUMMARY (PROFILE & NETWORTH)
+********************************/
+
+.account-summary {
+  padding-top: 0;
+  max-width: 100%;
+}
+
+.account-card-container {
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+}
+
+.account-card {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+
+  transition: transform 0.15s ease, color 0.15s ease;
+}
+
+.account-card:hover {
+  transform: translateY(-2px);
+}
+
+.account-card .label {
+  font-size: 10px;
+  font-weight: 600;
+  letter-spacing: 0.05em;
+  color: #333;
+}
+
+.account-card .value {
+  font-size: 10px;
+  font-weight: 500;
+  color: #111827;
+}
+
+.account-summary .divider {
+  border: none;
+  border-top: 1px solid #e6e8ec;
+  margin: 6px 0;  
+} 
+
+.account-kpis {
+  gap: 12px;
+  padding: 24px;
+}
+/* Transactions: muted/locked rows */
+.row.muted td {
+  color: #9aa0a6;
+}
+
+.row.locked:hover {
+  background: transparent;
+  transform: none;
+}
+
+.row.locked:hover td {
+  border-bottom-color: #f1f5f9;
+}
+
+/* =========================
+   Profile Table Fade Up + Overlay
+========================= */
+
+.profile-table-shell {
+  position: relative;
+  min-height: 560px; /* stable height so it doesn’t jump when data appears */
+  overflow: hidden;
+}
+
+.profile-table-content {
+  opacity: 0;
+  transform: translateY(6px);
+  transition: opacity 220ms ease, transform 220ms ease;
+  will-change: opacity, transform;
+}
+
+.profile-table-content.is-visible {
+  opacity: 1;
+  transform: translateY(0);
+}
+
+.profile-table-content.is-fading,
+.profile-table-content.is-pre {
+  opacity: 0;
+  transform: translateY(6px);
+}
+
+.profile-table-overlay {
+  position: absolute;
+  inset: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+
+  background: rgba(255, 255, 255, 0.75);
+
+  opacity: 0;
+  pointer-events: none;
+  transition: opacity 160ms ease;
+}
+
+.profile-table-overlay.is-visible {
+  opacity: 1;
+  pointer-events: auto;
+}
+
+
+/* =========================
+   Investment Chart Summary
+========================= */
+
+.investment-summary { 
+  display: flex; 
+  flex-direction: column; 
+  gap: 4px; 
+  margin-bottom: 14px; 
+  padding: 0 16px; 
+  transform: translateY(48px);
+}
+
+/* Force remove the translate for the bars component only */
+.bars-shell .investment-summary {
+  transform: none !important;
+  margin-bottom: 10px;
+}
+
+/* .bars-shell .investment-chart.pnl-bars-layout .investment-summary {
+  transform: none;
+} */
+
+/* Account */
+.investment-account {
+  font-size: 36px;
+  font-weight: 700;
+  color: #4a90e2;
+  line-height: 1.15;
+  margin-bottom: 2px;
+}
+
+/* Equity */
+.investment-equity {
+  font-size: 11px;
+  font-weight: 400;
+  color: #6b7280;
+}
+
+/* PnL */
+.investment-pnl {
+  font-size: 11px;
+  font-weight: 400;
+}
+
+.investment-pnl.positive {
+  color: #4a90e2;
+}
+
+.investment-pnl.negative {
+  color: #9aa0a6;
+}
+
+/* ROI */
+.investment-roi {
+  font-size: 11px;
+  font-weight: 400;
+  color: #6b7280;
+}
+
+.investment-roi.positive {
+  color: #4a90e2;
+}
+
+.investment-roi.negative {
+  color: #9aa0a6;
+}
+
+/* =========================
+   Chart Tooltip
+========================= */
+
+.tooltip-content {
+  background-color: transparent;
+  border-color: none;
+  border: none;
+  border-radius: 6px;
+  padding: 6px 8px;
+  font-size: 11px;
+  line-height: 1.3;
+}
+
+.tooltip-content p {
+  margin: 0;
+  padding: 0;
+  white-space: nowrap;
+}
+
+.tooltip-content p:first-child {
+  font-weight: 600;
+  /* color: #111827; */
+  color: #4a90e2;
+
+}
+
+.tooltip-date {
+  font-size: 10px;
+  color: #9aa0a6;
+  margin-top: 2px;
+}
+
+/* =========================
+   Chart Fade + Overlay
+========================= */
+
+.chart-shell {
+  height: 450px;
+  position: relative;
+}
+
+.chart-content {
+  height: 100%;
+  opacity: 0;
+  transition: opacity 220ms ease;
+}
+
+.chart-content.is-visible {
+  opacity: 1;
+}
+
+.chart-content.is-fading {
+  opacity: 0;
+}
+
+.chart-content.is-pre {
+  opacity: 0;
+}
+
+.chart-overlay {
+  position: absolute;
+  inset: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+
+  opacity: 0;
+  pointer-events: none;
+  transition: opacity 160ms ease;
+}
+
+.chart-overlay.is-visible {
+  opacity: 1;
+  pointer-events: auto;
+}
+
+/* =========================
+   Summary Fade + Overlay
+========================= */
+
+.summary-shell {
+  position: relative;
+  min-height: 180px;
+}
+
+/* Default hidden until visible */
+.summary-content {
+  opacity: 0;
+  transform: translateY(6px);
+  transition: opacity 220ms ease, transform 220ms ease;
+}
+
+.summary-content.is-visible {
+  opacity: 1;
+  transform: translateY(0);
+}
+
+.summary-content.is-fading {
+  opacity: 0;
+  transform: translateY(6px);
+}
+
+.summary-content.is-pre {
+  opacity: 0;
+  transform: translateY(6px);
+}
+
+
+/* Spinner overlay */
+.summary-overlay {
+  position: absolute;
+  inset: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+
+  opacity: 0;
+  pointer-events: none;
+  transition: opacity 160ms ease;
+}
+
+.summary-overlay.is-visible {
+  opacity: 1;
+  pointer-events: auto;
+}
+
+/********************************
+ ANALYSIS SUMMARY – BUBBLE SYSTEM (TradeKPIs)
+********************************/
+
+.analysis-summary {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  height: 360px;
+  /* padding: 20px; */
+  padding: 0;;
+
+}
+
+.analysis-circle-summary {
+  position: relative;
+  width: 100%;
+  max-width: 520px;
+  height: 100%;
+}
+
+
+/* =========================
+   BASE CIRCLE STYLE
+========================= */
+.circle {
+  position: absolute;
+  border-radius: 50%;
+  background-color: transparent;
+  border: 1px solid #dadada;
+
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-direction: column;
+
+  text-align: center;
+  transition: all 0.25s ease;
+}
+
+.circle p {
+  margin: 0;
+  font-size: 12px;
+  font-weight: 600;
+  color: #333;
+}
+
+.circle h3 {
+  margin: 0;
+  font-size: 9px;
+  font-weight: 500;
+  color: #666;
+}
+
+/* =========================
+   CORE (BIGGEST)
+========================= */
+.circle.trades {
+  width: 150px;
+  height: 150px;
+
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+}
+
+/* =========================
+   WIN / LOSS / RATE ROW
+========================= */
+.circle.wins {
+  width: 65px;
+  height: 65px;
+
+  top: calc(50% - 2px);
+  left: calc(50% - 110px);
+  transform: translate(-50%, -50%);
+}
+
+.circle.win-rate {
+  width: 100px;
+  height: 100px;
+
+  top: calc(50% - 90px);
+  left: calc(50% - 92px);
+  transform: translate(-50%, -50%);
+}
+
+.circle.losses {
+  width: 65px;
+  height: 65px;
+
+  top: 19.5%;
+  left: calc(50% - 5px);
+  transform: translate(-50%, -50%);
+}
+
+/* =========================
+   DIAGONAL CLUSTER (RIGHT)
+========================= */
+.circle.profit-factor {
+  width: 85px;
+  height: 85px;
+
+  top: calc(50% + 10px);
+  left: calc(50% + 120px);
+  transform: translate(-50%, -50%);
+}
+
+.circle.expectancy {
+  width: 85px;
+  height: 85px;
+
+  top: calc(50% + 118px);
+  left: calc(50% + 25px);
+  transform: translate(-50%, -50%);
+}
+
+.circle.payoff {
+  width: 85px;
+  height: 85px;
+
+  top: calc(50% + 122px);
+  left: calc(50% + 142px);
+  transform: translate(-50%, -50%);
+}
+
+.circle.max-dd {
+  width: 125px;
+  height: 125px;
+
+  top: calc(50% + 47px);
+  left: calc(50% + 222px);
+  transform: translate(-50%, -50%);
+}
+
+.circle.avg-hold {
+  width: 55px;
+  height: 55px;
+
+  top: calc(50% + 75px);
+  left: calc(50% + 85px);
+  transform: translate(-50%, -50%);
+}
+
+/* =========================
+   HOVER BEHAVIOR
+========================= */
+.circle:hover {
+  background-color: #f2f2f2;
+  border-color: #cfcfcf;
+}
+
+/* Wins */
+.circle.wins:hover {
+  cursor: pointer;
+  background-color: #e6f7ff;
+  border-color: #4a90e2;
+  box-shadow: 0 8px 16px rgba(72, 144, 226, 0.25);
+  transform: translate(-50%, -60%);
+}
+
+/* Losses */
+.circle.losses:hover {
+  cursor: pointer;
+  background-color: #fdecea;
+  border-color: #e74c3c;
+  box-shadow: 0 8px 16px rgba(231, 76, 60, 0.25);
+  transform: translate(-50%, -60%);
+}
+
+/* =========================
+   KPI Fade + Overlay (opacity only)
+========================= */
+
+.kpi-shell {
+  position: relative;
+  height: 360px;
+  /* padding: 20px;  */
+  overflow: hidden;
+}
+
+.kpi-content {
+  height: 100%;
+  opacity: 0;
+  transform: translateY(8px);
+  transition: opacity 220ms ease, transform 220ms ease;
+  will-change: opacity, transform;
+}
+
+.kpi-content.is-visible {
+  opacity: 1;
+  transform: translateY(0);
+}
+
+.kpi-content.is-fading,
+.kpi-content.is-pre {
+  opacity: 0;
+  transform: translateY(8px);
+}
+
+.kpi-overlay {
+  position: absolute;
+  inset: 0;
+
+  display: flex;
+  align-items: center;
+  justify-content: center;
+
+  background: rgba(255, 255, 255, 0.75);
+
+  opacity: 0;
+  pointer-events: none;
+  transition: opacity 160ms ease;
+}
+
+.kpi-overlay.is-visible {
+  opacity: 1;
+  pointer-events: auto;
+}
+
+/* =========================
+   Interpretation 3-column grid
+========================= */
+
+.interp3-shell {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 18px;
+  width: 100%;
+}
+
+.interp3-col {
+  display: grid;
+  grid-template-rows: auto repeat(4, auto);
+  gap: 14px;
+}
+
+.interp3-col-title {
+  font-size: 12px;
+  font-weight: 700;
+  color: #333;
+  padding: 2px 2px 0;
+}
+
+.interp3-tile {
+  padding: 8px 2px;
+}
+
+.interp3-title {
+  font-size: 11px;
+  font-weight: 600;
+  color: #666;
+}
+
+.interp3-divider {
+  height: 1px;
+  width: 70%;
+  background: #dadada;
+  margin: 10px 0 10px;
+}
+
+.interp3-value {
+  font-size: 18px;
+  font-weight: 700;
+  color: #4a90e2;
+  margin-bottom: 2px;
+}
+
+.interp3-desc {
+  font-size: 10px;
+  line-height: 1.55;
+  color: #555;
+  max-width: 360px; /* keeps descriptions readable like your example */
+}
+
+/* Responsive */
+@media (max-width: 980px) {
+  .interp3-shell {
+    grid-template-columns: 1fr;
+  }
+
+  .interp3-desc {
+    max-width: 520px;
+  }
+}
+
+/* =========================
+   Trades Table
+========================= */
+
+.table-wrapper {
+  margin: 20px;
+  height: 500px;
+  display: flex;
+  flex-direction: column;
+}
+
+/* Header row */
+.table-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  position: relative;
+}
+
+.table-title {
+  font-size: 14px;
+  font-weight: 600;
+}
+
+/* Add trade "+" button */
+.table-add-btn {
+  background: transparent;
+  border: none;
+  font-size: 22px;
+  cursor: pointer;
+  color: #9aa0a6;
+  position: relative;
+  transition: color 0.2s ease, transform 0.2s ease;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.table-add-btn:hover {
+  color: #4a90e2;
+  transform: scale(1.1);
+}
+
+/* ✅ Scroll container that fills remaining space */
+.table-scroll {
+  flex: 1;
+  min-height: 0;         /* IMPORTANT: enables scrolling inside flex column */
+  overflow-y: auto;
+  overflow-x: hidden;
+}
+
+.table-scroll::-webkit-scrollbar {
+  display: none;
+}
+
+/* Table layout */
+.table {
+  width: 100%;
+  border-collapse: collapse;
+}
+
+/* Sticky head */
+.table th {
+  position: sticky;
+  top: 0;
+  z-index: 2;
+
+  font-size: 11px;
+  font-weight: 600;
+  letter-spacing: 0.03em;
+
+  color: #6b7280;
+  background: #fff;
+
+  padding: 10px 8px;
+  text-align: left;
+  border-bottom: 1px solid #e5e7eb;
+}
+
+.table td {
+  padding: 7px 7px;
+  font-size: 11px;
+  color: #111827;
+  text-align: left;
+  border-bottom: 1px solid #f1f5f9;
+
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+/* Rows */
+.row {
+  cursor: pointer;
+  transition: transform 0.15s ease, color 0.15s ease;
+}
+
+.row:hover {
+  background: #f9fafb;
+  transform: translateY(-2px);
+}
+
+.row:hover td {
+  border-bottom-color: transparent;
+}
+
+
+/* =========================
+   Fade + Overlay Shell
+========================= */
+
+.trade-table-shell {
+  position: relative;
+  overflow: hidden;
+}
+
+
+.trade-table-content {
+  opacity: 0;
+  transform: translateY(8px);
+  transition: opacity 220ms ease, transform 220ms ease;
+  will-change: opacity, transform;
+}
+
+/* visible */
+.trade-table-content.is-visible {
+  opacity: 1;
+  transform: translateY(0);
+}
+
+/* fading out */
+.trade-table-content.is-fading {
+  opacity: 0;
+  transform: translateY(8px);
+}
+
+/* pre state (hidden but mounted) */
+.trade-table-content.is-pre {
+  opacity: 0;
+  transform: translateY(8px);
+}
+
+/* Overlay covers everything */
+.trade-table-overlay {
+  position: absolute;
+  inset: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+
+  background: rgba(255, 255, 255, 0.75);
+
+  opacity: 0;
+  pointer-events: none;
+  transition: opacity 160ms ease;
+}
+
+/* visible overlay */
+.trade-table-overlay.is-visible {
+  opacity: 1;
+  pointer-events: auto;
+}
+
+/* =========================
+   Trade Realized PnL Tooltip (scoped)
+========================= */
+
+.trade-pnl-tooltip {
+  background-color: #e6f7ff;
+  border: 1px solid #4a90e2;
+  border-radius: 8px;
+  padding: 6px 10px;
+  font-size: 11px;
+  line-height: 1.3;
+  box-shadow: 0 8px 16px rgba(72, 144, 226, 0.3),
+    0 14px 28px rgba(72, 144, 226, 0.2);
+  backdrop-filter: blur(6px);
+}
+
+.trade-pnl-tooltip p {
+  margin: 0;
+  padding: 0;
+  white-space: nowrap;
+  color: #6b7280;
+}
+
+.trade-pnl-tooltip p:first-child {
+  font-weight: 700;
+  color: #4a90e2;
+}
+
+.trade-pnl-tooltip-date {
+  font-size: 10px;
+  color: #4a90e2;
+  opacity: 0.75;
+  margin-top: 2px;
+}
+
+/* =========================
+   Bars Fade + Overlay (opacity only)
+========================= */
+
+.bars-shell {
+  /* height: 450px; */
+  height: 500px;
+  position: relative;
+  overflow: hidden;
+  padding: 16px 16px;
+}
+
+.bars-chart-shell {
+  position: relative;
+}
+
+.bars-content {
+  height: 100%;
+  opacity: 0;
+  transition: opacity 220ms ease;
+  will-change: opacity;
+}
+
+.bars-content.is-visible {
+  opacity: 1;
+}
+
+.bars-content.is-fading,
+.bars-content.is-pre {
+  opacity: 0;
+}
+
+.bars-overlay {
+  position: absolute;
+  inset: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+
+  background: rgba(255, 255, 255, 0.75);
+
+  opacity: 0;
+  pointer-events: none;
+  transition: opacity 160ms ease;
+}
+
+.bars-overlay.is-visible {
+  opacity: 1;
+  pointer-events: auto;
+}
+
+/* =========================
+   Realized PnL Bars Layout
+   (chart + tabs always visible)
+========================= */
+
+.pnl-bars-layout {
+  height: 100%;
+  display: flex;
+  flex-direction: column;
+}
+
+.pnl-bars-summary {
+  transform: none;
+  margin-bottom: 10px;
+}
+
+.pnl-bars-chart-area {
+  flex: 1;
+  min-height: 0; 
+  width: 100%;
+}
+
+.pnl-bars-tabs {
+  margin-top: 10px;
+}
+
+
+/* =========================
+   Analysis Card 
+========================= */
+
+.analysis-card-shell {
+  position: relative;
+  height: 360px;         
+  overflow: hidden;
+}
+
+.analysis-card-overlay {
+  position: absolute;
+  inset: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+
+  background: rgba(255, 255, 255, 0.75);
+
+  opacity: 0;
+  pointer-events: none;
+  transition: opacity 160ms ease;
+}
+
+.analysis-card-overlay.is-visible {
+  opacity: 1;
+  pointer-events: auto;
+}
+
+/* Lower section fade-up wrapper */
+.analysis-lower {
+  opacity: 0;
+  transform: translateY(6px);
+  transition: opacity 220ms ease, transform 220ms ease;
+}
+
+.analysis-lower.is-visible {
+  opacity: 1;
+  transform: translateY(0);
+}
+
+.analysis-lower.is-pre {
+  opacity: 0;
+  transform: translateY(6px);
+}
+
+/* Generic shell + overlay for analysis cards */
+.analysis-card-shell {
+  position: relative;
+  min-height: 360px;
+  overflow: hidden;
+}
+
+.analysis-card-overlay {
+  position: absolute;
+  inset: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+
+  background: rgba(255, 255, 255, 0.75);
+
+  opacity: 0;
+  pointer-events: none;
+  transition: opacity 160ms ease;
+}
+
+.analysis-card-overlay.is-visible {
+  opacity: 1;
+  pointer-events: auto;
+}
+
+.analysis-chart {
+  width: 100%;
+  height: 100%;
+  min-height: 320px;
+}
+/* Optional header styling used by the new charts */
+.analysis-chart-header {
+  padding:  0 16px;
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  margin-bottom: 60px;
+}
+
+.analysis-chart-title {
+  font-size: 12px;
+  font-weight: 600;
+  color: #111827;
+}
+
+.analysis-chart-value {
+  font-size: 36px;
+  font-weight: 700;
+  color: #4a90e2;
+}
+
+.analysis-chart-subtitle {
+  font-size: 10px;
+  color: #9aa0a6;
+}
+
+.recharts-scatter-symbol {
+  transition: transform 0.15s ease;
+}
+.recharts-scatter-symbol:hover {
+  transform: translateY(-1px);
+}
+/* =========================
+   Net Worth Donut Layout
+========================= */
+
+.networth-donut-shell {
+  display: grid;
+  grid-template-columns: 1fr 1.1fr;
+  gap: 18px;
+  padding: 0 8px;
+}
+
+/* Left column: summary + notes */
+.networth-left {
+  display: flex;
+  flex-direction: column;
+  gap: 60px;
+  min-width: 0; 
+}
+
+.networth-summary-block {
+  padding: 0 8px;
+}
+
+/* Notes: capped height + scroll so it never overlaps donut */
+.networth-notes-block {
+  padding: 10px 8px 0 8px;
+  max-height: 300px;         
+  overflow: auto;
+}
+
+.networth-notes-block::-webkit-scrollbar {
+  display: none;
+}
+
+.networth-notes-text {
+  font-size: 11px;
+  color: #6b7280;
+  line-height: 1.4;
+  white-space: pre-wrap;
+  word-break: break-word;
+}
+
+/* Date at bottom-left */
+.networth-notes-date {
+  margin-top: 10px;
+  font-size: 10px;
+  color: #9aa0a6;
+}
+
+/* Right column: donut */
+.networth-right {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  min-width: 0;
+}
+
+.networth-donut-wrap {
+  position: relative;
+  width: 100%;
+}
+
+/* Center label overlay */
+.networth-donut-center {
+  position: absolute;
+  inset: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-direction: column;
+  pointer-events: none;
+}
+
+.networth-donut-center-label {
+  font-size: 10px;
+  color: #9aa0a6;
+}
+
+.networth-donut-center-value {
+  font-size: 14px;
+  font-weight: 700;
+  color: #111827;
+  margin-top: 2px;
+}
+
+.networth-donut-center-sub {
+  font-size: 10px;
+  color: #6b7280;
+  margin-top: 6px;
+}
+
+/* =========================
+   Net Worth Jar Tooltip (scoped)
+========================= */
+
+.networth-jar-tooltip {
+  background-color: #e6f7ff;
+  border: 1px solid #4a90e2;
+  border-radius: 8px;
+  padding: 6px 10px;
+  font-size: 11px;
+  line-height: 1.3;
+  box-shadow: 0 8px 16px rgba(72, 144, 226, 0.3),
+    0 14px 28px rgba(72, 144, 226, 0.2);
+  backdrop-filter: blur(6px);
+}
+
+.networth-jar-tooltip p {
+  margin: 0;
+  padding: 0;
+  white-space: nowrap;
+  color: #6b7280;
+}
+
+.networth-jar-tooltip p:first-child {
+  font-weight: 700;
+  color: #4a90e2;
+}
+
+
+/* =========================
+   NetWorth Chart Fade + Overlay (opacity only)
+========================= */
+
+.networth-chart-shell {
+  height: 360px;
+  position: relative;
+  overflow: hidden;
+}
+
+.networth-chart-content {
+  height: 100%;
+  opacity: 0;
+  transition: opacity 220ms ease;
+  will-change: opacity;
+}
+
+.networth-chart-content.is-visible {
+  opacity: 1;
+}
+
+.networth-chart-content.is-fading,
+.networth-chart-content.is-pre {
+  opacity: 0;
+}
+
+.networth-chart-overlay {
+  position: absolute;
+  inset: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+
+  background: rgba(255, 255, 255, 0.75);
+
+  opacity: 0;
+  pointer-events: none;
+  transition: opacity 160ms ease;
+}
+
+.networth-chart-overlay.is-visible {
+  opacity: 1;
+  pointer-events: auto;
+}
+
+/* =========================
+   NetWorth Summary Fade Up + Overlay
+========================= */
+
+.networth-summary-shell {
+  /* position: relative;
+  min-height: 350px;
+  overflow: hidden; */
+  min-height: 100%;
+  /* display: flex; */
+  align-items: center;
+  justify-content: center;
+  overflow: visible;
+
+}
+
+.networth-summary-content {
+  opacity: 0;
+  transform: translateY(6px);
+  transition: opacity 220ms ease, transform 220ms ease;
+  will-change: opacity, transform;
+}
+
+.networth-summary-content.is-visible {
+  opacity: 1;
+  transform: translateY(0);
+}
+
+.networth-summary-content.is-fading,
+.networth-summary-content.is-pre {
+  opacity: 0;
+  transform: translateY(6px);
+}
+
+.networth-summary-overlay {
+  position: absolute;
+  inset: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+
+  background: rgba(255, 255, 255, 0.75);
+
+  opacity: 0;
+  pointer-events: none;
+  transition: opacity 160ms ease;
+}
+
+.networth-summary-overlay.is-visible {
+  opacity: 1;
+  pointer-events: auto;
+}
+
+/* =========================
+   NetWorth Table Fade Up + Overlay
+========================= */
+
+.networth-table-shell {
+  position: relative;
+  min-height: 560px; /* stable height so no jump when data appears */
+  overflow: hidden;
+}
+
+.networth-table-content {
+  opacity: 0;
+  transform: translateY(6px);
+  transition: opacity 220ms ease, transform 220ms ease;
+  will-change: opacity, transform;
+}
+
+.networth-table-content.is-visible {
+  opacity: 1;
+  transform: translateY(0);
+}
+
+.networth-table-content.is-fading,
+.networth-table-content.is-pre {
+  opacity: 0;
+  transform: translateY(6px);
+}
+
+.networth-table-overlay {
+  position: absolute;
+  inset: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+
+  background: rgba(255, 255, 255, 0.75);
+
+  opacity: 0;
+  pointer-events: none;
+  transition: opacity 160ms ease;
+}
+
+.networth-table-overlay.is-visible {
+  opacity: 1;
+  pointer-events: auto;
+}
+
+/* =========================
+    NetWorth Trend Fade Up + Overlay
+========================= */
+
+.networth-trend-shell {
+  position: relative;
+  min-height: 320px; /* keeps layout stable while loading */
+}
+
+.networth-trend-content {
+  opacity: 0;
+  transform: translateY(6px);
+  transition: opacity 220ms ease, transform 220ms ease;
+}
+
+.networth-trend-content.is-pre {
+  opacity: 0;
+  transform: translateY(6px);
+}
+
+.networth-trend-content.is-visible {
+  opacity: 1;
+  transform: translateY(0);
+}
+
+.networth-trend-content.is-fading {
+  opacity: 0;
+  transform: translateY(6px);
+}
+
+.networth-trend-overlay {
+  position: absolute;
+  inset: 0;
+  display: grid;
+  place-items: center;
+}
+
+/* =========================
+   Profile Chart (fade-in only)
+========================= */
+
+.profile-chart-shell {
+  height: 360px;
+  position: relative;
+  overflow: hidden;
+}
+
+.profile-chart-content {
+  height: 100%;
+  opacity: 0;
+  transition: opacity 220ms ease;
+  will-change: opacity;
+}
+
+.profile-chart-content.is-visible {
+  opacity: 1;
+}
+
+.profile-chart-content.is-fading,
+.profile-chart-content.is-pre {
+  opacity: 0;
+}
+
+.profile-chart-overlay {
+  position: absolute;
+  inset: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+
+  background: rgba(255, 255, 255, 0.75);
+
+  opacity: 0;
+  pointer-events: none;
+  transition: opacity 160ms ease;
+}
+
+.profile-chart-overlay.is-visible {
+  opacity: 1;
+  pointer-events: auto;
+}
+
+/* =========================
+   Profile KPI (fade-up)
+========================= */
+
+.profile-kpi-shell {
+  position: relative;
+  min-height: 350px;
+  overflow: hidden;
+}
+
+.profile-kpi-content {
+  opacity: 0;
+  transform: translateY(6px);
+  transition: opacity 220ms ease, transform 220ms ease;
+  will-change: opacity, transform;
+}
+
+.profile-kpi-content.is-visible {
+  opacity: 1;
+  transform: translateY(0);
+}
+
+.profile-kpi-content.is-fading,
+.profile-kpi-content.is-pre {
+  opacity: 0;
+  transform: translateY(6px);
+}
+
+.profile-kpi-overlay {
+  position: absolute;
+  inset: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+
+  background: rgba(255, 255, 255, 0.75);
+
+  opacity: 0;
+  pointer-events: none;
+  transition: opacity 160ms ease;
+}
+
+.profile-kpi-overlay.is-visible {
+  opacity: 1;
+  pointer-events: auto;
+}
+
+.profile-chart-shell .investment-summary {
+  transform: none !important;
+  margin-bottom: 0px;
+}
+
+
+
+/* =========================
+   Profile Table (fade-up)
+========================= */
+
+.profile-table-shell {
+  position: relative;
+  min-height: 560px;
+  overflow: hidden;
+}
+
+.profile-table-content {
+  opacity: 0;
+  transform: translateY(6px);
+  transition: opacity 220ms ease, transform 220ms ease;
+  will-change: opacity, transform;
+}
+
+.profile-table-content.is-visible {
+  opacity: 1;
+  transform: translateY(0);
+}
+
+.profile-table-content.is-fading,
+.profile-table-content.is-pre {
+  opacity: 0;
+  transform: translateY(6px);
+}
+
+.profile-table-overlay {
+  position: absolute;
+  inset: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+
+  background: rgba(255, 255, 255, 0.75);
+
+  opacity: 0;
+  pointer-events: none;
+  transition: opacity 160ms ease;
+}
+
+.profile-table-overlay.is-visible {
+  opacity: 1;
+  pointer-events: auto;
+}
+
+
+
+/* =========================
+   Custom Tabs
+========================= */
+.tab-container {
+  display: flex;
+  gap: 50px;
+}
+
+.tab-container-bottom-left {
+  justify-content: flex-start;
+  gap: 50px;
+  margin-top: 10px;
+}
+
+.tab {
+  overflow: hidden;
+  background-color: #fff;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 1px 0;
+}
+
+.tab-button {
+  float: left;
+  background-color: transparent;
+  border: none;
+  padding: 1px 0;
+  font-size: 12px;
+  font-weight: bold;
+  cursor: pointer;
+  transition: background-color 0.2s ease, color 0.2s ease;
+}
+
+.tab-button:hover {
+  background-color: transparent;
+  color: #4a90e2;
+}
+
+.tab-button.active {
+  color: #4a90e2;
+  font-weight: 600;
+}
+
+.tab-loading {
+  font-size: 11px;
+  color: #9aa0a6;
+  margin-left: 6px;
+}
+
+/* =========================
+Layout Sections
+========================= */
+.section {
+  width: 100%;
+  padding: 20px 20px;
+  box-sizing: border-box;
+
+}
+
+.card {
+  position: relative;
+}
+
+.fixed {
+  min-height: 500px;
+}
+
+.fixed .card-body {
+  min-height: 520px;
+  display: flex;
+  flex-direction: column;
+
+  justify-content: center;
+}
+
+.card-loading-center {
+  flex: 1;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.card-loading-overlay {
+  position: absolute;
+  inset: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: rgba(255, 255, 255, 0.55);
+  backdrop-filter: blur(2px);
+  z-index: 5;
+}
+
+
+/* =========================
+Dashboard Container
+========================= */
+
+.dashboard-container {
+  margin: 0 auto;
+  width: 100%;
+  height: 100%;
+}
+
+
+.dashboard-grid {
+  display: flex;
+  width: 100%;
+  align-items: center;
+
+}
+
+.dashboard-left {
+  flex: 0 0 70%;
+  min-width: 0; 
+}
+
+.dashboard-right {
+  flex: 0 0 30%;
+}
+
+/* 50/50 split variant */
+.dashboard-grid-50 .dashboard-half {
+  flex: 0 0 50%;
+  min-width: 0;
+  height: 600px;
+}
+
+
+@media (max-width: 1024px) {
+  .dashboard-grid {
+    flex-direction: column;
+  }
+
+  .dashboard-left,
+  .dashboard-right {
+    flex: 1 1 auto;
+    width: 100%;
+  }
+}
+
+@media (max-width: 1024px) {
+  .dashboard-grid-50 .dashboard-half {
+    flex: 1 1 auto;
+    width: 100%;
+  }
+}
+
+
+
+
+/* src/styles/styles.css
+
+* {
+  font-family: Arial, Helvetica, sans-serif;
+}
+body::-webkit-scrollbar {
+  display: none;
+}
+
+
+/* =========================
+Navigation
+========================= */
+/*
+.navigation {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  background-color: transparent;
+  padding: 0.5rem 1rem;
+  z-index: 1000;
+  backdrop-filter: blur(10px);
+  border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+  position: sticky;
+  top: 0;
+}
+
+.nav-container {
+  display: flex;
+  align-items: center;
+  width: 100%;
+  margin-top: 5px;
+}
+.nav-logo {
+  display: flex;
+  align-items: center;
+  margin-right: 20px;
+}
+
+.logo-image {
+  height: 30px;
+  width: auto;
+  object-fit: contain;
+}
+
+.search {
+  flex: 1;
+  margin-right: 1rem;
+}
+
+.search input {
+  width: 50%;
+  padding: 0.3rem;
+  border: none;
+  border-bottom: 1px solid black;
+  font-size: 12px;
+  background-color: transparent;
+  color: black;
+  transition: all 0.5s ease-in-out;
+}
+.search input::placeholder {
+  color: #333;
+}
+
+.search input:focus {
+  outline: none;
+  width: 100%;
+  border-bottom: 1px solid #4a90e2;
+}
+
+.nav-links {
+  display: flex;
+  gap: 0.75rem;
+  align-items: center;
+}
+
+.nav-links a {
+  color: black;
+  text-decoration: none;
+  font-size: 11px;
+  padding: 0.5rem 1rem;
+  transition: background-color 0.3s ease;
+}
+
+.nav-links a:hover {
+  color: #4a90e2;
+}
+.nav-links a.active {
+  color: #4a90e2;
+}
+
+.logout-btn {
+  background: none;
+  border: none;
+  cursor: pointer;
+  padding: 5px;
+}
+
+.logout-icon {
+  font-size: 12px;
+  color: #4a90e2;
+}
+
+/* =========================
+Registration / Sign-in
+========================= */
+
+/***************************** Landing Component (Register / Login) *************************/
+/*
+.landing-container {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  height: 100vh;
+  background-color: transparent;
+  padding: 20px;
+  box-sizing: border-box;
+}
+
+.landing-content {
+  text-align: center;
+  background-color: transparent;
+  padding: 2.5rem;
+  border-radius: 12px;
+  max-width: 350px;
+  width: 100%;
+}
+
+.auth-container {
+  display: flex;
+  flex-direction: column;
+  gap: 1.5rem;
+}
+
+.link-btn {
+  background: none;
+  border: none;
+  color: #1f2937;
+  cursor: pointer;
+  font-size: 0.75rem;
+  padding: 0;
+  text-decoration: none;
+}
+
+.link-btn:hover {
+  color: #4a90e2;
+  background-color: transparent;
+}
+
+/************************** Login/ Registration Form Authentication *************************/
+/*
+.auth-form {
+  display: flex;
+  flex-direction: column;
+  gap: 0.75rem;
+  background-color: transparent;
+  border-top: 1px solid #e5e7eb;
+  padding-top: 1rem;
+  padding-bottom: 1rem;
+  border-bottom: 1px solid #e5e7eb;
+}
+
+.auth-form input {
+  padding: 11px;
+  font-size: 12px;
+  outline: none;
+  border: 1px solid #d1d5db;
+  border-radius: 6px;
+}
+
+.auth-form select {
+  font-size: 12px;
+  padding: 10px 5px;
+  outline: none;
+  border: none;
+  background-color: transparent;
+  border-bottom: 1px solid #d1d5db;
+  width: 100%;
+  transition: border-color 0.3s;
+}
+
+.auth-form input:focus,
+.auth-form select:focus {
+  border-color: #4a90e2;
+}
+
+.auth-form .btn {
+  padding: 11px;
+  font-size: 12px;
+  border: 1px solid #d1d5db;
+  border-radius: 6px;
+  background-color: #4a90e2;
+  color: white;
+  cursor: pointer;
+  margin-top: 0.5rem;
+  transition: background-color 0.3s, border-color 0.3s;
+}
+
+.auth-form .btn:hover {
+  background-color: #165599;
+  border: 1px solid #d1d5db;
+}
+
+.error-message {
+  color: #dc2626;
+  font-size: 10px;
+  padding: 10px;
+}
+
+/* =========================
+Navigation
+========================= */
+/*
+.navigation {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  background-color: transparent;
+  padding: 0.5rem 1rem;
+  z-index: 1000;
+  backdrop-filter: blur(10px);
+  border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+  position: sticky;
+  top: 0;
+}
+
+.nav-container {
+  display: flex;
+  align-items: center;
+  width: 100%;
+  margin-top: 5px;
+}
+.nav-logo {
+  display: flex;
+  align-items: center;
+  margin-right: 20px;
+}
+
+.logo-image {
+  height: 30px;
+  width: auto;
+  object-fit: contain;
+}
+
+.search {
+  flex: 1;
+  margin-right: 1rem;
+}
+
+.search input {
+  width: 50%;
+  padding: 0.3rem;
+  border: none;
+  border-bottom: 1px solid black;
+  font-size: 12px;
+  background-color: transparent;
+  color: black;
+  transition: all 0.5s ease-in-out;
+}
+.search input::placeholder {
+  color: #333;
+}
+
+.search input:focus {
+  outline: none;
+  width: 100%;
+  border-bottom: 1px solid #4a90e2;
+}
+
+.nav-links {
+  display: flex;
+  gap: 0.75rem;
+  align-items: center;
+}
+
+.nav-links a {
+  color: black;
+  text-decoration: none;
+  font-size: 11px;
+  padding: 0.5rem 1rem;
+  transition: background-color 0.3s ease;
+}
+
+.nav-links a:hover {
+  color: #4a90e2;
+}
+.nav-links a.active {
+  color: #4a90e2;
+}
+
+.logout-btn {
+  background: none;
+  border: none;
+  cursor: pointer;
+  padding: 5px;
+}
+
+.logout-icon {
+  font-size: 12px;
+  color: #4a90e2;
+} */
+
+/************************************ Rules (Hidden) **************************************/
+/* .rules-container {
+  padding: 20px;
+  width: auto;
+  border-collapse: collapse;
+  border-radius: 8px;
+  height: 100%;
+  transition: 0.3s;
+}
+
+.rules-container:hover {
+  box-shadow: 0 3px 6px rgba(72, 128, 170, 0.2),
+    0 6px 12px rgba(72, 128, 170, 0.15);
+}
+
+#rule-new-btn {
+  font-size: 12px;
+  cursor: pointer;
+  color: black;
+  border: 1px solid black;
+  padding: 6px 10px;
+  border-radius: 5px;
+}
+#rule-new-btn:hover {
+  background-color: #f1f8ff;
+  border: 1px solid #4a90e2;
+  color: #4a90e2;
+}
+
+.rules-list {
+  max-height: 400px;
+  overflow-y: auto;
+  display: flex;
+  flex-direction: column;
+  gap: 5px;
+}
+
+.rules-list::-webkit-scrollbar {
+  display: none;
+}
+.rule-item {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  background-color: transparent;
+  cursor: pointer;
+  padding: 20px;
+  transition: transform 0.3s, background-color 0.3s;
+}
+
+.rule-item:hover {
+  transform: scale(1.02) translateY(-2px);
+}
+
+.plan-section {
+  color: black;
+  align-items: left;
+  margin-top: 10px;
+  margin-bottom: 10px;
+  display: block;
+  max-height: 180px;
+  overflow-y: auto;
+}
+
+.plan-section::-webkit-scrollbar {
+  display: none;
+}
+.watchlist-value {
+  text-align: right;
+  color: #555;
+}
+.rule-item-date {
+  font-weight: bold;
+  font-size: 12px;
+  color: #333;
+  width: 20%;
+  text-align: left;
+}
+
+.rule-item-text {
+  width: 75%;
+  font-size: 12px;
+  color: #555;
+  text-align: left;
+}
+
+.new-rule-container {
+  padding: 20px;
+  width: 30%;
+  border-radius: 8px;
+  background-color: #ffffff;
+  box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+  font-family: Arial, sans-serif;
+  margin-top: 4vh;
+  transition: 0.3s;
+}
+
+.rule-details {
+  margin-bottom: 20px;
+}
+
+.rule-header {
+  display: flex;
+  justify-content: space-between;
+}
+
+.rule-item-date {
+  font-size: 10px;
+  color: #333;
+}
+
+.rule-item-text {
+  display: flex;
+  justify-content: space-between;
+  margin: 8px 0;
+  font-size: 11px;
+  color: #333;
+}
+
+.rule-info label {
+  font-weight: 600;
+  color: #444;
+}
+
+.rule-info textarea {
+  color: black;
+  align-items: left;
+  margin-top: 10px;
+  margin-bottom: 10px;
+  display: block;
+  max-height: 180px;
+  overflow-y: auto;
+  resize: auto;
+  transition: border-color 0.2s;
+}
+
+.rule-info textarea:focus {
+  border-color: #4a90e2;
+  outline: none;
+}
+.rule-value {
+  font-weight: 100;
+}
+
+.icon-container {
+  display: flex;
+  gap: 12px;
+} */
+
+/*******************************************************************************************/
+/*************************************** Navigation ****************************************/
+/*******************************************************************************************/
+/*.navigation {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  background-color: transparent;
+  padding: 0.5rem 1rem;
+  z-index: 1000;
+  backdrop-filter: blur(10px);
+  border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+  position: sticky;
+  top: 0;
+}
+
+.nav-container {
+  display: flex;
+  align-items: center;
+  width: 100%;
+  margin-top: 5px;
+}
+.nav-logo {
+  display: flex;
+  align-items: center;
+  margin-right: 20px;
+}
+
+.logo-image {
+  height: 30px;
+  width: auto;
+  object-fit: contain;
+}
+
+.search {
+  flex: 1;
+  margin-right: 1rem;
+}
+
+.search input {
+  width: 50%;
+  padding: 0.3rem;
+  border: none;
+  border-bottom: 1px solid black;
+  font-size: 12px;
+  background-color: transparent;
+  color: black;
+  transition: all 0.5s ease-in-out;
+}
+.search input::placeholder {
+  color: #333;
+}
+
+.search input:focus {
+  outline: none;
+  width: 100%;
+  border-bottom: 1px solid #4a90e2;
+}
+
+.nav-links {
+  display: flex;
+  gap: 0.75rem;
+  align-items: center;
+}
+
+.nav-links a {
+  color: black;
+  text-decoration: none;
+  font-size: 11px;
+  padding: 0.5rem 1rem;
+  transition: background-color 0.3s ease;
+}
+
+.nav-links a:hover {
+  color: #4a90e2;
+}
+.nav-links a.active {
+  color: #4a90e2;
+}
+
+.logout-btn {
+  background: none;
+  border: none;
+  cursor: pointer;
+  padding: 5px;
+}
+
+.logout-icon {
+  font-size: 12px;
+  color: #4a90e2;
+}
+
+/*******************************************************************************************/
+/**************************************** Components ***************************************/
+/*******************************************************************************************/
+
+/***************************** Landing Component (Register / Login) *************************/
+/*.landing-container {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  height: 100vh;
+  background-color: transparent;
+  padding: 20px;
+  box-sizing: border-box;
+}
+
+.landing-content {
+  text-align: center;
+  background-color: transparent;
+  padding: 2.5rem;
+  border-radius: 12px;
+  max-width: 350px;
+  width: 100%;
+}
+
+.auth-container {
+  display: flex;
+  flex-direction: column;
+  gap: 1.5rem;
+}
+
+.link-btn {
+  background: none;
+  border: none;
+  color: #1f2937;
+  cursor: pointer;
+  font-size: 0.75rem;
+  padding: 0;
+  text-decoration: none;
+}
+
+.link-btn:hover {
+  color: #4a90e2;
+  background-color: transparent;
+}
+
+/************************** Login/ Registration Form Authentication *************************/
+/*.auth-form {
+  display: flex;
+  flex-direction: column;
+  gap: 0.75rem;
+  background-color: transparent;
+  border-top: 1px solid #e5e7eb;
+  padding-top: 1rem;
+  padding-bottom: 1rem;
+  border-bottom: 1px solid #e5e7eb;
+}
+
+.auth-form input {
+  padding: 11px;
+  font-size: 12px;
+  outline: none;
+  border: 1px solid #d1d5db;
+  border-radius: 6px;
+}
+
+.auth-form select {
+  font-size: 12px;
+  padding: 10px 5px;
+  outline: none;
+  border: none;
+  background-color: transparent;
+  border-bottom: 1px solid #d1d5db;
+  width: 100%;
+  transition: border-color 0.3s;
+}
+
+.auth-form input:focus,
+.auth-form select:focus {
+  border-color: #4a90e2;
+}
+
+.auth-form .btn {
+  padding: 11px;
+  font-size: 12px;
+  border: 1px solid #d1d5db;
+  border-radius: 6px;
+  background-color: #4a90e2;
+  color: white;
+  cursor: pointer;
+  margin-top: 0.5rem;
+  transition: background-color 0.3s, border-color 0.3s;
+}
+
+.auth-form .btn:hover {
+  background-color: #165599;
+  border: 1px solid #d1d5db;
+}
+
+.error-message {
+  color: #dc2626;
+  font-size: 10px;
+  padding: 10px;
+}
+
+/******************************** DailyPNL Component ***************************************/
+/*.daily-pnl-section {
+  width: 100%;
+  margin-top: 15%;
+}
+
+.dailypnl-wrapper {
+  position: relative;
+  min-height: 300px;
+}
+
+.dailypnl-container {
+  padding: 20px;
+  background-color: transparent;
+  border-radius: 8px;
+  font-family: Arial, sans-serif;
+  opacity: 0;
+  transform: translateY(10px);
+  transition: opacity 1s ease, transform 1s ease;
+  position: relative;
+  min-height: 450px;
+}
+
+.dailypnl-container.fade-in {
+  opacity: 1;
+  transform: translateY(0);
+}
+
+.daily-pnl-section .daily-pnl-card-container {
+  display: flex;
+  justify-content: space-between;
+  gap: 16px;
+}
+
+.daily-pnl-section .daily-pnl-card {
+  border-radius: 8px;
+  flex: 1;
+  max-width: 100%;
+  display: flex;
+  transition: transform 0.3s, background-color 0.3s;
+}
+
+.daily-pnl-section .card-content {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  justify-content: space-between;
+  width: 100%;
+}
+
+.daily-pnl-section .icon-label {
+  display: flex;
+  align-items: center;
+}
+
+.daily-pnl-section .card-icon {
+  font-size: 16px;
+  color: #4a90e2;
+  margin-right: 8px;
+}
+
+.daily-pnl-section .label {
+  font-size: 10px;
+  font-weight: 600;
+  color: #333;
+}
+
+.daily-pnl-section .value {
+  font-size: 10px;
+  font-weight: 500;
+  color: #333;
+  margin-top: 4px;
+}
+
+.daily-pnl-section .divider {
+  border: none;
+  border-top: 1px solid #e6e8ec;
+  margin: 16px 0;
+}
+#new-pnl-btn {
+  font-size: 12px;
+  cursor: pointer;
+  color: black;
+  padding: 6px 10px;
+  border-radius: 5px;
+}
+#new-pnl-btn:hover {
+  font-size: 12px;
+  cursor: pointer;
+  color: #4a90e2;
+}
+
+.new-daily-pnl-container {
+  background: #fefefe;
+  width: 250px;
+  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.15);
+  font-family: Arial, Helvetica, sans-serif;
+  padding: 10px;
+  transition: all 0.3s ease;
+}
+
+/*********************************** Bars Component *****************************************/
+/*.main-bars-container {
+  font-family: Arial, sans-serif;
+  background-color: transparent;
+  padding: 20px;
+}
+
+.header-card {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 1px 0;
+}
+
+/*********************************** Calendar Component *****************************************/
+/*.calendar-container {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  position: relative;
+  flex-direction: column;
+  background-color: transparent;
+  transition: 0.3s;
+}
+
+.react-calendar__tile {
+  width: 60px;
+  height: 70px;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  font-size: 10px;
+  color: black;
+  background-color: #ffffff;
+  border: 1px solid #dddddd;
+  border-radius: 5px;
+  transition: transform 0.3s, background-color 0.3s, font-size 0.3s;
+}
+
+.react-calendar__tile:hover {
+  transform: scale(1.05);
+  background-color: #eeeeee;
+  cursor: pointer;
+  font-size: 11px;
+  color: black;
+}
+
+.react-calendar__navigation {
+  align-items: center;
+}
+.react-calendar__navigation__label {
+  background-color: white;
+  border: 1px solid;
+  font-size: 10px;
+  padding: 10px;
+  margin-right: 5px;
+  margin-left: 5px;
+  margin-bottom: 5px;
+  border-radius: 3.5px;
+  cursor: pointer;
+  border: 1px solid #bebebe;
+}
+.react-calendar__navigation__prev2-button {
+  background-color: white;
+  border: 1px solid #bebebe;
+  font-size: 10px;
+  padding: 5px 8px;
+  margin-right: 5px;
+  border-radius: 3.5px;
+  cursor: pointer;
+}
+.react-calendar__navigation__prev-button {
+  background-color: white;
+  border: 1px solid #bebebe;
+  font-size: 10px;
+  padding: 5px 8px;
+  border-radius: 3.5px;
+  cursor: pointer;
+}
+.react-calendar__navigation__next-button {
+  background-color: white;
+  border: 1px solid #bebebe;
+  font-size: 10px;
+  padding: 5px 8px;
+  margin-right: 5px;
+  border-radius: 3.5px;
+  cursor: pointer;
+}
+
+.react-calendar__navigation__next2-button {
+  background-color: white;
+  border: 1px solid #bebebe;
+  font-size: 10px;
+  padding: 5px 8px;
+  border-radius: 3.5px;
+  cursor: pointer;
+}
+.react-calendar__navigation__label:hover,
+.react-calendar__navigation__prev2-button:hover,
+.react-calendar__navigation__prev-button:hover,
+.react-calendar__navigation__next-button:hover,
+.react-calendar__navigation__next2-button:hover {
+  background-color: #e6f7ff;
+  cursor: pointer;
+  border: 1px solid #4a90e2;
+  color: #4a90e2;
+}
+
+.react-calendar__tile--active {
+  border: 1px solid #4a90e2;
+  background-color: #e6f7ff;
+}
+
+.react-calendar__month-view__weekdays__weekday {
+  font-size: 10px;
+  margin-top: 10px;
+  margin-bottom: 5px;
+  text-align: center;
+  text-decoration: none;
+}
+
+.pnl-tile {
+  text-align: center;
+  font-family: "Arial", sans-serif;
+  font-size: 10px;
+  color: #333;
+  margin-top: 10px;
+  margin-bottom: 5px;
+}
+
+/******************************  Trades Table Component ******************************  */
+/*
+.trade-table-wrapper {
+  position: relative;
+  min-height: 300px;
+  padding: 20px;
+  background-color: transparent;
+  border-radius: 8px;
+  font-family: Arial, sans-serif;
+}
+
+.trade-table-container {
+  background-color: transparent;
+  border-radius: 8px;
+  font-family: Arial, sans-serif;
+  padding: 20px;
+  transform: translateY(10px);
+  transition: opacity 1s ease, transform 1s ease;
+  position: relative;
+  min-height: 550px;
+  opacity: 0;
+}
+
+.trade-table-container.fade-in {
+  opacity: 1;
+  transform: translateY(0);
+}
+
+.header-card {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 1px 0;
+}
+
+#trade-new-btn {
+  font-size: 12px;
+  cursor: pointer;
+  color: black;
+  padding: 6px 10px;
+  border-radius: 5px;
+}
+#trade-new-btn:hover {
+  font-size: 12px;
+  cursor: pointer;
+  color: #4a90e2;
+}
+
+.new-trade-container {
+  background: #fefefe;
+  width: 320px;
+  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.15);
+  font-family: Arial, Helvetica, sans-serif;
+  padding: 10px;
+  transition: all 0.3s ease;
+}
+
+.trade-table {
+  width: 100%;
+  border-collapse: collapse;
+  margin-top: 5px;
+}
+
+.trade-table th {
+  color: #000;
+  font-size: 11px;
+  position: sticky;
+  top: 0;
+  text-align: left;
+  padding: 10px 0px;
+  z-index: 1;
+  font-size: 10px;
+}
+.trade-table tbody {
+  display: block;
+  max-height: 500px;
+  overflow-y: auto;
+}
+
+.trade-table tbody::-webkit-scrollbar {
+  display: none;
+}
+
+.trade-table tr {
+  display: table;
+  width: 100%;
+  table-layout: fixed;
+  gap: inherit;
+}
+.trade-table td {
+  padding: 5px 0px;
+  font-size: 10px;
+  text-align: left;
+  border-bottom: 1px solid #ddd;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+.trade-table th:nth-child(1),
+.trade-table td:nth-child(1) {
+  width: 60px;
+}
+.trade-table th:nth-child(2),
+.trade-table td:nth-child(2) {
+  width: 160px;
+}
+.trade-table tbody tr:hover {
+  background-color: #e6f7ff;
+  border: #4a90e2;
+  cursor: pointer;
+}
+
+/******************************** Analysis Summary Component *******************************/
+/*.analysis-summary {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  position: relative;
+  height: 250px;
+  padding: 20px;
+}
+
+.analysis-circle-summary {
+  position: relative;
+  width: 100%;
+  height: 100%;
+}
+
+.analysis-circle-summary .abs-return {
+  width: 120px;
+  height: 120px;
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  background-color: transparent;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  text-align: center;
+  flex-direction: column;
+  border: 1px solid #dadada;
+}
+
+.analysis-circle-summary .sharpe-ratio {
+  width: 95px;
+  height: 95px;
+  position: absolute;
+  top: calc(50% + 10px);
+  left: calc(50% + 115px);
+  transform: translate(-50%, -50%);
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  text-align: center;
+  flex-direction: column;
+  border: 1px solid #dadada;
+  background-color: transparent;
+}
+.analysis-circle-summary .risk-reward {
+  width: 95px;
+  height: 95px;
+  position: absolute;
+  top: calc(50% + 105px);
+  left: calc(50% + 45px);
+  transform: translate(-50%, -50%);
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  text-align: center;
+  flex-direction: column;
+  border: 1px solid #dadada;
+  background-color: transparent;
+}
+.analysis-circle-summary .avg-days {
+  width: 65px;
+  height: 65px;
+  position: absolute;
+  top: calc(50% + 95px);
+  left: calc(50% + 130px);
+  transform: translate(-50%, -50%);
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  text-align: center;
+  flex-direction: column;
+  border: 1px solid #dadada;
+  background-color: transparent;
+}
+
+.analysis-circle-summary .wins {
+  width: 65px;
+  height: 65px;
+  position: absolute;
+  top: 50%;
+  left: calc(50% - 100px);
+  transform: translate(-50%, -50%);
+  background-color: transparent;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  text-align: center;
+  flex-direction: column;
+  border: 1px solid #dadada;
+  transition: transform 0.3s ease, border-color 0.3s ease, box-shadow 0.3s ease;
+}
+
+.analysis-circle-summary .win-rate {
+  width: 65px;
+  height: 65px;
+  position: absolute;
+  top: calc(50% - 70px);
+  left: calc(50% - 70px);
+  transform: translate(-50%, -50%);
+  background-color: transparent;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  text-align: center;
+  flex-direction: column;
+  border: 1px solid #dadada;
+  transition: transform 0.3s ease, border-color 0.3s ease, box-shadow 0.3s ease;
+}
+.analysis-circle-summary .loss {
+  width: 65px;
+  height: 65px;
+  position: absolute;
+  top: calc(50% - 100px);
+  left: 50%;
+  transform: translate(-50%, -50%);
+  background-color: transparent;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  text-align: center;
+  flex-direction: column;
+  border: 1px solid #dadada;
+  transition: transform 0.3s ease-out, border-color 0.3s ease,
+    box-shadow 0.3s ease;
+}
+
+.analysis-circle-summary h3 {
+  margin: 0;
+  font-size: 9px;
+  font-weight: 500;
+  color: #666;
+  text-align: center;
+}
+
+.analysis-circle-summary p {
+  font-size: 11px;
+  font-weight: 550;
+  color: #333;
+  margin: 0;
+  text-align: center;
+}
+
+.abs-return:hover,
+.sharpe-ratio:hover,
+.risk-reward:hover,
+.win-rate:hover,
+.avg-days:hover {
+  border: 1px solid #dadada;
+  background-color: #dadada;
+  transition: background-color 0.3s ease, border-color 0.3s ease;
+}
+
+.wins:hover,
+.loss:hover {
+  box-shadow: 0 6px 12px rgba(0, 0, 0, 0.2);
+  transform: scale(1.08) translateY(-6px);
+}
+
+.analysis-circle-summary .wins:hover {
+  cursor: pointer;
+  background-color: #e6f7ff;
+  border-color: #4a90e2;
+  box-shadow: 0 8px 16px rgba(72, 144, 226, 0.3),
+    0 14px 28px rgba(72, 144, 226, 0.2);
+  transform: translate(-50%, -60%) scale(1);
+}
+
+.analysis-circle-summary .loss:hover {
+  cursor: pointer;
+  background-color: #fdecea;
+  border-color: #e74c3c;
+  box-shadow: 0 8px 16px rgba(231, 76, 60, 0.3),
+    0 14px 28px rgba(231, 76, 60, 0.2);
+  transform: translate(-50%, -60%) scale(1);
+}
+
+/******************************** Analysis Pie Charts Component *******************************/
+/*.analysis-container {
+  display: flex;
+  width: auto;
+  flex-direction: column;
+  gap: 1.5rem;
+  background-color: #f5f5f5;
+  position: relative;
+  justify-content: space-around;
+  min-height: 300px;
+}
+
+.analysis-circle-row {
+  display: flex;
+  justify-content: space-around;
+  gap: 1rem;
+  min-height: 160px;
+}
+
+/******************************** Networth Summary Component *******************************/
+/*.networth-summary {
+  padding: 20px;
+  padding-top: 0px;
+  max-width: 100%;
+}
+
+.networth-summary .networth-card-container {
+  display: flex;
+  flex-direction: column;
+  align-items: stretch;
+  gap: 16px;
+  max-width: 100%;
+}
+
+.networth-summary .networth-card {
+  border-radius: 8px;
+  max-width: 100%;
+  display: flex;
+  transition: transform 0.3s, background-color 0.3s;
+}
+
+.networth-summary .card-content {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  justify-content: space-between;
+  width: 100%;
+}
+
+.networth-summary .icon-label {
+  display: flex;
+  align-items: center;
+}
+.networth-summary .card-icon {
+  font-size: 16px;
+  color: #4a90e2;
+  margin-right: 8px;
+}
+
+.networth-summary .label {
+  font-size: 10px;
+  font-weight: 600;
+  color: #333;
+}
+
+.networth-summary .value {
+  font-size: 10px;
+  font-weight: 500;
+  color: #333;
+  margin-top: 4px;
+}
+
+.networth-summary .divider {
+  border: none;
+  border-top: 1px solid #e6e8ec;
+  margin: 2px 0;
+}
+
+/******************************  Financial Table Component ******************************  */
+/*.financial-table-wrapper {
+  position: relative;
+  min-height: 300px;
+  padding: 20px;
+  background-color: transparent;
+  border-radius: 8px;
+  font-family: Arial, sans-serif;
+}
+
+.financial-table-container {
+  background-color: transparent;
+  border-radius: 8px;
+  font-family: Arial, sans-serif;
+  padding: 20px;
+  transform: translateY(10px);
+  transition: opacity 1s ease, transform 1s ease;
+  position: relative;
+  min-height: 550px;
+  opacity: 0;
+}
+
+.financial-table-container.fade-in {
+  opacity: 1;
+  transform: translateY(0);
+}
+
+.header-card {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 1px 0;
+}
+
+.title {
+  font-size: 12px;
+  font-weight: bold;
+}
+
+#financial-new-btn {
+  font-size: 12px;
+  cursor: pointer;
+  color: black;
+  padding: 6px 10px;
+  border-radius: 5px;
+}
+
+#financial-new-btn:hover {
+  font-size: 12px;
+  cursor: pointer;
+  color: #4a90e2;
+}
+
+.new-financial-container {
+  background: #fefefe;
+  width: 320px;
+  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.15);
+  font-family: Arial, Helvetica, sans-serif;
+  padding: 10px;
+  transition: all 0.3s ease;
+}
+
+.financial-table {
+  width: 100%;
+  border-collapse: collapse;
+  margin-top: 5px;
+}
+
+.financial-table th {
+  color: #000;
+  font-size: 11px;
+  position: sticky;
+  top: 0;
+  text-align: left;
+  padding: 10px 0px;
+  z-index: 1;
+  font-size: 10px;
+}
+
+.financial-table tbody {
+  display: block;
+  max-height: 500px;
+  overflow-y: auto;
+}
+
+.financial-table tbody::-webkit-scrollbar {
+  display: none;
+}
+
+.financial-table tr {
+  display: table;
+  width: 100%;
+  table-layout: fixed;
+}
+
+.financial-table td {
+  padding: 5px 0px;
+  font-size: 10px;
+  text-align: left;
+  border-bottom: 1px solid #ddd;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.financial-table th:nth-child(1),
+.financial-table td:nth-child(1) {
+  width: 70px;
+}
+
+.financial-table th:nth-child(2),
+.financial-table td:nth-child(2) {
+  width: 80px;
+}
+
+.financial-table th:nth-child(3),
+.financial-table td:nth-child(3) {
+  width: 80px;
+}
+
+.financial-table th:nth-child(4),
+.financial-table td:nth-child(4) {
+  width: 60px;
+}
+
+.financial-table th:nth-child(5),
+.financial-table td:nth-child(5) {
+  width: 60px;
+}
+
+.financial-table th:nth-child(6),
+.financial-table td:nth-child(6) {
+  width: 60px;
+}
+
+.financial-table th:nth-child(7),
+.financial-table td:nth-child(7) {
+  width: 60px;
+}
+
+.financial-table th:nth-child(8),
+.financial-table td:nth-child(8) {
+  width: 60px;
+}
+
+.financial-table th:nth-child(9),
+.financial-table td:nth-child(9) {
+  width: 80px;
+}
+
+.financial-table th:nth-child(10),
+.financial-table td:nth-child(10) {
+  width: 120px;
+}
+
+.financial-table tbody tr:hover {
+  background-color: #e6f7ff;
+  cursor: pointer;
+}
+
+/******************************** Cash Summary Component *******************************/
+/*
+.cash-summary {
+  padding: 20px;
+  padding-top: 0px;
+  max-width: 100%;
+}
+
+.cash-summary .cash-card-container {
+  display: flex;
+  flex-direction: column;
+  align-items: stretch;
+  gap: 16px;
+  max-width: 100%;
+}
+
+.cash-summary .cash-card {
+  border-radius: 8px;
+  max-width: 100%;
+  display: flex;
+  transition: transform 0.3s, background-color 0.3s;
+}
+
+.cash-summary .card-content {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  justify-content: space-between;
+  width: 100%;
+}
+
+.cash-summary .icon-label {
+  display: flex;
+  align-items: center;
+}
+
+.cash-summary .card-icon {
+  font-size: 16px;
+  color: #4a90e2;
+  margin-right: 8px;
+}
+
+.cash-summary .label {
+  font-size: 10px;
+  font-weight: 600;
+  color: #333;
+}
+
+.cash-summary .value {
+  font-size: 10px;
+  font-weight: 500;
+  color: #333;
+  margin-top: 4px;
+}
+
+.cash-summary .divider {
+  border: none;
+  border-top: 1px solid #e6e8ec;
+  margin: 2px 0;
+}
+
+/* New Cash  */
+/*.new-cash-container {
+  background: #fefefe;
+  width: 300px;
+  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.15);
+  font-family: Arial, Helvetica, sans-serif;
+  padding: 10px;
+  transition: all 0.3s ease;
+}
+#cash-new-btn {
+  font-size: 12px;
+  cursor: pointer;
+  color: black;
+  padding: 6px 10px;
+  border-radius: 5px;
+}
+
+#cash-new-btn:hover {
+  font-size: 12px;
+  cursor: pointer;
+  color: #4a90e2;
+}
+.error-section .header-card {
+  margin-left: 5rem;
+}
+/******************************  Transaction Table Component ******************************  */
+/*.transaction-table-wrapper {
+  position: relative;
+  min-height: 300px;
+  padding: 20px;
+  background-color: transparent;
+  border-radius: 8px;
+  font-family: Arial, sans-serif;
+}
+
+.transaction-table-container {
+  background-color: transparent;
+  border-radius: 8px;
+  font-family: Arial, sans-serif;
+  padding: 20px;
+  transform: translateY(10px);
+  transition: opacity 1s ease, transform 1s ease;
+  position: relative;
+  min-height: 550px;
+  opacity: 0;
+}
+
+.transaction-table-container.fade-in {
+  opacity: 1;
+  transform: translateY(0);
+}
+
+#transaction-new-btn {
+  font-size: 12px;
+  cursor: pointer;
+  color: black;
+  padding: 6px 10px;
+  border-radius: 5px;
+}
+
+#transaction-new-btn:hover {
+  font-size: 12px;
+  cursor: pointer;
+  color: #4a90e2;
+}
+
+.new-transaction-container {
+  background: #fefefe;
+  width: 320px;
+  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.15);
+  font-family: Arial, Helvetica, sans-serif;
+  padding: 10px;
+  transition: all 0.3s ease;
+}
+
+.transaction-table {
+  width: 100%;
+  border-collapse: collapse;
+  margin-top: 5px;
+}
+.transaction-table-container th {
+  color: #000;
+  font-size: 11px;
+  position: sticky;
+  top: 0;
+  text-align: left;
+  padding: 10px 0px;
+  z-index: 1;
+}
+.transaction-table-container tbody {
+  display: block;
+  max-height: 350px;
+  overflow-y: auto;
+}
+
+.transaction-table-container tbody::-webkit-scrollbar {
+  display: none;
+}
+
+.transaction-table-container tr {
+  display: table;
+  width: 100%;
+  table-layout: fixed;
+  gap: inherit;
+}
+.transaction-table-container td {
+  padding: 5px 0px;
+  font-size: 10px;
+  text-align: left;
+  border-bottom: 1px solid #ddd;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+.transaction-table-container th:nth-child(1),
+.transaction-table-container td:nth-child(1) {
+  width: 60px;
+}
+.transaction-table-container th:nth-child(2),
+.transaction-table-container td:nth-child(2) {
+  width: 160px;
+}
+.transaction-table-container tbody tr:hover {
+  background-color: #e6f7ff;
+  border: #4a90e2;
+  cursor: pointer;
+}
+
+.transaction-table th {
+  color: #000;
+  font-size: 11px;
+  text-align: left;
+  padding: 10px 0px;
+  font-size: 10px;
+}
+.transaction-table td {
+  padding: 5px 0px;
+  font-size: 10px;
+  text-align: left;
+}
+
+/**************************************** Line Charts ***************************************/
+/* .eqt-chart,
+.investment-chart,
+.networth-chart {
+  font-family: Arial, sans-serif;
+  margin: 40px;
+  background-color: transparent;
+  transition: transform 0.3s, box-shadow 0.3s;
+  position: relative;
+  min-height: 400px;
+} */
+
+/************************************ Line Chart Summary  **********************************/
+/*.summary-section {
+  text-align: left;
+  color: #333;
+  margin-bottom: 20px;
+  padding: 0 10px;
+}
+
+.investment-cash,
+.trade-count,
+.networth-cash {
+  font-size: 26px;
+  font-weight: 700;
+  color: #4a90e2;
+  margin-top: 6px;
+}
+
+.investment-roi,
+.eqt-rate,
+.networth-change {
+  font-weight: 100;
+  font-size: 10px;
+  margin-left: 0px;
+  color: #4a90e2;
+}
+
+.trade-label,
+.investment-date,
+.networth-date {
+  font-weight: 100;
+  font-size: 10px;
+  margin-left: 0px;
+  color: #888;
+}
+
+/*******************************************************************************************/
+/**************************************** Utilities ****************************************/
+/*******************************************************************************************/
+
+/***************************************** Modal *******************************************/
+/*
+.modal {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  background-color: transparent;
+  z-index: 1000;
+  backdrop-filter: blur(5px);
+  opacity: 0;
+  animation: fadeIn 0.5s forwards;
+}
+@keyframes fadeIn {
+  0% {
+    opacity: 0;
+    transform: scale(0.99);
+  }
+  100% {
+    opacity: 1;
+    transform: scale(1);
+  }
+}
+.modal .close-btn {
+  color: black;
+  cursor: pointer;
+}
+.modal .close-btn:hover {
+  color: #dadada;
+  cursor: pointer;
+}
+
+/***************************************** Flow Modal View ******************************************/
+/*
+.flow-modal-container {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100vw;
+  height: 100vh;
+  background-color: transparent;
+  backdrop-filter: blur(5px);
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  z-index: 1000;
+  animation: fadeIn 0.5s forwards;
+}
+.flow-modal-content {
+  width: 90vw;
+  height: 90vh;
+  display: flex;
+  flex-direction: column;
+  background: #fefefe;
+  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.15);
+  font-family: Arial, Helvetica, sans-serif;
+  overflow: hidden;
+}
+
+.flow-modal-header {
+  padding: 20px;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  background: #fefefe;
+  position: sticky;
+  top: 0;
+  z-index: 10;
+}
+
+.flow-modal-body {
+  flex: 1;
+  overflow-y: auto;
+  padding: 20px;
+  scrollbar-width: thin;
+  scrollbar-color: transparent transparent;
+}
+
+.flow-modal-body::-webkit-scrollbar {
+  width: 4px;
+}
+
+.flow-modal-body::-webkit-scrollbar-thumb {
+  background-color: transparent;
+}
+/***************************************** Modal View ******************************************/
+/*.modal-container {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100vw;
+  height: 100vh;
+  background-color: transparent;
+  backdrop-filter: blur(5px);
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  z-index: 9999;
+  animation: fadeIn 0.5s forwards;
+}
+
+.modal-content {
+  background: #fefefe;
+  width: 350px;
+  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.15);
+  font-family: Arial, Helvetica, sans-serif;
+}
+
+.modal-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 20px;
+}
+
+.modal-header h2 {
+  margin: 0;
+  font-size: 12px;
+  color: #444;
+  letter-spacing: 0.5px;
+}
+.modal-header h3 {
+  margin: 0;
+  color: #444;
+}
+
+.close-button {
+  background: none;
+  border: none;
+  font-size: 16px;
+  cursor: pointer;
+  color: #444;
+  transition: color 0.2s ease;
+}
+
+.close-button:hover {
+  background: none;
+  border: none;
+  color: #dadada;
+}
+
+.modal-body {
+  padding: 20px;
+  color: #555;
+  line-height: 1.6;
+  font-size: 10px;
+}
+.modal-body hr {
+  border: none;
+  border-top: 1px solid #e6e8ec;
+}
+
+.modal-row {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 4px 0;
+}
+
+.label {
+  flex: 1;
+  text-align: left;
+}
+
+.separator {
+  flex: 0.5;
+  text-align: center;
+  color: #ddd;
+}
+
+.modal-row .value {
+  flex: 1;
+  text-align: right;
+  font-size: 10px;
+}
+.modal-hr {
+  margin: 20px;
+}
+.modal-footer {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 20px;
+  min-height: 25px;
+}
+
+.misc-item-footer {
+  display: flex;
+  gap: 10px;
+}
+
+.settings-icon {
+  cursor: pointer;
+  color: #4a90e2;
+  font-size: 12px;
+}
+.settings-icon:hover {
+  color: #165599;
+}
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
+}
+
+@keyframes slideUp {
+  from {
+    transform: translateY(20px);
+  }
+  to {
+    transform: translateY(0);
+  }
+}
+
+/******************************************* Forms  *******************************************/
+
+/*.form-container {
+  background-color: transparent;
+}
+
+.form-container label {
+  font-size: 12px;
+  width: 100%;
+}
+
+.form-container input,
+.form-container select {
+  font-size: 11px;
+  padding: 10px 0px;
+  outline: none;
+  background-color: transparent;
+  box-sizing: border-box;
+  border: none;
+  border-bottom: 1px solid black;
+  width: 100%;
+  margin-bottom: 5px;
+}
+
+.form-container button {
+  padding: 12px 0px;
+  font-size: 12px;
+  background-color: transparent;
+  color: black;
+  border: 1px solid #333;
+  cursor: pointer;
+  transition: all 0.3s ease-in-out;
+  margin-top: 2vh;
+  width: 100%;
+}
+
+.form-container button:hover {
+  background-color: #f3fafd;
+  cursor: pointer;
+  border: 1px solid grey;
+  color: black;
+  transform: translateY(-2px);
+}
+
+/**************************************** Tool Tips  ***************************************/
+/*.tooltip-content {
+  background-color: #e6f7ff;
+  border: 1px solid #4a90e2;
+  padding: 8px 10px;
+  border-radius: 8px;
+  font-size: 12px;
+  color: #4a90e2;
+  box-shadow: 0 6px 12px rgba(72, 144, 226, 0.2),
+    0 12px 24px rgba(72, 144, 226, 0.15);
+}
+
+.tooltip-content .amount {
+  font-size: 12px;
+  font-weight: 600;
+  color: #4a90e2;
+  margin-top: 4px;
+}
+
+.recharts-surface {
+  background-color: transparent;
+}
+
+.recharts-tooltip-cursor {
+  display: none;
+}
+
+/******************************** New Entry Tool Tips  **********************************/
+/*
+.tooltip {
+  position: relative;
+  display: flex;
+  align-items: center;
+}
+
+.tooltip .tooltiptext {
+  visibility: hidden;
+  white-space: nowrap;
+  max-width: 220px;
+  background-color: rgba(0, 0, 0, 0.7);
+  color: #fff;
+  text-align: left;
+  border-radius: 6px;
+  padding: 5px 10px;
+  position: absolute;
+  z-index: 1;
+  top: 50%;
+  right: 115%;
+  transform: translateY(-50%);
+  opacity: 0;
+  transition: opacity 0.3s, max-width 0.3s ease-in-out;
+  overflow-wrap: break-word;
+}
+.tooltip:hover .tooltiptext,
+.tooltip.show .tooltiptext {
+  visibility: visible;
+  opacity: 1;
+  background-color: transparent;
+  color: #4a90e2;
+  font-size: 10px;
+  max-width: 250px;
+}
+.fade-out {
+  opacity: 0;
+  transition: opacity 0.5s ease-in-out;
+}
+
+.fade-in {
+  opacity: 1;
+  transition: opacity 0.5s ease-in-out;
+}
+
+/************************************ Loading Spinner  *************************************/
+/*
+.component-loading-spinner-wrapper {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  min-height: 300px;
+  background-color: transparent;
+  z-index: 10;
+}
+
+.spinner-wrapper {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+}
+
+.spinner {
+  width: 50px;
+  height: 50px;
+  border: 6px solid #ccc;
+  border-top-color: #007bff;
+  border-radius: 50%;
+  animation: spin 1s linear infinite;
+}
+
+.items-spinner-wrapper {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  height: 150px;
+}
+
+@keyframes spin {
+  from {
+    transform: rotate(0deg);
+  }
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+/***************************************** Toggle  ****************************************/
+/*.toggle-switch {
+  position: relative;
+  display: inline-block;
+  width: 34px;
+  height: 18px;
+  cursor: pointer;
+}
+
+.toggle-switch input {
+  opacity: 0;
+  width: 0;
+  height: 0;
+}
+
+.slider {
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background-color: #ccc;
+  border-radius: 24px;
+  transition: 0.4s;
+}
+
+.slider:before {
+  position: absolute;
+  content: "";
+  height: 12px;
+  width: 12px;
+  left: 3px;
+  bottom: 3px;
+  background-color: white;
+  border-radius: 50%;
+  transition: 0.4s;
+}
+
+input:checked + .slider {
+  background-color: #4a90e2;
+}
+
+input:checked + .slider:before {
+  transform: translateX(16px);
+}
+
+.toggle-label {
+  margin-left: 10px;
+  font-weight: bold;
+}
+.icon-container {
+  display: flex;
+  gap: 10px;
+}
+
+/************************************ Fade Animation  *************************************/
+/*.fade-in {
+  opacity: 0;
+  transform: translateY(10px);
+  transition: opacity 0.6s ease, transform 0.6s ease;
+}
+
+.fade-in.visible {
+  opacity: 1;
+  transform: translateY(0);
+}
+
+/* Calendar fade-in  */
+/*.fades-in-hidden {
+  opacity: 0;
+  visibility: hidden;
+}
+
+.fades-in {
+  opacity: 0;
+  visibility: visible;
+  animation: fadesIn 0.9s ease-in-out forwards;
+}
+
+@keyframes fadesIn {
+  to {
+    opacity: 1;
+  }
+}
+
+/*************************************** Bars Tabs  ***************************************/
+/*
+.tab-container {
+  display: flex;
+  gap: 50px;
+}
+.tab {
+  overflow: hidden;
+  background-color: #fff;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 1px 0;
+}
+
+.tab-button {
+  float: left;
+  background-color: transparent;
+  border: none;
+  padding: 1px 0;
+  font-size: 12px;
+  font-weight: bold;
+  cursor: pointer;
+  transition: background-color 0.2s ease, color 0.2s ease;
+}
+
+.tab-button:hover {
+  background-color: transparent;
+  color: #4a90e2;
+}
+
+.tab-button.active {
+  color: #4a90e2;
+  font-weight: 600;
+}
+
+/*************************************** Flow Tabs  ***************************************/
+/*
+.flow-tabs .tab-container {
+  display: flex;
+  gap: 50px;
+}
+
+.flow-tabs .tab-button {
+  float: left;
+  background-color: transparent;
+  border: none;
+  padding: 1px 20px;
+  font-size: 10px;
+  font-weight: bold;
+  cursor: pointer;
+  transition: background-color 0.2s ease, color 0.2s ease;
+}
+
+/***************************************** Toast  ********************************************/
+/*
+.custom-toast {
+  position: fixed;
+  bottom: 1rem;
+  right: -300px;
+  width: 210px;
+  padding: 1.25rem 1.5rem;
+  background: #e6f7ff;
+  border: 1px solid #4a90e2;
+  border-radius: 5px;
+
+  color: #4a90e2;
+  font-size: 11px;
+  font-weight: 500;
+  text-align: center;
+
+  opacity: 0;
+  transition: right 0.3s ease, opacity 0.3s ease;
+  z-index: 10000;
+}
+
+.custom-toast.show {
+  right: 1rem;
+  opacity: 1;
+}
+
+/*******************************************************************************************/
+/****************************************** Pages ******************************************/
+/*******************************************************************************************/
+
+/* ******************************* Horizontal Containers ***********************************/
+/*
+.flow-summary-and-largest-trade-container,
+.bars-and-calendar-container,
+.investment-and-dailypnl-container,
+.networth-and-cash-container,
+.investment-and-cash-container,
+.eqt-and-summary-container,
+.watchlist-and-misc-container {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 0px;
+  padding: 20px;
+  min-height: 500px;
+}
+
+@media (max-width: 768px) {
+  .investment-and-dailypnl-container {
+    flex-direction: column;
+    gap: 1rem;
+  }
+}
+
+.savings-account-charts-container,
+.transactions-and-distribution-container {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 0px;
+}
+
+/* .watchlist-and-misc-container {
+  display: flex;
+  position: inherit;
+  gap: 1rem;
+  align-items: flex-start;
+  width: 100%;
+  height: 500px;
+  background-color: transparent;
+  padding: 0;
+} */
+
+/******************************Within the Horizontal Containers *****************************/
+/*.flow-summary,
+.transactions-accounts,
+.networth-chart-networth,
+.eqt-home,
+.eqt-trades,
+.eqt-analysis,
+.eqt-accounts,
+.investment-home,
+.investment-accounts {
+  flex: 0.7;
+}
+
+.bars-home,
+.calendar-home,
+.watchlist-trades,
+.misc-trades {
+  flex: 0.5;
+  display: flex;
+  flex-direction: column;
+}
+
+.largest-trade,
+.transaction-distribution-accounts,
+.networth-cash-networth,
+.summary-accounts,
+.summary-home,
+.summary-analysis,
+.summary-trades,
+.cash-accounts,
+.pnl-home {
+  flex: 0.3;
+}
+
+/* .watchlist-trades {
+  flex: 0.35;
+  padding-left: 2vw;
+  padding-top: 2vh;
+  box-sizing: border-box;
+}
+
+, {
+  flex: 0.65;
+  padding-right: 2vw;
+  padding-top: 2vh;
+  box-sizing: border-box;
+} */
+
+/**************************************** Pie Charts ***************************************/
+/*
+.savings-growth-chart,
+.account-distribution-chart {
+  flex: 1;
+}
+
+/**************************************** Context Page ***************************************/
