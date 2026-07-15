@@ -69,8 +69,62 @@ def _prepend_initial_cash_anchor(points, initial_cash_row):
     else:
         return points
 
-    anchor = {"date": anchor_date, "value": initial_value}
+    # anchor = {"date": anchor_date, "value": initial_value}
+    anchor = {
+        "date": anchor_date,
+        "value": initial_value,
+        "actual_value": initial_value,
+        "portfolio_close": initial_value,
+        "deposits": 0.0,
+        "withdrawals": 0.0,
+        "net_flow": 0.0,
+    }
     return [anchor] + points
+
+def _prepend_home_initial_cash_anchor(points, initial_cash_row):
+    """
+    Home chart version of the initial cash anchor.
+
+    The Home chart is rebased for deposits/withdrawals so cash movement does not
+    create fake cliffs/spikes. The initial cash anchor must be rebased too.
+
+    Example:
+      initial cash = 550
+      later withdrawal = 500
+
+      regular anchor would be 550, then next point may be 50.
+      home anchor should be 50 so the chart does not show a fake drop.
+    """
+    if not points or not initial_cash_row:
+        return points
+
+    initial_date = initial_cash_row.entry_date
+    initial_value = round(float(initial_cash_row.initial_cash), 2)
+
+    first_date = points[0]["date"]
+
+    if first_date == initial_date:
+        anchor_date = initial_date - timedelta(days=1)
+    elif first_date > initial_date:
+        anchor_date = initial_date
+    else:
+        return points
+
+    total_future_net_flow = sum(float(p.get("net_flow", 0) or 0) for p in points)
+    adjusted_initial_value = round(initial_value + total_future_net_flow, 2)
+
+    anchor = {
+        "date": anchor_date,
+        "value": adjusted_initial_value,
+        "actual_value": adjusted_initial_value,
+        "portfolio_close": initial_value,
+        "deposits": 0.0,
+        "withdrawals": 0.0,
+        "net_flow": 0.0,
+    }
+
+    return [anchor] + points
+
 
 def _cash_flows_on_date(db: Session, user_id: int, txn_date: date) -> tuple[float, float]:
     """
@@ -125,27 +179,125 @@ def _actual_equity_for_entry(db: Session, user_id: int, portfolio_entry) -> floa
 
     return balance + deposits - withdrawals
 
-
 def _build_actual_equity_points(db: Session, user_id: int, portfolio_entries):
     """
-    Sparse actual equity curve.
+    Actual account-value curve with cash-flow context.
 
-    Used by Home page:
-    - Shows actual current FFA/broker account value.
-    - Deposits increase the value.
-    - Withdrawals decrease the value.
+    Used by Home page tooltip:
+    - Portfolio close shows the trading close snapshot.
+    - Deposits/withdrawals explain account-value movement.
+    - Actual value reflects what is really in the broker/FFA account after cash movement.
     """
     points = []
 
     for p in portfolio_entries:
-        actual_equity = _actual_equity_for_entry(db, user_id, p)
+        deposits, withdrawals = _cash_flows_on_date(
+            db=db,
+            user_id=user_id,
+            txn_date=p.entry_date,
+        )
+
+        portfolio_close = float(p.balance)
+        actual_equity = portfolio_close + deposits - withdrawals
+        net_flow = deposits - withdrawals
 
         points.append({
             "date": p.entry_date,
             "value": round(actual_equity, 2),
+            "portfolio_close": round(portfolio_close, 2),
+            "deposits": round(deposits, 2),
+            "withdrawals": round(withdrawals, 2),
+            "net_flow": round(net_flow, 2),
         })
 
     return points
+# def _build_actual_equity_points(db: Session, user_id: int, portfolio_entries):
+#     """
+#     Sparse actual equity curve.
+
+#     Used by Home page:
+#     - Shows actual current FFA/broker account value.
+#     - Deposits increase the value.
+#     - Withdrawals decrease the value.
+#     """
+#     points = []
+
+#     for p in portfolio_entries:
+#         actual_equity = _actual_equity_for_entry(db, user_id, p)
+
+#         points.append({
+#             "date": p.entry_date,
+#             "value": round(actual_equity, 2),
+#         })
+
+#     return points
+
+def _build_home_equity_points(db: Session, user_id: int, portfolio_entries):
+    """
+    Broker-style Home equity curve.
+
+    This curve rebases historical portfolio closes by cash flows that happened
+    from each date through the latest date.
+
+    Why:
+    - Withdrawals should not create a fake cliff on the chart.
+    - Deposits should not create a fake spike on the chart.
+    - The Home chart should show account-value scale while preserving trading shape.
+
+    Example:
+      6/10 close = 1067.94
+      6/11 close = 901.94
+      6/11 withdrawal = 500
+      6/12 close = 329.12
+
+      Home values:
+      6/10 = 1067.94 - 500 = 567.94
+      6/11 = 901.94 - 500 = 401.94
+      6/12 = 329.12
+    """
+    if not portfolio_entries:
+        return []
+
+    base_points = []
+
+    for p in portfolio_entries:
+        deposits, withdrawals = _cash_flows_on_date(
+            db=db,
+            user_id=user_id,
+            txn_date=p.entry_date,
+        )
+
+        portfolio_close = float(p.balance)
+        net_flow = deposits - withdrawals
+
+        base_points.append({
+            "date": p.entry_date,
+            "portfolio_close": round(portfolio_close, 2),
+            "deposits": round(deposits, 2),
+            "withdrawals": round(withdrawals, 2),
+            "net_flow": round(net_flow, 2),
+        })
+
+    adjusted_points = []
+    future_net_flow = 0.0
+
+    for point in reversed(base_points):
+        future_net_flow += float(point["net_flow"])
+
+        adjusted_value = float(point["portfolio_close"]) + future_net_flow
+
+        adjusted_points.append({
+            "date": point["date"],
+            "value": round(adjusted_value, 2),
+            "actual_value": round(adjusted_value, 2),
+            "portfolio_close": point["portfolio_close"],
+            "deposits": point["deposits"],
+            "withdrawals": point["withdrawals"],
+            "net_flow": point["net_flow"],
+        })
+
+    adjusted_points.reverse()
+    return adjusted_points
 
 
 def compute_daily_trading_summary(db: Session, user_id: int, portfolio_entries):
@@ -416,7 +568,18 @@ def compute_account_summary(db: Session, user_id: int, portfolio_entries, deposi
 
 def _fill_daily_curve(points):
     """
-    Given sparse points [{date, value}] sorted asc, fill missing days by carrying forward last value.
+    Given sparse points sorted asc, fill missing days by carrying forward
+    the latest full point.
+
+    Important:
+    Preserve extra fields such as:
+    - actual_value
+    - portfolio_close
+    - deposits
+    - withdrawals
+    - net_flow
+
+    This lets the Home chart plot one value while showing richer tooltip context.
     """
     if not points:
         return []
@@ -427,14 +590,36 @@ def _fill_daily_curve(points):
     filled = []
     date_pointer = start
     index = 0
-    last_value = float(points[0]["value"])
+
+    last_point = dict(points[0])
 
     while date_pointer <= end:
         if index < len(points) and points[index]["date"] == date_pointer:
-            last_value = float(points[index]["value"])
+            last_point = dict(points[index])
             index += 1
 
-        filled.append({"date": date_pointer, "value": round(last_value, 2)})
+        carried_point = dict(last_point)
+        carried_point["date"] = date_pointer
+
+        if "value" in carried_point:
+            carried_point["value"] = round(float(carried_point["value"]), 2)
+
+        if "actual_value" in carried_point:
+            carried_point["actual_value"] = round(float(carried_point["actual_value"]), 2)
+
+        if "portfolio_close" in carried_point:
+            carried_point["portfolio_close"] = round(float(carried_point["portfolio_close"]), 2)
+
+        if "deposits" in carried_point:
+            carried_point["deposits"] = round(float(carried_point["deposits"]), 2)
+
+        if "withdrawals" in carried_point:
+            carried_point["withdrawals"] = round(float(carried_point["withdrawals"]), 2)
+
+        if "net_flow" in carried_point:
+            carried_point["net_flow"] = round(float(carried_point["net_flow"]), 2)
+
+        filled.append(carried_point)
         date_pointer += timedelta(days=1)
 
     return filled
@@ -719,8 +904,8 @@ def dashboard(
     # ]
     # equity_curve = _prepend_initial_cash_anchor(equity_curve, initial_cash_row)
 
-    equity_curve = _build_actual_equity_points(db, user_id, portfolio_entries)
-    equity_curve = _prepend_initial_cash_anchor(equity_curve, initial_cash_row)
+    equity_curve = _build_home_equity_points(db, user_id, portfolio_entries)
+    equity_curve = _prepend_home_initial_cash_anchor(equity_curve, initial_cash_row)
 
     trades = db.query(Trades).filter(Trades.user_id == user_id).all()
     realized = [float(t.profit_loss) for t in trades if t.profit_loss is not None]
@@ -1018,82 +1203,20 @@ def dashboard_charts(
             "financial_curve": [],
         }
 
-    # initial_cash_row = (
-    #     db.query(InitialCash)
-    #     .filter(InitialCash.user_id == user_id)
-    #     .first()
-    # )
-
-    # # raw_points = [
-    # #     {"date": p.entry_date, "value": round(float(p.balance), 2)}
-    # #     for p in portfolio_entries
-    # # ]
-    # # raw_points = _prepend_initial_cash_anchor(raw_points, initial_cash_row)
-    # # filled_curve = _fill_daily_curve(raw_points)
-
-    # raw_points = _build_actual_equity_points(db, user_id, portfolio_entries)
-    # raw_points = _prepend_initial_cash_anchor(raw_points, initial_cash_row)
-    # filled_curve = _fill_daily_curve(raw_points)
-
-    # normalized_points = _build_normalized_equity_points(db, user_id, portfolio_entries)
-    # normalized_points = _prepend_initial_cash_anchor(normalized_points, initial_cash_row)
-    # normalized_filled_curve = _fill_daily_curve(normalized_points)
-
-    # trades = (
-    #     db.query(Trades)
-    #     .filter(Trades.user_id == user_id)
-    #     .all()
-    # )
-
     initial_cash_row = (
         db.query(InitialCash)
         .filter(InitialCash.user_id == user_id)
         .first()
     )
 
-    # ---------------------------------------------------------
-    # Home chart curve
-    # ---------------------------------------------------------
-    # This is the broker-style trading equity curve.
-    # It uses the actual portfolio close values only.
-    #
-    # Important:
-    # - Deposits should not make the Home line chart jump up.
-    # - Withdrawals should not make the Home line chart drop.
-    # - The Home big number/account value can still reflect cash movement,
-    #   but the chart line should represent trading/account close performance.
-    # ---------------------------------------------------------
-    raw_points = [
-        {
-            "date": p.entry_date,
-            "value": round(float(p.balance), 2),
-        }
-        for p in portfolio_entries
-    ]
-    raw_points = _prepend_initial_cash_anchor(raw_points, initial_cash_row)
+    raw_points = _build_home_equity_points(db, user_id, portfolio_entries)
+    raw_points = _prepend_home_initial_cash_anchor(raw_points, initial_cash_row)
     filled_curve = _fill_daily_curve(raw_points)
 
-    # ---------------------------------------------------------
-    # Actual account value curve
-    # ---------------------------------------------------------
-    # This reflects the real broker/FFA account value after cash movement.
-    # Useful for debugging, future tooltip improvements, or account-value displays.
-    #
-    # Example:
-    # portfolio close = 901.94
-    # after-close withdrawal = 500.00
-    # actual account value = 401.94
-    # ---------------------------------------------------------
     actual_points = _build_actual_equity_points(db, user_id, portfolio_entries)
     actual_points = _prepend_initial_cash_anchor(actual_points, initial_cash_row)
     actual_filled_curve = _fill_daily_curve(actual_points)
 
-    # ---------------------------------------------------------
-    # Profile performance curve
-    # ---------------------------------------------------------
-    # This removes the distortion from deposits/withdrawals.
-    # It is the correct curve for Profile/account performance.
-    # ---------------------------------------------------------
     normalized_points = _build_normalized_equity_points(db, user_id, portfolio_entries)
     normalized_points = _prepend_initial_cash_anchor(normalized_points, initial_cash_row)
     normalized_filled_curve = _fill_daily_curve(normalized_points)
