@@ -1018,23 +1018,82 @@ def dashboard_charts(
             "financial_curve": [],
         }
 
+    # initial_cash_row = (
+    #     db.query(InitialCash)
+    #     .filter(InitialCash.user_id == user_id)
+    #     .first()
+    # )
+
+    # # raw_points = [
+    # #     {"date": p.entry_date, "value": round(float(p.balance), 2)}
+    # #     for p in portfolio_entries
+    # # ]
+    # # raw_points = _prepend_initial_cash_anchor(raw_points, initial_cash_row)
+    # # filled_curve = _fill_daily_curve(raw_points)
+
+    # raw_points = _build_actual_equity_points(db, user_id, portfolio_entries)
+    # raw_points = _prepend_initial_cash_anchor(raw_points, initial_cash_row)
+    # filled_curve = _fill_daily_curve(raw_points)
+
+    # normalized_points = _build_normalized_equity_points(db, user_id, portfolio_entries)
+    # normalized_points = _prepend_initial_cash_anchor(normalized_points, initial_cash_row)
+    # normalized_filled_curve = _fill_daily_curve(normalized_points)
+
+    # trades = (
+    #     db.query(Trades)
+    #     .filter(Trades.user_id == user_id)
+    #     .all()
+    # )
+
     initial_cash_row = (
         db.query(InitialCash)
         .filter(InitialCash.user_id == user_id)
         .first()
     )
 
-    # raw_points = [
-    #     {"date": p.entry_date, "value": round(float(p.balance), 2)}
-    #     for p in portfolio_entries
-    # ]
-    # raw_points = _prepend_initial_cash_anchor(raw_points, initial_cash_row)
-    # filled_curve = _fill_daily_curve(raw_points)
-
-    raw_points = _build_actual_equity_points(db, user_id, portfolio_entries)
+    # ---------------------------------------------------------
+    # Home chart curve
+    # ---------------------------------------------------------
+    # This is the broker-style trading equity curve.
+    # It uses the actual portfolio close values only.
+    #
+    # Important:
+    # - Deposits should not make the Home line chart jump up.
+    # - Withdrawals should not make the Home line chart drop.
+    # - The Home big number/account value can still reflect cash movement,
+    #   but the chart line should represent trading/account close performance.
+    # ---------------------------------------------------------
+    raw_points = [
+        {
+            "date": p.entry_date,
+            "value": round(float(p.balance), 2),
+        }
+        for p in portfolio_entries
+    ]
     raw_points = _prepend_initial_cash_anchor(raw_points, initial_cash_row)
     filled_curve = _fill_daily_curve(raw_points)
 
+    # ---------------------------------------------------------
+    # Actual account value curve
+    # ---------------------------------------------------------
+    # This reflects the real broker/FFA account value after cash movement.
+    # Useful for debugging, future tooltip improvements, or account-value displays.
+    #
+    # Example:
+    # portfolio close = 901.94
+    # after-close withdrawal = 500.00
+    # actual account value = 401.94
+    # ---------------------------------------------------------
+    actual_points = _build_actual_equity_points(db, user_id, portfolio_entries)
+    actual_points = _prepend_initial_cash_anchor(actual_points, initial_cash_row)
+    actual_filled_curve = _fill_daily_curve(actual_points)
+
+    # ---------------------------------------------------------
+    # Profile performance curve
+    # ---------------------------------------------------------
+    # This removes the distortion from deposits/withdrawals.
+    # It is the correct curve for Profile/account performance.
+    # ---------------------------------------------------------
     normalized_points = _build_normalized_equity_points(db, user_id, portfolio_entries)
     normalized_points = _prepend_initial_cash_anchor(normalized_points, initial_cash_row)
     normalized_filled_curve = _fill_daily_curve(normalized_points)
@@ -1117,8 +1176,18 @@ def dashboard_charts(
         for f in financial_rows
     ]
 
+    # return {
+    #     "equity_curve": filled_curve,
+    #     "normalized_equity_curve": normalized_filled_curve,
+    #     "equity_analysis": equity_analysis,
+    #     "weekly_pnl": weekly_pnl,
+    #     "win_loss": win_loss,
+    #     "allocation": allocation,
+    #     "financial_curve": financial_curve,
+    # }
     return {
         "equity_curve": filled_curve,
+        "actual_equity_curve": actual_filled_curve,
         "normalized_equity_curve": normalized_filled_curve,
         "equity_analysis": equity_analysis,
         "weekly_pnl": weekly_pnl,
@@ -1126,7 +1195,6 @@ def dashboard_charts(
         "allocation": allocation,
         "financial_curve": financial_curve,
     }
-
 
 # =========================================================
 # Realized PnL Histogram

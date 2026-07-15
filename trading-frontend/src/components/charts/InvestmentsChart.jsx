@@ -60,7 +60,11 @@ const InvestmentsChart = ({
     ? account.current_equity
     : account.total_value;
 
-  const bigNumber = latestCurveValue ?? fallbackBigNumber ?? 0;
+  // const bigNumber = latestCurveValue ?? fallbackBigNumber ?? 0;
+
+  const bigNumber = isHome
+    ? account.current_equity
+    : (latestCurveValue ?? account.total_value ?? 0);
 
   const pnlValue = isHome ? (daily?.pnl ?? 0) : account.net_pnl;
   const roiValue = isHome ? (daily?.roi ?? 0) : account.roi;
