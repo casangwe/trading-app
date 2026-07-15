@@ -5,7 +5,7 @@ from sqlalchemy.orm import Session
 
 from ..database import get_db_connection
 from ..auth import get_current_user
-from ..models import User, InitialCash
+from ..models import User, InitialCash, Portfolio
 from ..schema import (
     InitialCashCreate,
     InitialCashUpdate,
@@ -14,6 +14,39 @@ from ..schema import (
 
 router = APIRouter()
 
+def _sync_initial_portfolio_row(
+    db: Session,
+    user_id: int,
+    entry_date,
+    initial_cash,
+) -> Portfolio:
+    """
+    Initial cash is also the first portfolio balance.
+
+    This keeps new-user dashboards, profile KPIs, and charts populated as soon
+    as the user enters initial cash, without requiring a separate manual
+    portfolio entry.
+    """
+    portfolio_row = (
+        db.query(Portfolio)
+        .filter(
+            Portfolio.user_id == user_id,
+            Portfolio.entry_date == entry_date,
+        )
+        .first()
+    )
+
+    if portfolio_row:
+        portfolio_row.balance = initial_cash
+        return portfolio_row
+
+    portfolio_row = Portfolio(
+        user_id=user_id,
+        entry_date=entry_date,
+        balance=initial_cash,
+    )
+    db.add(portfolio_row)
+    return portfolio_row
 
 @router.get("/", response_model=InitialCashResponse | None)
 def get_initial_cash(
@@ -58,6 +91,14 @@ def create_initial_cash(
     )
 
     db.add(row)
+
+    _sync_initial_portfolio_row(
+        db=db,
+        user_id=current_user.id,
+        entry_date=payload.entry_date,
+        initial_cash=payload.initial_cash,
+    )
+
     db.commit()
     db.refresh(row)
     return row
@@ -91,6 +132,13 @@ def update_initial_cash(
 
     for field, value in update_data.items():
         setattr(row, field, value)
+
+    _sync_initial_portfolio_row(
+        db=db,
+        user_id=current_user.id,
+        entry_date=row.entry_date,
+        initial_cash=row.initial_cash,
+    )
 
     db.commit()
     db.refresh(row)
