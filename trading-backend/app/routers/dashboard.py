@@ -155,105 +155,121 @@ def _cash_flows_on_date(db: Session, user_id: int, txn_date: date) -> tuple[floa
 
     return float(deposits), float(withdrawals)
 
+def _cash_flows_on_date_by_timing(
+    db: Session,
+    user_id: int,
+    txn_date: date,
+    timing: str,
+) -> tuple[float, float]:
+    """
+    Returns deposits and withdrawals for one date and one timing bucket.
+
+    timing:
+    - pre_open: cash available before the trading session
+    - after_close: cash moved after the trading close
+    """
+    deposits = _sum_transactions_on_date(
+        db=db,
+        user_id=user_id,
+        txn_type="deposit",
+        txn_date=txn_date,
+        timing=timing,
+    )
+
+    withdrawals = _sum_transactions_on_date(
+        db=db,
+        user_id=user_id,
+        txn_type="withdrawal",
+        txn_date=txn_date,
+        timing=timing,
+    )
+
+    return float(deposits), float(withdrawals)
 
 def _actual_equity_for_entry(db: Session, user_id: int, portfolio_entry) -> float:
     """
-    Actual trading account value for Home page.
+    Actual broker/FFA account value after the close for this portfolio date.
 
-    This reflects what is actually in the broker/FFA account after same-day
-    deposits and withdrawals are included.
+    Portfolio.balance is treated as the market close value before after-close
+    cash movement.
 
-    Example:
-      portfolio balance = 599.72
-      same-day deposit = 208.60
-      same-day withdrawal = 198.33
-
-      actual equity = 599.72 + 208.60 - 198.33 = 609.99
+    Therefore:
+    - pre_open deposits/withdrawals are already reflected in Portfolio.balance
+    - after_close deposits/withdrawals must be applied after Portfolio.balance
     """
     balance = float(portfolio_entry.balance)
-    deposits, withdrawals = _cash_flows_on_date(
+
+    deposits_after_close, withdrawals_after_close = _cash_flows_on_date_by_timing(
         db=db,
         user_id=user_id,
         txn_date=portfolio_entry.entry_date,
+        timing="after_close",
     )
 
-    return balance + deposits - withdrawals
+    return balance + deposits_after_close - withdrawals_after_close
 
 def _build_actual_equity_points(db: Session, user_id: int, portfolio_entries):
     """
-    Actual account-value curve with cash-flow context.
+    Raw actual account-value curve by date.
 
-    Used by Home page tooltip:
-    - Portfolio close shows the trading close snapshot.
-    - Deposits/withdrawals explain account-value movement.
-    - Actual value reflects what is really in the broker/FFA account after cash movement.
+    This is not the Home chart's rebased curve.
+    This reflects actual account value after after-close cash movement.
+
+    Rules:
+    - Portfolio.balance already includes pre_open flows.
+    - Apply after_close flows to get true end-of-day account value.
     """
     points = []
 
     for p in portfolio_entries:
-        deposits, withdrawals = _cash_flows_on_date(
+        deposits_pre_open, withdrawals_pre_open = _cash_flows_on_date_by_timing(
             db=db,
             user_id=user_id,
             txn_date=p.entry_date,
+            timing="pre_open",
         )
 
+        deposits_after_close, withdrawals_after_close = _cash_flows_on_date_by_timing(
+            db=db,
+            user_id=user_id,
+            txn_date=p.entry_date,
+            timing="after_close",
+        )
+
+        deposits_total = deposits_pre_open + deposits_after_close
+        withdrawals_total = withdrawals_pre_open + withdrawals_after_close
+
         portfolio_close = float(p.balance)
-        actual_equity = portfolio_close + deposits - withdrawals
-        net_flow = deposits - withdrawals
+        actual_equity = portfolio_close + deposits_after_close - withdrawals_after_close
+        net_flow = deposits_total - withdrawals_total
 
         points.append({
             "date": p.entry_date,
             "value": round(actual_equity, 2),
+            "actual_value": round(actual_equity, 2),
             "portfolio_close": round(portfolio_close, 2),
-            "deposits": round(deposits, 2),
-            "withdrawals": round(withdrawals, 2),
+            "deposits": round(deposits_total, 2),
+            "withdrawals": round(withdrawals_total, 2),
+            "pre_open_net_flow": round(deposits_pre_open - withdrawals_pre_open, 2),
+            "after_close_net_flow": round(deposits_after_close - withdrawals_after_close, 2),
             "net_flow": round(net_flow, 2),
         })
 
     return points
-# def _build_actual_equity_points(db: Session, user_id: int, portfolio_entries):
-#     """
-#     Sparse actual equity curve.
-
-#     Used by Home page:
-#     - Shows actual current FFA/broker account value.
-#     - Deposits increase the value.
-#     - Withdrawals decrease the value.
-#     """
-#     points = []
-
-#     for p in portfolio_entries:
-#         actual_equity = _actual_equity_for_entry(db, user_id, p)
-
-#         points.append({
-#             "date": p.entry_date,
-#             "value": round(actual_equity, 2),
-#         })
-
-#     return points
 
 def _build_home_equity_points(db: Session, user_id: int, portfolio_entries):
     """
     Broker-style Home equity curve.
 
-    This curve rebases historical portfolio closes by cash flows that happened
-    from each date through the latest date.
+    The Home chart should not create fake cliffs/spikes from deposits or
+    withdrawals.
 
-    Why:
-    - Withdrawals should not create a fake cliff on the chart.
-    - Deposits should not create a fake spike on the chart.
-    - The Home chart should show account-value scale while preserving trading shape.
+    Portfolio.balance is the market close value before after-close flows.
 
-    Example:
-      6/10 close = 1067.94
-      6/11 close = 901.94
-      6/11 withdrawal = 500
-      6/12 close = 329.12
-
-      Home values:
-      6/10 = 1067.94 - 500 = 567.94
-      6/11 = 901.94 - 500 = 401.94
-      6/12 = 329.12
+    Rules:
+    - pre_open flows are already inside that day's Portfolio.balance.
+    - after_close flows are applied to that same day's displayed account value.
+    - future cash flows rebase earlier points so transfers don't look like PnL.
     """
     if not portfolio_entries:
         return []
@@ -261,30 +277,48 @@ def _build_home_equity_points(db: Session, user_id: int, portfolio_entries):
     base_points = []
 
     for p in portfolio_entries:
-        deposits, withdrawals = _cash_flows_on_date(
+        deposits_pre_open, withdrawals_pre_open = _cash_flows_on_date_by_timing(
             db=db,
             user_id=user_id,
             txn_date=p.entry_date,
+            timing="pre_open",
+        )
+
+        deposits_after_close, withdrawals_after_close = _cash_flows_on_date_by_timing(
+            db=db,
+            user_id=user_id,
+            txn_date=p.entry_date,
+            timing="after_close",
         )
 
         portfolio_close = float(p.balance)
-        net_flow = deposits - withdrawals
+
+        pre_open_net_flow = deposits_pre_open - withdrawals_pre_open
+        after_close_net_flow = deposits_after_close - withdrawals_after_close
+        total_net_flow = pre_open_net_flow + after_close_net_flow
 
         base_points.append({
             "date": p.entry_date,
             "portfolio_close": round(portfolio_close, 2),
-            "deposits": round(deposits, 2),
-            "withdrawals": round(withdrawals, 2),
-            "net_flow": round(net_flow, 2),
+            "deposits": round(deposits_pre_open + deposits_after_close, 2),
+            "withdrawals": round(withdrawals_pre_open + withdrawals_after_close, 2),
+            "pre_open_net_flow": round(pre_open_net_flow, 2),
+            "after_close_net_flow": round(after_close_net_flow, 2),
+            "net_flow": round(total_net_flow, 2),
         })
 
     adjusted_points = []
-    future_net_flow = 0.0
+    future_net_flow_after_this_date = 0.0
 
     for point in reversed(base_points):
-        future_net_flow += float(point["net_flow"])
+        portfolio_close = float(point["portfolio_close"])
+        after_close_net_flow = float(point["after_close_net_flow"])
 
-        adjusted_value = float(point["portfolio_close"]) + future_net_flow
+        adjusted_value = (
+            portfolio_close
+            + after_close_net_flow
+            + future_net_flow_after_this_date
+        )
 
         adjusted_points.append({
             "date": point["date"],
@@ -293,12 +327,15 @@ def _build_home_equity_points(db: Session, user_id: int, portfolio_entries):
             "portfolio_close": point["portfolio_close"],
             "deposits": point["deposits"],
             "withdrawals": point["withdrawals"],
+            "pre_open_net_flow": point["pre_open_net_flow"],
+            "after_close_net_flow": point["after_close_net_flow"],
             "net_flow": point["net_flow"],
         })
 
+        future_net_flow_after_this_date += float(point["net_flow"])
+
     adjusted_points.reverse()
     return adjusted_points
-
 
 def compute_daily_trading_summary(db: Session, user_id: int, portfolio_entries):
     """
@@ -529,13 +566,24 @@ def compute_account_summary(db: Session, user_id: int, portfolio_entries, deposi
         latest_balance = float(latest.balance)
         latest_date = latest.entry_date
 
-        deposits_on_latest, withdrawals_on_latest = _cash_flows_on_date(
+        deposits_pre_open, withdrawals_pre_open = _cash_flows_on_date_by_timing(
             db=db,
             user_id=user_id,
             txn_date=latest_date,
+            timing="pre_open",
         )
 
-        current_equity = latest_balance + deposits_on_latest - withdrawals_on_latest
+        deposits_after_close, withdrawals_after_close = _cash_flows_on_date_by_timing(
+            db=db,
+            user_id=user_id,
+            txn_date=latest_date,
+            timing="after_close",
+        )
+
+        deposits_on_latest = deposits_pre_open + deposits_after_close
+        withdrawals_on_latest = withdrawals_pre_open + withdrawals_after_close
+
+        current_equity = latest_balance + deposits_after_close - withdrawals_after_close
 
     total_value = current_equity + total_withdrawals
     net_pnl = total_value - invested_capital
@@ -626,20 +674,15 @@ def _fill_daily_curve(points):
 
 def _build_normalized_equity_points(db: Session, user_id: int, portfolio_entries):
     """
-    Build a sparse normalized performance curve.
+    Build a normalized performance curve for Profile.
 
     Used by Profile page:
     - Deposits should not make performance look better.
     - Withdrawals should not make performance look worse.
     - This represents total trading progress.
 
-    Formula:
-      actual_equity = portfolio.balance + same_day_deposits - same_day_withdrawals
-
-      normalized_equity =
-          actual_equity
-          + cumulative_withdrawals
-          - cumulative_deposits
+    Portfolio.balance already includes pre_open flows.
+    Actual end-of-day equity only needs after_close flows applied.
     """
     if not portfolio_entries:
         return []
@@ -652,16 +695,31 @@ def _build_normalized_equity_points(db: Session, user_id: int, portfolio_entries
     for p in portfolio_entries:
         txn_date = p.entry_date
 
-        deposits_on_date, withdrawals_on_date = _cash_flows_on_date(
+        deposits_pre_open, withdrawals_pre_open = _cash_flows_on_date_by_timing(
             db=db,
             user_id=user_id,
             txn_date=txn_date,
+            timing="pre_open",
         )
+
+        deposits_after_close, withdrawals_after_close = _cash_flows_on_date_by_timing(
+            db=db,
+            user_id=user_id,
+            txn_date=txn_date,
+            timing="after_close",
+        )
+
+        deposits_on_date = deposits_pre_open + deposits_after_close
+        withdrawals_on_date = withdrawals_pre_open + withdrawals_after_close
 
         cumulative_deposits += deposits_on_date
         cumulative_withdrawals += withdrawals_on_date
 
-        actual_equity = float(p.balance) + deposits_on_date - withdrawals_on_date
+        actual_equity = (
+            float(p.balance)
+            + deposits_after_close
+            - withdrawals_after_close
+        )
 
         normalized_equity = (
             actual_equity
@@ -675,92 +733,6 @@ def _build_normalized_equity_points(db: Session, user_id: int, portfolio_entries
         })
 
     return normalized
-
-# def _build_normalized_equity_points(db: Session, user_id: int, portfolio_entries):
-#     """
-#     Build a sparse normalized curve (only portfolio dates).
-#     Removes cash flows so deposits/withdrawals don't inflate trading performance.
-
-#     Rule:
-#       trading_pnl = curr_close - (prev_close + net_flow_on_curr_date)
-#     """
-#     if not portfolio_entries:
-#         return []
-
-#     norm_value = float(portfolio_entries[0].balance)
-#     normalized = [{"date": portfolio_entries[0].entry_date, "value": round(norm_value, 2)}]
-
-#     for i in range(1, len(portfolio_entries)):
-#         prev = portfolio_entries[i - 1]
-#         curr = portfolio_entries[i]
-
-#         prev_close = float(prev.balance)
-#         curr_close = float(curr.balance)
-
-#         prev_date = prev.entry_date
-#         curr_date = curr.entry_date
-
-#         # Match the same timing logic used by compute_daily_trading_summary:
-#         # - previous date after_close flows affect the next day's open
-#         # - current date pre_open flows affect the same day's open
-#         deposits_on_prev = _sum_transactions_on_date(
-#             db, user_id, "deposit", prev_date, timing="after_close"
-#         )
-#         withdrawals_on_prev = _sum_transactions_on_date(
-#             db, user_id, "withdrawal", prev_date, timing="after_close"
-#         )
-#         net_flow_prev = deposits_on_prev - withdrawals_on_prev
-
-#         deposits_on_curr = _sum_transactions_on_date(
-#             db, user_id, "deposit", curr_date, timing="pre_open"
-#         )
-#         withdrawals_on_curr = _sum_transactions_on_date(
-#             db, user_id, "withdrawal", curr_date, timing="pre_open"
-#         )
-#         net_flow_curr = deposits_on_curr - withdrawals_on_curr
-
-#         normalized_open = prev_close + net_flow_prev + net_flow_curr
-#         trading_pnl = curr_close - normalized_open
-#         norm_value = norm_value + trading_pnl
-
-#         normalized.append({"date": curr.entry_date, "value": round(norm_value, 2)})
-
-#     return normalized
-    
-# def _build_normalized_equity_points(db: Session, user_id: int, portfolio_entries):
-#     """
-#     Build a sparse normalized curve (only portfolio dates).
-#     Removes cash flows so deposits/withdrawals don't inflate trading performance.
-
-#     Rule:
-#       trading_pnl = curr_close - (prev_close + net_flow_on_curr_date)
-#     """
-#     if not portfolio_entries:
-#         return []
-
-#     norm_value = float(portfolio_entries[0].balance)
-#     normalized = [{"date": portfolio_entries[0].entry_date, "value": round(norm_value, 2)}]
-
-#     for i in range(1, len(portfolio_entries)):
-#         prev = portfolio_entries[i - 1]
-#         curr = portfolio_entries[i]
-
-#         prev_close = float(prev.balance)
-#         curr_close = float(curr.balance)
-
-#         curr_date = curr.entry_date
-#         deposits_on_curr = _sum_transactions_on_date(db, user_id, "deposit", curr_date)
-#         withdrawals_on_curr = _sum_transactions_on_date(db, user_id, "withdrawal", curr_date)
-
-#         net_flow_curr = deposits_on_curr - withdrawals_on_curr
-
-#         trading_pnl = curr_close - (prev_close + net_flow_curr)
-#         norm_value = norm_value + trading_pnl
-
-#         normalized.append({"date": curr.entry_date, "value": round(norm_value, 2)})
-
-#     return normalized
-
 
 def _linear_regression_line(points):
     """

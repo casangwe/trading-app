@@ -6,7 +6,7 @@ import { createTransaction } from "../../api/transactions.api";
 const TransactionEntry = ({ onSuccess, onCancel }) => {
   const [form, setForm] = useState({
     transaction_type: "deposit",
-    timing: "pre_open",
+    timing: "after_close",
     transaction_date: "",
     amount: "",
     transaction_summary: "",
@@ -16,8 +16,7 @@ const TransactionEntry = ({ onSuccess, onCancel }) => {
     setForm((prev) => ({
       ...prev,
       transaction_type: nextType,
-      // sensible default when switching
-      timing: nextType === "deposit" ? "pre_open" : "after_close",
+      timing: "after_close",
     }));
   };
 
@@ -118,7 +117,7 @@ const TransactionEntry = ({ onSuccess, onCancel }) => {
           className={`option-btn ${form.timing === "pre_open" ? "active" : ""}`}
           onClick={() => setTiming("pre_open")}
         >
-          Pre-market
+          Before open
         </button>
 
         <div className="option-divider" />
@@ -131,7 +130,7 @@ const TransactionEntry = ({ onSuccess, onCancel }) => {
           // If you want to FORCE withdrawals to after_close, uncomment this:
           // disabled={isWithdrawal}
         >
-          Post-market
+          After close
         </button>
       </div>
 
