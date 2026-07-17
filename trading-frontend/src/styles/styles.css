@@ -488,8 +488,6 @@ Modal
   background: #ffffff;
   width: 400px;
   max-width: 90%;
-
-  /* border-radius: 10px; */
   border-radius: 2px;
   padding: 24px 24px 28px;
   position: relative;
@@ -2667,4 +2665,26 @@ Dashboard Container
   opacity: 0.72;
   font-weight: 700;
 
+}
+
+.calendar-container .modal-title{
+  font-weight: 600;
+}
+
+.calendar-detail-daily {
+  gap: 34px;
+}
+
+.calendar-detail-row {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 56px;
+  align-items: center;
+}
+
+.calendar-detail-divider {
+  height: 1px;
+  width: 100%;
+  background: rgba(120, 130, 150, 0.28);
+  margin: 8px 0;
 }
